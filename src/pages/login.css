@@ -1,0 +1,102 @@
+/* Styles specific to login page */ 
+
+/* Body Styling with Background Image */
+.bodylogin {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh; /* Full viewport height */
+  margin: 0;
+  background: url('/public/loginbackground.svg') no-repeat center center;
+  background-size: cover; /* Ensure the entire image is visible */
+  background-attachment: fixed; /* Make the background fixed as you scroll */
+}
+
+/* Login Container Styling */
+.login-container {
+  position: relative;
+  z-index: 2; /* Position content above the overlay */
+  max-width: 400px;
+  width: 100%;
+  padding: 20px;
+  margin-right: 50rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #e5e5e5;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-sizing: border-box;
+}
+
+/* Content Styling */
+.login-container h2 {
+  margin-bottom: 20px;
+  text-align: center;
+  font-size: 1.5rem;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 0.9rem;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 8px;
+  font-size: 0.9rem;
+  box-sizing: border-box;
+}
+
+/* Button Group Styling */
+
+.signup-link{
+  font-size: 9px;
+  margin-right: 5rem;
+}
+
+.button-group {
+  display: flex;
+  justify-content: space-between;
+}
+
+.loginbutton {
+  padding: 0.5rem 1rem; /* Reduced padding for buttons */
+  border: none;
+  border-radius: 4px; /* Rounded corners */
+  cursor: pointer;
+  font-size: 0.875rem; /* Smaller font size for buttons */
+  font-weight: bold; /* Bold text */
+  background-color: #28a745; /* Green background */
+  color: white;
+}
+
+.loginbutton:hover {
+  background-color: #6cc251; /* Light green color */
+}
+
+.cancellogin {
+  background-color: #c1c1c1; /* Light gray background */
+  color: #333;
+  padding: 0.5rem 1rem; /* Reduced padding for buttons */
+  border: none;
+  border-radius: 4px; /* Rounded corners */
+  cursor: pointer;
+  font-size: 0.875rem; /* Smaller font size for buttons */
+  font-weight: bold; /* Bold text */
+}
+
+.cancellogin:hover {
+  background-color: #aaa; /* Darker gray on hover */
+}
+
+.error {
+  color: red;
+}
+
+.success {
+  color: green;
+}
