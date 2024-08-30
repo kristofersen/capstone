@@ -61,10 +61,9 @@ const hashedPassword = await bcrypt.hash(password, 10);
 // Create new user
 const newUser = new User({ firstName, middleName, lastName, contactNumber, address, email, password: hashedPassword });
 await newUser.save();
-res.status(201).json({ message: 'User created successfully!', token });
+res.status(201).json({ message: 'User created successfully!' });
 } catch (error) {
 console.error('Error creating user:', error); // Log detailed error
-res.status(500).json({ error: 'Error creating user' });
 }
 });
 

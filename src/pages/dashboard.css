@@ -1,0 +1,178 @@
+/* DASHBOARD CONTAINER STYLE */
+.dashboard-container {
+    display: flex; /* Use flexbox to create a side-by-side layout */
+    height: 100vh; /* Full height of the viewport */
+    overflow: hidden; /* Prevents scrolling */
+  }
+  
+  /* SIDEBAR CONTAINER STYLE */
+  .sidebar-container {
+    width: 250px; /* Fixed width for the sidebar */
+    z-index: 1000; /* Ensure it's above other content */
+  }
+  
+  /* SIDEBAR STYLE */
+  .sidebar {
+    width: 100%; /* Full width within its container */
+    height: 100vh; /* Full height */
+    background-color: #00712D; /* Dark background color */
+    padding-top: 20px;
+    position: relative; /* Relative positioning within its container */
+    overflow-y: auto; /* Add vertical scrolling if necessary */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  /* LOGO STYLE */
+  .sidebar-logo {
+    margin-bottom: 20px;
+  }
+  
+  .logo-image {
+    width: 150px; /* Adjust the width as needed */
+    height: 150px; /* Adjust the height as needed */
+  }
+  
+  /* SIDEBAR LIST STYLE */
+  .sidebar-list {
+    list-style-type: none; /* Remove bullets */
+    padding: 0; /* Remove default padding */
+    margin: 0; /* Remove default margin */
+    width: 100%; /* Full width for sidebar links */
+  }
+  
+  /* SIDEBAR LINK STYLE */
+  .sidebar-link {
+    display: block;
+    padding: 15px 20px;
+    color: #ffffff; /* White text color */
+    text-decoration: none; /* Remove underline */
+    /*font-weight: bold; */
+    transition: background-color 0.3s; /* Smooth hover effect */
+  }
+
+  .sidebar-linkactive{
+    display: block;
+    padding: 15px 20px;
+    color: #ffffff; /* White text color */
+    text-decoration: none; /* Remove underline */
+    /*font-weight: bold; */
+    background-color: #399918;
+  }
+  
+  .sidebar-link:hover {
+    background-color: #399918; /* Darker background on hover */
+  }
+  
+  /* CONTENT STYLE */
+  .content {
+    flex-grow: 1; /* Allow content area to expand to fill available space */
+    padding: 20px; /* Add padding around the content */
+    overflow-y: auto; /* Enable vertical scrolling for content if necessary */
+  }
+  
+  /* HEADER AND NAVIGATION */
+  header {
+    margin-bottom: 20px; /* Space below the header */
+    background-color: #00712D; /* Example background color */
+    color: #ffffff; /* White text color for contrast */
+    padding: 20px; /* Padding inside the header */
+    border-radius: 10px; /* Rounded corners */
+    text-align: center; /* Center-align the header text */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional: subtle shadow for depth */
+  }
+  
+  .error {
+    color: red;
+    font-weight: bold;
+  }
+
+/* APPLICATION CONTAINER STYLE */
+.applicationcontainer {
+    display: flex; /* Aligns the buttons side by side */
+    justify-content: center; /* Centers buttons horizontally */
+    align-items: center; /* Centers buttons vertically */
+    gap: 20px; /* Space between buttons */
+    padding: 20px; /* Adds padding around the container */
+    margin-top: 20px; /* Adds margin above the container */
+  }
+  
+  /* BUTTON STYLE - COMMON */
+  .businesspermitbutton, .workpermitbutton {
+    background-color: #ffffff; /* Consistent green background */
+    color: #000000; /* White text color */
+    padding: 3rem; /* Similar padding to other buttons */
+    border-radius: 8px; /* Rounded corners for a modern look */
+    text-decoration: none; /* Removes underline */ /* Bold text */
+    text-align: center; /* Centers text inside the button */
+    transition: background-color 0.3s, transform 0.3s; /* Smooth hover and click effects */
+    display: inline-block; /* Makes the buttons inline elements */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional: subtle shadow for depth */
+  }
+  
+  /* BUSINESS PERMIT BUTTON SPECIFIC STYLE */
+  .businesspermitbutton:hover {
+    background-color: #88D66C; /* Darker green on hover */
+    transform: translateY(-2px); /* Lifts the button slightly on hover */
+  }
+  
+  /* WORK PERMIT BUTTON SPECIFIC STYLE */
+  .workpermitbutton:hover {
+    background-color: #88D66C; /* Darker green on hover */
+    transform: translateY(-2px); /* Lifts the button slightly on hover */
+  }
+  
+
+  /* BUSINESS PERMIT TABLE STYLE */
+.businesspermittable {
+    margin: 20px 0; /* Space above and below the table */
+    padding: 20px; /* Padding around the table */
+    border-radius: 8px; /* Rounded corners */
+    background-color: #ffffff; /* White background for contrast */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    overflow-x: auto; /* Horizontal scrolling for smaller screens */
+  }
+  
+  /* PERMIT TABLE STYLE */
+  .permit-table {
+    width: 100%; /* Full width */
+    border-collapse: collapse; /* Remove gaps between cells */
+    text-align: left; /* Align text to the left */
+  }
+  
+  /* TABLE HEADER STYLE */
+
+  .businesspermittable p{
+    font-weight: bold;
+    font-size: 22px;
+  }
+  .permit-table thead th {
+    background-color: #F1C93B; /* Header background color */
+    color: #191919; /* White text color */
+    padding: 12px; /* Padding for header cells */
+    font-weight: bold; /* Bold header text */
+    border-bottom: 2px solid #ffffff; /* Bottom border for separation */
+  }
+  
+  /* TABLE BODY STYLE */
+  .permit-table tbody td {
+    padding: 10px; /* Padding for table cells */
+    border-bottom: 1px solid #ddd; /* Light border for rows */
+  }
+  
+  /* BUTTON STYLE INSIDE TABLE */
+  .table-button {
+    background-color: #00712D; /* Consistent green background */
+    color: #ffffff; /* White text color */
+    padding: 5px 10px; /* Padding inside the button */
+    border: none; /* Remove default border */
+    border-radius: 4px; /* Rounded corners */
+    font-weight: bold; /* Bold text */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: background-color 0.3s; /* Smooth hover effect */
+  }
+  
+  .table-button:hover {
+    background-color: #399918; /* Darker green on hover */
+  }

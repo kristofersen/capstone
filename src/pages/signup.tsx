@@ -51,6 +51,7 @@ setError(data.error);
 setError('Error signing up please try again');
 }
 };
+
 const handleCancel = () => {
 navigate('/'); // Redirect to home page
 };

@@ -5,6 +5,7 @@ import Home from './pages/home';
 import Login from './pages/login'; 
 import Signup from './pages/signup'; 
 import Dashboard from './pages/dashboard'; 
+import Account from './pages/account'; 
 
 const App: React.FC = () => {
   return (
@@ -14,6 +15,7 @@ const App: React.FC = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/account" element={<Account />} />
         {/* Add more routes as needed */}
       </Routes>
     </Router>
