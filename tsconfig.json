@@ -1,7 +1,19 @@
 {
   "files": [],
+  "compilerOptions": {
+  "target": "es6",
+  "module": "commonjs",
+  "outDir": "./dist",
+  "rootDir": "./src",
+  "strict": true,
+  "esModuleInterop": true,
+  "skipLibCheck": true,
+  "forceConsistentCasingInFileNames": true
+  },
+  "include": ["src/**/*.{ts,tsx}"],
+  "exclude": ["node_modules"],
   "references": [
-    { "path": "./tsconfig.app.json" },
-    { "path": "./tsconfig.node.json" }
+  { "path": "./tsconfig.app.json" },
+  { "path": "./tsconfig.node.json" }
   ]
-}
+  }
