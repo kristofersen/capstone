@@ -42,6 +42,76 @@ password: String,
 
 const User = mongoose.model('User', userSchema);
 
+// Define schema and model for Business Permit Application
+const businessPermitSchema = new mongoose.Schema({
+    owner: {
+        lastName: String,
+        firstName: String,
+        middleInitial: String,
+        civilStatus: String,
+        gender: String,
+        citizenship: String,
+        tinNumber: String,
+        isRepresentative: Boolean,
+    representative: {
+        fullName: String,
+        designation: String,
+        mobileNumber: String,
+    }
+    },
+    businessReference: {
+        businessName: String,
+        businessScale: String,
+        paymentMethod: String,
+        houseBuildingNo: String,
+        buildingStreetName: String,
+        subdivisionCompoundName: String,
+        region: String,
+        province: String,
+        cityMunicipality: String,
+        barangay: String,
+        businessStreet: String,
+        zone: String,
+        zip: String,
+        contactNumber: String,
+    }
+}, { timestamps: true });
+
+const BusinessPermit = mongoose.model('BusinessPermit', businessPermitSchema);
+
+const workPermitSchema = new mongoose.Schema({
+    personalInformation: {
+        lastName: String,
+        firstName: String,
+        middleInitial: String,
+        permanentAddress: String,
+        currentlyResiding: Boolean,
+        temporaryAddress: String,
+        dateOfBirth: Date,
+        age: Number,
+        placeOfBirth: String,
+        citizenship: String,
+        civilStatus: String,
+        gender: String,
+        height: String,
+        weight: String,
+        mobileTel: String,
+        email: String,
+        educationalAttainment: String,
+        natureOfWork: String,
+        placeOfWork: String,
+        companyName: String,
+        applicationType: [String] // Array to store multiple types of applications
+    },
+    emergencyContact: {
+        name: String,
+        mobileTel: String,
+        address: String
+    }
+}, { timestamps: true });
+
+const WorkPermit = mongoose.model('WorkPermit', workPermitSchema);
+
 // Routes
 app.post('/signup', async (req, res) => {
 const { firstName, middleName, lastName, contactNumber, address, email, password } = req.body;
@@ -106,3 +176,45 @@ res.status(401).json({ error: 'Invalid or expired token' });
 });
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+// Route to handle business permit form submission
+app.post('/businesspermitpage', async (req, res) => {
+    const { owner, businessReference } = req.body;
+
+    try {
+      // Create a new business permit application
+        const newBusinessPermit = new BusinessPermit({
+        owner,
+        businessReference
+        });
+
+      // Save the new application to the database
+        await newBusinessPermit.save();
+
+        res.status(201).json({ message: 'Business Permit Application submitted successfully!' });
+    } catch (error) {
+        console.error('Error saving business permit application:', error);
+        res.status(500).json({ error: 'An error occurred while saving the application.' });
+    }
+});
+
+// Route to handle work permit form submission
+app.post('/workpermitpage', async (req, res) => {
+    const { personalInformation, emergencyContact } = req.body;
+
+    try {
+        // Create a new work permit application
+        const newWorkPermit = new WorkPermit({
+            personalInformation,
+            emergencyContact
+        });
+
+        // Save the new application to the database
+        await newWorkPermit.save();
+
+        res.status(201).json({ message: 'Work Permit Application submitted successfully!' });
+    } catch (error) {
+        console.error('Error saving work permit application:', error);
+        res.status(500).json({ error: 'An error occurred while saving the work permit application.' });
+    }
+});

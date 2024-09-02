@@ -54,8 +54,8 @@ const Dashboard: React.FC = () => {
           </div>
           <ul className="sidebar-list">
             <li><a href="/dashboard" className="sidebar-linkactive" >Dashboard</a></li>
-            <li><a href="/apply-work-permit" className="sidebar-link">Apply for Work Permit</a></li>
-            <li><a href="/apply-business-permit" className="sidebar-link">Apply for Business Permit</a></li>
+            <li><a href="/workpermitpage" className="sidebar-link">Apply for Work Permit</a></li>
+            <li><a href="/businesspermitpage" className="sidebar-link">Apply for Business Permit</a></li>
             <li><a href="/view-applications" className="sidebar-link">View Applications</a></li>
             <li><a href="/" onClick={handleLogout} className="sidebar-link">Log Out</a></li>
           </ul>
@@ -83,20 +83,21 @@ const Dashboard: React.FC = () => {
           <p>Loading user details...</p>
         )}
             <div className="applicationcontainer">
-                <div>
-                    <a href="/#" className='businesspermitbutton'> Apply for Business Permit</a>
+                <div> 
+                    <a href="/businesspermitpage" className='businesspermitbutton'> Apply for Business Permit</a>
                 </div>
                 <div>
-                    <a href="/#" className='workpermitbutton'> Apply for Work Permit</a>
+                    <a href="/workpermitpage" className='workpermitbutton'> Apply for Work Permit</a>
                 </div>
             </div>
+
             <div className='businesspermittable'>
                 <p>Released Business Permit Applications</p>
             <table className="permit-table">
     <thead>
       <tr>
         <th>Action</th>
-        <th>Active</th>
+        <th>Status</th>
         <th>Transaction</th>
         <th>ID No.</th>
         <th>Date Issued</th>
@@ -125,9 +126,42 @@ const Dashboard: React.FC = () => {
     </tbody>
   </table>
             </div>
-            <div className='workpermittable'>
 
-            </div>
+            <div className='workpermittable'>
+                <p>Released Work Permit Applications</p>
+            <table className="permit-table">
+    <thead>
+      <tr>
+        <th>Action</th>
+        <th>Status</th>
+        <th>Transaction</th>
+        <th>ID No.</th>
+        <th>Date Issued</th>
+        <th>Expiry Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      {/* Sample data rows (Replace with dynamic data as needed) */}
+      <tr>
+        <td><button className="table-button">View</button></td>
+        <td>Expired</td>
+        <td>Work Permit Renewal</td>
+        <td>123456</td>
+        <td>01/01/2024</td>
+        <td>01/01/2025</td>
+      </tr>
+      <tr>
+        <td><button className="table-button">View</button></td>
+        <td>Pending</td>
+        <td>New Work Registration</td>
+        <td>789012</td>
+        <td>03/01/2024</td>
+        <td>03/01/2025</td>
+      </tr>
+      {/* Add more rows as needed */}
+    </tbody>
+  </table>
+  </div>
       </div>
     </section>
   );
