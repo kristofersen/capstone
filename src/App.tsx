@@ -8,6 +8,8 @@ import Dashboard from './pages/dashboard';
 import Account from './pages/account'; 
 import BusinessPermit from './pages/businesspermitpage';
 import WorkPermit from './pages/workpermitpage';
+import EmailVerification from './pages/emailverification';
+import ForgotPassword from './pages/forgotpassword';
 
 const App: React.FC = () => {
   return (
@@ -20,6 +22,8 @@ const App: React.FC = () => {
         <Route path="/account" element={<Account />} />
         <Route path="/businesspermitpage" element={<BusinessPermit />} />
         <Route path="/workpermitpage" element={<WorkPermit />} />
+        <Route path="/emailverification" element={<EmailVerification />} />
+        <Route path="/forgotpassword" element={<ForgotPassword />} />
         {/* Add more routes as needed */}
       </Routes>
     </Router>
