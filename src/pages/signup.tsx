@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './signup.css';
+import './Utility/signup.css';
 
 const Signup: React.FC = () => {
   const [firstName, setFirstName] = useState('');
@@ -27,7 +27,7 @@ const Signup: React.FC = () => {
       return;
     }
     try {
-      const response = await fetch('http://localhost:5000/signup', {
+      const response = await fetch('http://localhost:3000/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -52,7 +52,7 @@ const Signup: React.FC = () => {
         setError(data.error);
         setTimeout(() => {
           setError(null);
-        }, 5000);
+        }, 3000);
       }
     } catch (error) {
         console.error('Error signing up please try again', error);

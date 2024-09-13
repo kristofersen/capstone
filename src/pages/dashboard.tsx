@@ -1,47 +1,85 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './dashboard.css'; // Import your CSS file
+import './Utility/dashboard.css'; // Import your CSS file
+import { v4 as uuidv4 } from 'uuid';
 
 const Dashboard: React.FC = () => {
   const [userDetails, setUserDetails] = useState<{ email: string; firstName: string; lastName: string } | null>(null);
+  const [businessPermits, setBusinessPermits] = useState<{ id: number; status: string; transaction: string; dateIssued: number; expiryDate: number }[] | null>(null);
+  const [workPermits, setWorkPermits] = useState<{ id: number; status: string; transaction: string; dateIssued: number; expiryDate: number }[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [token, setToken] = useState<string | null>(localStorage.getItem('token')); // Initialize token with localStorage value
+
   const navigate = useNavigate();
 
+  const fetchProfile = async (token: string) => {
+    try {
+      const response = await fetch('http://localhost:3000/profile', {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      const userData = await response.json();
+      setUserDetails(userData.user);
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+      setError('Failed to fetch profile, please try again.');
+    }
+  };
+
+  const fetchWorkPermits = async () => {
+    if (!token) {
+      throw new Error('Token is null or undefined');
+    }
+    try {
+      const response = await fetch('http://localhost:3000/workpermitpage', {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      const workPermitsData = await response.json();
+      setWorkPermits(workPermitsData);
+    } catch (error) {
+      console.error('Error fetching work permits:', error);
+      setError('Failed to fetch work permits, please try again.');
+    }
+  };
+  
+  const fetchBusinessPermits = async () => {
+    if (!token) {
+      throw new Error('Token is null or undefined');
+    }
+    try {
+      const response = await fetch('http://localhost:3000/businesspermitpage', {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      const businessPermitsData = await response.json();
+      setBusinessPermits(businessPermitsData);
+    } catch (error) {
+      console.error('Error fetching business permits:', error);
+      setError('Failed to fetch business permits, please try again.');
+    }
+  };
+
   useEffect(() => {
-    const fetchUserDetails = async () => {
-      const token = localStorage.getItem('token');
-
-      if (!token) {
-        navigate('/'); // Redirect to login if no token
-        return;
-      }
-
-      try {
-        const response = await fetch('http://localhost:5000/profile', {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        });
-
-        const data = await response.json();
-        if (response.ok) {
-          setUserDetails(data.user);
-          setError(null);
-        } else {
-          setError(data.error || 'Error fetching user details.');
-        }
-      } catch (error) {
-        console.error('Error fetching user details:', error);
-        setError('Failed to fetch user details, please try again.');
-      }
-    };
-    fetchUserDetails();
-  }, [navigate]);
+    if (token) {
+      fetchProfile(token);
+      fetchWorkPermits();
+      fetchBusinessPermits();
+    }
+  }, [token]);
 
   const handleLogout = () => {
     localStorage.removeItem('token'); // Remove token from localStorage
+    setToken(null); // Update the state variable
     navigate('/'); // Redirect to home page
   };
 
@@ -91,78 +129,70 @@ const Dashboard: React.FC = () => {
                 </div>
             </div>
 
-            <div className='businesspermittable'>
-                <p>Released Business Permit Applications</p>
-            <table className="permit-table">
-    <thead>
-      <tr>
-        <th>Action</th>
-        <th>Status</th>
-        <th>Transaction</th>
-        <th>ID No.</th>
-        <th>Date Issued</th>
-        <th>Expiry Date</th>
-      </tr>
-    </thead>
-    <tbody>
-      {/* Sample data rows (Replace with dynamic data as needed) */}
-      <tr>
-        <td><button className="table-button">View</button></td>
-        <td>Expired</td>
-        <td>Business Permit Renewal</td>
-        <td>123456</td>
-        <td>01/01/2024</td>
-        <td>01/01/2025</td>
-      </tr>
-      <tr>
-        <td><button className="table-button">View</button></td>
-        <td>Pending</td>
-        <td>New Business Registration</td>
-        <td>789012</td>
-        <td>03/01/2024</td>
-        <td>03/01/2025</td>
-      </tr>
-      {/* Add more rows as needed */}
-    </tbody>
-  </table>
-            </div>
-
-            <div className='workpermittable'>
-                <p>Released Work Permit Applications</p>
-            <table className="permit-table">
-    <thead>
-      <tr>
-        <th>Action</th>
-        <th>Status</th>
-        <th>Transaction</th>
-        <th>ID No.</th>
-        <th>Date Issued</th>
-        <th>Expiry Date</th>
-      </tr>
-    </thead>
-    <tbody>
-      {/* Sample data rows (Replace with dynamic data as needed) */}
-      <tr>
-        <td><button className="table-button">View</button></td>
-        <td>Expired</td>
-        <td>Work Permit Renewal</td>
-        <td>123456</td>
-        <td>01/01/2024</td>
-        <td>01/01/2025</td>
-      </tr>
-      <tr>
-        <td><button className="table-button">View</button></td>
-        <td>Pending</td>
-        <td>New Work Registration</td>
-        <td>789012</td>
-        <td>03/01/2024</td>
-        <td>03/01/2025</td>
-      </tr>
-      {/* Add more rows as needed */}
-    </tbody>
-  </table>
-  </div>
+            <div className="businesspermittable">
+        <p>Released Business Permit Applications</p>
+        <table className="permit-table">
+          <thead>
+            <tr>
+              <th>Action</th>
+              <th>Status</th>
+              <th>Transaction</th>
+              <th>Date Issued</th>
+              <th>Expiry Date</th>
+            </tr>
+          </thead>
+          <tbody>
+          {businessPermits && businessPermits.length > 0 ? (
+  businessPermits.map((permit) => (
+    <tr key={uuidv4()}>
+      <td><button className="table-button">View</button></td>
+      <td>{permit.status}</td>
+      <td>{permit.transaction}</td>
+      <td>{new Date(permit.dateIssued).toLocaleDateString()}</td>
+      <td>{new Date(permit.expiryDate).toLocaleDateString()}</td>
+    </tr>
+  ))
+) : (
+  <tr>
+    <td colSpan={5}>No business permits available.</td>
+  </tr>
+)}
+          </tbody>
+        </table>
       </div>
+
+<div className='workpermittable'>
+  <p>Released Work Permit Applications</p>
+  <table className="permit-table">
+    <thead>
+      <tr>
+        <th>Action</th>
+        <th>Status</th>
+        <th>Transaction</th>
+        <th>Date Issued</th>
+        <th>Expiry Date</th>
+      </tr>
+    </thead>
+    <tbody>
+    {workPermits && workPermits.length > 0 ? (
+    workPermits?.map((permit) => (
+              <tr key={uuidv4()}>
+                <td><button className="table-button">View</button></td>
+                <td>{permit.status}</td>
+                <td>{permit.transaction}</td>
+                <td>{new Date(permit.dateIssued).toLocaleDateString()}</td>
+                <td>{new Date(permit.expiryDate).toLocaleDateString()}</td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan={5}>No work permits available.</td>
+            </tr>
+            )}
+    </tbody>
+  </table>
+</div>
+</div>
     </section>
   );
 };

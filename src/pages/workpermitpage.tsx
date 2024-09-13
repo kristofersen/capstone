@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './workpermitpage.css';
+import './Utility/workpermitpage.css';
 
 const WorkPermit: React.FC = () => {
   const navigate = useNavigate();
@@ -34,6 +34,7 @@ const WorkPermit: React.FC = () => {
       mobileTel2: '',
       address: ''
     }
+    
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -70,12 +71,16 @@ const WorkPermit: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await fetch('http://localhost:5000/workpermitpage', {
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://localhost:3000/workpermitpage', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(formData),
       });
-      
+  
       if (response.ok) {
         alert('Work Permit Application submitted successfully!');
         navigate('/dashboard'); // Redirect to the dashboard or any other page

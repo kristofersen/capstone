@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
-import './emailverification.css';
+import './Utility/emailverification.css';
 
 const EmailVerification: React.FC = () => {
     const location = useLocation();
@@ -17,7 +17,7 @@ const EmailVerification: React.FC = () => {
         if (!email) return;
 
         try {
-            const response = await fetch('http://localhost:5000/send-otp', {
+            const response = await fetch('http://localhost:3000/send-otp', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -31,13 +31,13 @@ const EmailVerification: React.FC = () => {
                 setOtpCountdown(10); // Set the timer to 10 seconds
                 setTimeout(() => {
                     setSuccess(null);
-                  }, 5000);
+                }, 3000);
                 setError(null);
             } else {
                 setError(data.error);
                 setTimeout(() => {
                     setError(null);
-                  }, 5000);
+                  }, 3000);
             }
         } catch (error) {
             console.error('Error sending OTP:', error);
@@ -66,7 +66,7 @@ const EmailVerification: React.FC = () => {
     const handleVerifyOtp = async () => {
         if (!email || !otp) return;
         try {
-            const response = await fetch('http://localhost:5000/verify-emailotp', {
+            const response = await fetch('http://localhost:3000/verify-emailotp', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

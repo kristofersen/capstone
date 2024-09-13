@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './account.css'; // Import your CSS file
+import './Utility/account.css'; // Import your CSS file
 
 const Account: React.FC = () => {
   const [userDetails, setUserDetails] = useState<{ email: string; firstName: string; middleName: string; lastName: string } | null>(null);
@@ -17,7 +17,7 @@ const Account: React.FC = () => {
       }
 
       try {
-        const response = await fetch('http://localhost:5000/profile', {
+        const response = await fetch('http://localhost:3000/profile', {
           method: 'GET',
           headers: {
             Authorization: `Bearer ${token}`,

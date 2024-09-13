@@ -8,7 +8,7 @@ const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
 const app = express();
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3000;
 const JWT_SECRET = 'your_jwt_secret'; // Use a strong secret key in production
 
 // Setup Nodemailer Transporter
@@ -97,7 +97,11 @@ const businessPermitSchema = new mongoose.Schema({
     zone: String,
     zip: String,
     contactNumber: String,
-  }
+  },
+  bui: { type: String, required: true, default: 'Pending' },
+  transaction: { type: String, required: true, default: 'Processing' },
+  dateIssued: { type: Date, default: Date.now },
+  expiryDate: { type: Date, default: () => Date.now() + 31536000000 }
 }, { timestamps: true });
 
 const BusinessPermit = mongoose.model('BusinessPermit', businessPermitSchema);
@@ -124,13 +128,17 @@ const workPermitSchema = new mongoose.Schema({
     natureOfWork: String,
     placeOfWork: String,
     companyName: String,
-    applicationType: [String] // Array to store multiple types of applications
   },
   emergencyContact: {
     name: String,
     mobileTel: String,
     address: String
-  }
+  },
+  statusWork: { type: String, required: true, default: 'Pending' },
+  transaction: { type: String, required: true, default: 'Processing' },
+  dateIssued: { type: Date, default: Date.now },
+  expiryDate: { type: Date, default: () => Date.now() + 31536000000 }
+
 }, { timestamps: true });
 
 const WorkPermit = mongoose.model('WorkPermit', workPermitSchema);
@@ -195,6 +203,7 @@ app.post('/login', async (req, res) => {
   }
 });
 
+
 app.get('/profile', async (req, res) => {
   const token = req.headers.authorization?.split(' ')[1]; // Extract token from 'Bearer <token>'
   console.log('Received token:', token);
@@ -218,48 +227,6 @@ app.get('/profile', async (req, res) => {
 });
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
-// Route to handle business permit form submission
-app.post('/businesspermitpage', async (req, res) => {
-  const { owner, businessReference } = req.body;
-
-  try {
-    // Create a new business permit application
-    const newBusinessPermit = new BusinessPermit({
-      owner,
-      businessReference
-    });
-
-    // Save the new application to the database
-    await newBusinessPermit.save();
-
-    res.status(201).json({ message: 'Business Permit Application submitted successfully!' });
-  } catch (error) {
-    console.error('Error saving business permit application:', error);
-    res.status(500).json({ error: 'An error occurred while saving the application.' });
-  }
-});
-
-// Route to handle work permit form submission
-app.post('/workpermitpage', async (req, res) => {
-  const { personalInformation, emergencyContact } = req.body;
-
-  try {
-    // Create a new work permit application
-    const newWorkPermit = new WorkPermit({
-      personalInformation,
-      emergencyContact
-    });
-
-    // Save the new application to the database
-    await newWorkPermit.save();
-
-    res.status(201).json({ message: 'Work Permit Application submitted successfully!' });
-  } catch (error) {
-    console.error('Error saving work permit application:', error);
-    res.status(500).json({ error: 'An error occurred while saving the work permit application.' });
-  }
-});
 
 
 // Generate OTP
@@ -370,5 +337,70 @@ app.post('/update-password', async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Error updating password. Please try again.' });
+  }
+});
+
+// Route to get all business permit applications
+app.post('/businesspermitpage', async (req, res) => {
+
+  try {
+    // Get the userID from the decoded token
+    const token = req.headers.authorization?.split(' ')[1];
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const userID = decoded.userId;
+    
+    // Create a new business permit application
+    const newBusinessPermit = new BusinessPermit({
+
+      statusBusiness,
+      transaction,
+      dateIssued,
+      expiryDate
+    });
+
+    // Save the new application to the database
+    await newBusinessPermit.save();
+
+       // Retrieve all business permit applications for the user
+    const businessPermits = await BusinessPermit.find({ userID });
+    
+    res.status(200).json({ workPermits });
+    res.status(201).json({ message: 'Business Permit Application submitted successfully!' });
+  } catch (error) {
+    console.error('Error saving business permit application:', error);
+    res.status(500).json({ error: 'An error occurred while saving the application.' });
+  }
+});
+
+app.post('/workpermitpage', async (req, res) => {
+
+  try {
+    // Get the userID from the decoded token
+    const token = req.headers.authorization?.split(' ')[1];
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const userID = decoded.userId;
+
+    // Create a new work permit application
+    const newWorkPermit = new WorkPermit({
+      statusWork,
+      transaction,
+      dateIssued,
+      expiryDate
+    });
+
+    
+
+    // Save the new application to the database
+    await newWorkPermit.save();
+    
+       // Retrieve all working permit applications for the user
+      const workPermits = await WorkPermit.find({ userID });
+
+    res.status(200).json({ businessPermits });
+    res.status(201).json({ message: 'Work Permit Application submitted successfully!' });
+  } catch (error) {
+    
+    console.error('Error saving work permit application:', error);
+    res.status(500).json({ error: 'An error occurred while saving the work permit application.' });
   }
 });

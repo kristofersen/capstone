@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
-import './forgotpassword.css';
+import './Utility/forgotpassword.css';
 
 const ForgotPassword: React.FC = () => {
     const location = useLocation();
@@ -21,7 +21,7 @@ const ForgotPassword: React.FC = () => {
 
 
         try {
-            const response = await fetch('http://localhost:5000/send-otp', {
+            const response = await fetch('http://localhost:3000/send-otp', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -35,13 +35,13 @@ const ForgotPassword: React.FC = () => {
                 setOtpCountdown(10); // Set the timer to 10 seconds
                 setTimeout(() => {
                     setSuccess(null);
-                  }, 5000);
+                  }, 3000);
                 setError(null);
             } else {
                 setError(data.error);
                 setTimeout(() => {
                     setError(null);
-                  }, 5000);
+                  }, 3000);
             }
         } catch (error) {
             console.error('Error sending OTP:', error);
@@ -76,7 +76,7 @@ const ForgotPassword: React.FC = () => {
           }
 
         try {
-            const response = await fetch('http://localhost:5000/update-password', {
+            const response = await fetch('http://localhost:3000/update-password', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
