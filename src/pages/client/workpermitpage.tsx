@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './Utility/workpermitpage.css';
+import '../Styles/workpermitpage.css';
 
 const WorkPermit: React.FC = () => {
   const navigate = useNavigate();
@@ -109,7 +109,7 @@ const WorkPermit: React.FC = () => {
             <li><a href="/dashboard" className="sidebar-link">Dashboard</a></li>
             <li><a href="/workpermitpage" className="sidebar-linkactive">Apply for Work Permit</a></li>
             <li><a href="/businesspermitpage" className="sidebar-link">Apply for Business Permit</a></li>
-            <li><a href="/view-applications" className="sidebar-link">View Applications</a></li>
+            <li><a href="/viewapplication" className="sidebar-link">View Applications</a></li>
             <li><a href="/" onClick={handleLogout} className="sidebar-link">Log Out</a></li>
           </ul>
         </div>
@@ -238,7 +238,7 @@ const WorkPermit: React.FC = () => {
             <label>ADDRESS:</label>
             <input type="text" name="address" value={formData.emergencyContact.address} onChange={handleChange} />
           </div>
-          <button type="submit" className="button">Submit</button>
+          <button type="submit" className="submitbuttonworkpermit">Submit</button>
         </form>
       </div>
     </section>

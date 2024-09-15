@@ -7,7 +7,7 @@
   align-items: center;
   min-height: 100vh; /* Full viewport height */
   margin: 0;
-  background: url('/public/loginbackground.svg') no-repeat center center;
+  background: url('/loginbackground.svg') no-repeat center center;
   background-size: cover; /* Ensure the entire image is visible */
   background-attachment: fixed; /* Make the background fixed as you scroll */
 }
@@ -55,7 +55,6 @@
 
 .signup-link{
   font-size: 9px;
-  margin-right: 5rem;
 }
 
 .button-group {
@@ -63,8 +62,7 @@
   justify-content: space-between;
 }
 
-.loginbutton {
-  padding: 0.5rem 1rem; /* Reduced padding for buttons */
+.loginbutton { /* Reduced padding for buttons */
   border: none;
   border-radius: 4px; /* Rounded corners */
   cursor: pointer;
@@ -75,7 +73,7 @@
 }
 
 .loginbutton:hover {
-  background-color: #6cc251; /* Light green color */
+  background-color: #005a1a; /* Light green color */
 }
 
 .cancellogin {

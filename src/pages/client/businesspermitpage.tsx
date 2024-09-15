@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import './Utility/businesspermitpage.css';
+import '../Styles/businesspermitpage.css';
 
 const BusinessPermit: React.FC = () => {
   const navigate = useNavigate();
@@ -156,7 +156,7 @@ const BusinessPermit: React.FC = () => {
             <li><Link to="/dashboard" className="sidebar-link">Dashboard</Link></li>
             <li><Link to="/workpermitpage" className="sidebar-link">Apply for Work Permit</Link></li>
             <li><Link to="/businesspermitpage" className="sidebar-linkactive">Apply for Business Permit</Link></li>
-            <li><Link to="/view-applications" className="sidebar-link">View Applications</Link></li>
+            <li><Link to="/viewapplication" className="sidebar-link">View Applications</Link></li>
             <li><Link to="/" onClick={handleLogout} className="sidebar-link">Log Out</Link></li>
           </ul>
         </div>

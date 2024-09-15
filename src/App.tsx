@@ -4,12 +4,13 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Home from './pages/home'; 
 import Login from './pages/login'; 
 import Signup from './pages/signup'; 
-import Dashboard from './pages/dashboard'; 
-import Account from './pages/account'; 
-import BusinessPermit from './pages/businesspermitpage';
-import WorkPermit from './pages/workpermitpage';
-import EmailVerification from './pages/emailverification';
-import ForgotPassword from './pages/forgotpassword';
+import Dashboard from './pages/client/dashboard'; 
+import Account from './pages/client/account'; 
+import BusinessPermit from './pages/client/businesspermitpage';
+import WorkPermit from './pages/client/workpermitpage';
+import EmailVerification from './pages/client/emailverification';
+import ForgotPassword from './pages/client/forgotpassword';
+import ViewApplication from './pages/client/viewapplication';
 
 const App: React.FC = () => {
   return (
@@ -24,6 +25,7 @@ const App: React.FC = () => {
         <Route path="/workpermitpage" element={<WorkPermit />} />
         <Route path="/emailverification" element={<EmailVerification />} />
         <Route path="/forgotpassword" element={<ForgotPassword />} />
+        <Route path="/viewapplication" element={<ViewApplication />} />
         {/* Add more routes as needed */}
       </Routes>
     </Router>

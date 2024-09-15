@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
-import './Utility/forgotpassword.css';
+import '../Styles/forgotpassword.css';
 
 const ForgotPassword: React.FC = () => {
     const location = useLocation();
@@ -35,13 +35,13 @@ const ForgotPassword: React.FC = () => {
                 setOtpCountdown(10); // Set the timer to 10 seconds
                 setTimeout(() => {
                     setSuccess(null);
-                  }, 3000);
+                }, 3000);
                 setError(null);
             } else {
                 setError(data.error);
                 setTimeout(() => {
                     setError(null);
-                  }, 3000);
+                }, 3000);
             }
         } catch (error) {
             console.error('Error sending OTP:', error);
@@ -73,7 +73,7 @@ const ForgotPassword: React.FC = () => {
         if (confirmpassword !== password) {
             setError('Password Not Match.');
             return;
-          }
+        }
 
         try {
             const response = await fetch('http://localhost:3000/update-password', {
@@ -95,6 +95,10 @@ const ForgotPassword: React.FC = () => {
             console.error('Error verifying OTP, please try again.', error);
             setError('Error verifying OTP, please try again.');
         }
+    };
+
+    const handleCancel = () => {
+        navigate('/'); // Redirect to home page
     };
 
     return (
@@ -152,6 +156,9 @@ const ForgotPassword: React.FC = () => {
                     </div>
                 </div>
                 <div className="button-group">
+                <button type="button" className="cancelForgotPassword" onClick={handleCancel}>
+                    Cancel
+                </button>
                     <button
                         type="button"
                         className={`sendotp ${otpSent ? 'disabled-button' : ''}`}  // Add conditional class
@@ -161,7 +168,7 @@ const ForgotPassword: React.FC = () => {
                     Send OTP
                     </button>
                         <label className="otp-timer-label">
-                           {otpSent && otpCountdown !== null ? `(${otpCountdown}s)` : ''}
+                        {otpSent && otpCountdown !== null ? `(${otpCountdown}s)` : ''}
                         </label>
                     <button
                         type="button"

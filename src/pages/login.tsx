@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './Utility/login.css';
+import './Styles/login.css';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -78,11 +78,7 @@ const Login: React.FC = () => {
             />
           </div>
           <div className="button-group">
-            <button
-              type="button"
-              className="cancellogin"
-              onClick={handleCancel}
-            >
+            <button type="button" className="cancellogin" onClick={handleCancel}>
               Cancel
             </button>
             <a href="/signup" className="signup-link">

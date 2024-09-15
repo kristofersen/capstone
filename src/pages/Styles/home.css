@@ -67,7 +67,7 @@ nav ul li a:hover {
 /* CONTENTS */
 
 .bodylandingpage{
-background-image: url('/public/landingpagebackground.svg'); 
+background-image: url('/landingpagebackground.svg'); 
 background-size: cover;       /* Ensures the image covers the entire area */
 background-position: center;  /* Centers the image */
 background-repeat: no-repeat; /* Prevents the image from repeating */

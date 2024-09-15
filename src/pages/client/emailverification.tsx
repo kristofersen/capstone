@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
-import './Utility/emailverification.css';
+import '../Styles/emailverification.css';
 
 const EmailVerification: React.FC = () => {
     const location = useLocation();
@@ -28,7 +28,7 @@ const EmailVerification: React.FC = () => {
             if (response.ok) {
                 setSuccess('OTP sent to your email.');
                 setOtpSent(true); // Disable the button
-                setOtpCountdown(10); // Set the timer to 10 seconds
+                setOtpCountdown(300); // Set the timer to 10 seconds
                 setTimeout(() => {
                     setSuccess(null);
                 }, 3000);
@@ -37,7 +37,7 @@ const EmailVerification: React.FC = () => {
                 setError(data.error);
                 setTimeout(() => {
                     setError(null);
-                  }, 3000);
+                }, 3000);
             }
         } catch (error) {
             console.error('Error sending OTP:', error);
@@ -127,7 +127,7 @@ const EmailVerification: React.FC = () => {
                     Send OTP
                     </button>
                         <label className="otp-timer-label">
-                           {otpSent && otpCountdown !== null ? `(${otpCountdown}s)` : ''}
+                        {otpSent && otpCountdown !== null ? `(${otpCountdown}s)` : ''}
                         </label>
                     <button
                         type="button"

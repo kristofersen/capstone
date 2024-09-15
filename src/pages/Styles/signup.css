@@ -5,7 +5,7 @@
   align-items: center;
   min-height: 100vh; /* Full viewport height */
   margin: 0;
-  background: url('/public/signupbackground.svg') no-repeat center center;
+  background: url('/signupbackground.svg') no-repeat center center;
   background-size: cover ;
   background-attachment: fixed; /* Make the background fixed as you scroll */
   background-color: #f0f0f0; /* Fallback color in case the image doesn't load */

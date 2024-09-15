@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './Utility/dashboard.css'; // Import your CSS file
+import '../Styles/dashboard.css'; // Import your CSS file
 import { v4 as uuidv4 } from 'uuid';
 
 const Dashboard: React.FC = () => {
@@ -94,7 +94,7 @@ const Dashboard: React.FC = () => {
             <li><a href="/dashboard" className="sidebar-linkactive" >Dashboard</a></li>
             <li><a href="/workpermitpage" className="sidebar-link">Apply for Work Permit</a></li>
             <li><a href="/businesspermitpage" className="sidebar-link">Apply for Business Permit</a></li>
-            <li><a href="/view-applications" className="sidebar-link">View Applications</a></li>
+            <li><a href="/viewapplication" className="sidebar-link">View Applications</a></li>
             <li><a href="/" onClick={handleLogout} className="sidebar-link">Log Out</a></li>
           </ul>
         </div>
@@ -120,14 +120,18 @@ const Dashboard: React.FC = () => {
         ) : (
           <p>Loading user details...</p>
         )}
-            <div className="applicationcontainer">
-                <div> 
-                    <a href="/businesspermitpage" className='businesspermitbutton'> Apply for Business Permit</a>
-                </div>
-                <div>
-                    <a href="/workpermitpage" className='workpermitbutton'> Apply for Work Permit</a>
-                </div>
-            </div>
+<div className="applicationcontainer">
+    <div> 
+        <a href="/businesspermitpage" className='businesspermitbutton'>
+            Apply for Business Permit
+        </a>
+    </div>
+    <div>
+        <a href="/workpermitpage" className='workpermitbutton'>
+            Apply for Work Permit
+        </a>
+    </div>
+</div>
 
             <div className="businesspermittable">
         <p>Released Business Permit Applications</p>
