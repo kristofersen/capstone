@@ -4,40 +4,33 @@ import '../Styles/viewapplication.css';
 
 const ViewApplication: React.FC = () => {
     const navigate = useNavigate();
-    const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false); // State to manage Payment modal visibility
-    const [isReceiptModalOpen, setIsReceiptModalOpen] = useState(false); // State to manage Receipt modal visibility
-    const [isPermitModalOpen, setIsPermitModalOpen] = useState(false); // State to manage Permit modal visibility
+    const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false); 
+    const [isReceiptModalOpen, setIsReceiptModalOpen] = useState(false); 
+    const [isPermitModalOpen, setIsPermitModalOpen] = useState(false); 
+    const [isBusinessPermitApplicationModalOpen, setIsBusinessPermitApplicationModalOpen] = useState(false); 
+    const [isWorkPermitApplicationModalOpen, setIsWorkPermitApplicationModalOpen] = useState(false); 
 
     const handleLogout = () => {
-        sessionStorage.clear(); // Example: clear session storage
+        sessionStorage.clear(); 
         alert('You have been logged out.');
-        navigate('/'); // Redirect to home or login page
+        navigate('/'); 
     };
 
     // Open/Close Modal Functions
-    const openPaymentModal = () => {
-        setIsPaymentModalOpen(true); // Open the payment modal
-    };
-
-    const closePaymentModal = () => {
-        setIsPaymentModalOpen(false); // Close the payment modal
-    };
-
-    const openReceiptModal = () => {
-        setIsReceiptModalOpen(true); // Open the receipt modal
-    };
-
-    const closeReceiptModal = () => {
-        setIsReceiptModalOpen(false); // Close the receipt modal
-    };
-
-    const openPermitModal = () => {
-        setIsPermitModalOpen(true); // Open the permit modal
-    };
-
-    const closePermitModal = () => {
-        setIsPermitModalOpen(false); // Close the permit modal
-    };
+    const openPaymentModal = () => setIsPaymentModalOpen(true);
+    const closePaymentModal = () => setIsPaymentModalOpen(false);
+    
+    const openReceiptModal = () => setIsReceiptModalOpen(true);
+    const closeReceiptModal = () => setIsReceiptModalOpen(false);
+    
+    const openPermitModal = () => setIsPermitModalOpen(true);
+    const closePermitModal = () => setIsPermitModalOpen(false);
+    
+    const openBusinessPermitApplicationModal = () => setIsBusinessPermitApplicationModalOpen(true); 
+    const closeBusinessPermitApplicationModal = () => setIsBusinessPermitApplicationModalOpen(false); 
+    
+    const openWorkPermitApplicationModal = () => setIsWorkPermitApplicationModalOpen(true);
+    const closeWorkPermitApplicationModal = () => setIsWorkPermitApplicationModalOpen(false);
 
     return (
         <section className="dashboard-container">
@@ -68,9 +61,17 @@ const ViewApplication: React.FC = () => {
                 </header>
 
                 <div className="contentcontainer">
-                    <div className="applicationstatus">
-                        <h2>Current Application Status: </h2>
+                    <div className="applicationStatusContainer">
+                        <div className="applicationstatusBusinessPermit">
+                            <h2>Current Application Status For Business Permit:</h2>
+                            <button className='viewapplicationbutton' onClick={openBusinessPermitApplicationModal}>View Application</button>
+                        </div>
+                        <div className="applicationstatusWorkPermit">
+                            <h2>Current Application Status For Work Permit:</h2>
+                            <button className='viewapplicationbutton' onClick={openWorkPermitApplicationModal}>View Application</button>
+                        </div>
                     </div>
+
                     <div className="paymentandviewpermitcontainer">
                         <div className="payment">
                             <h2>Payment</h2>
@@ -151,6 +152,263 @@ const ViewApplication: React.FC = () => {
                         </div>
                     </div>
                 )}
+
+                {/* View Application Modal for Business Permit */}
+                {isBusinessPermitApplicationModalOpen && (
+                    <div className="modal-overlay" onClick={closeBusinessPermitApplicationModal}>
+                        <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                            {/* Owner Information Form */}
+                            <form className="businesspermit-form">
+                                <h2>Owner's Personal Information</h2>
+                                <div className="form-group">
+                                    <label>
+                                        <input type="checkbox" name="checkifcorporation" />
+                                        Check if Corporation
+                                    </label>
+                                </div>
+                                <div className="form-row">
+                                    <div className="form-group">
+                                        <label>LAST NAME:</label>
+                                        <input type="text" name="lastName" />
+                                    </div>
+                                    <div className="form-group">
+                                        <label>FIRST NAME:</label>
+                                        <input type="text" name="firstName" />
+                                    </div>
+                                    <div className="form-group">
+                                        <label>MIDDLE INITIAL:</label>
+                                        <input type="text" name="middleInitial" />
+                                    </div>
+                                </div>
+                                <div className="form-group">
+                                    <label>CIVIL STATUS:</label>
+                                    <input type="text" name="civilStatus" />
+                                </div>
+                                <div className="form-group gender-group">
+                                    <label>GENDER:</label>
+                                    <label>
+                                        <input type="radio" name="gender" value="male" />
+                                        Male
+                                    </label>
+                                    <label>
+                                        <input type="radio" name="gender" value="female" />
+                                        Female
+                                    </label>
+                                </div>
+                                <div className="form-group">
+                                    <label>CITIZENSHIP:</label>
+                                    <input type="text" name="citizenship" />
+                                </div>
+                                <div className="form-row">
+                                    <div className="form-group">
+                                        <label>TIN NUMBER:</label>
+                                        <input type="text" name="tinNumber" />
+                                    </div>
+                                </div>
+                                <div className="form-group">
+                                    <label>
+                                        <input type="checkbox" name="checkIfRepresentative" id="checkIfRepresentative"/>
+                                        Check if Thru Representative
+                                    </label>
+                                </div>
+                                <div className="form-group">
+                                    <label>Representative Full Name:</label>
+                                    <input type="text" name="representative.fullName" />
+                                </div>
+                                <div className="form-group">
+                                    <label>Designation/Position:</label>
+                                    <input type="text" name="representative.designation" />
+                                </div>
+                                <div className="form-group">
+                                    <label>Representative Mobile Number:</label>
+                                    <input type="text" name="representative.mobileNumber" />
+                                </div>
+
+                                {/* Business Reference Form */}
+                                <h2>Business Reference Form</h2>
+                                <div className="form-group">
+                                    <label>Business Name:</label>
+                                    <input type="text" name="businessName" />
+                                </div>
+                                <div className="form-group">
+                                    <label>Business Scale:</label>
+                                    <input type="text" name="businessScale" />
+                                </div>
+                                <div className="form-group">
+                                    <label>Payment Method:</label>
+                                    <input type="text" name="paymentMethod" />
+                                </div>
+                                <div className="form-group">
+                                    <label>House/Bldg No./Blk and Lot:</label>
+                                    <input type="text" name="houseBuildingNo" />
+                                </div>
+                                <div className="form-group">
+                                    <label>Building Name/Street Name:</label>
+                                    <input type="text" name="buildingStreetName" />
+                                </div>
+                                <div className="form-group">
+                                    <label>Subdivision/Compound Name:</label>
+                                    <input type="text" name="subdivisionCompoundName"/>
+                                </div>
+                                <div className="form-group">
+                                    <label>Region:</label>
+                                    <input type="text" name="region" />
+                                </div>
+                                <div className="form-group">
+                                    <label>Province:</label>
+                                    <input type="text" name="province"/>
+                                </div>
+                                <div className="form-group">
+                                    <label>City/Municipality:</label>
+                                    <input type="text" name="cityMunicipality" />
+                                </div>
+                                <div className="form-group">
+                                    <label>Barangay:</label>
+                                    <input type="text" name="barangay" />
+                                </div>
+                                <div className="form-group">
+                                    <label>Business Street:</label>
+                                    <input type="text" name="businessStreet" />
+                                </div>
+                                <div className="form-group">
+                                    <label>Zone:</label>
+                                    <input type="text" name="zone"/>
+                                </div>
+                                <div className="form-group">
+                                    <label>Zip:</label>
+                                    <input type="text" name="zip"/>
+                                </div>
+                                <div className="form-group">
+                                    <label>Contact Number:</label>
+                                    <input type="text" name="contactNumber"/>
+                                </div>
+                            </form>
+                            <button className='closebuttonmodalviewapplication' onClick={closeBusinessPermitApplicationModal}>Close</button>
+                        </div>
+                    </div>
+                )}
+
+{/* View Application Modal for Work Permit */}
+{isWorkPermitApplicationModalOpen && (
+    <div className="modal-overlay" onClick={closeWorkPermitApplicationModal}>
+        <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <form className="workpermit-form">
+                <h2>Personal Information</h2>
+                <div className="form-row">
+                    <div className="form-group">
+                        <label>LAST NAME:</label>
+                        <input type="text" name="lastName" />
+                    </div>
+                    <div className="form-group">
+                        <label>FIRST NAME:</label>
+                        <input type="text" name="firstName" />
+                    </div>
+                    <div className="form-group">
+                        <label>MIDDLE INITIAL:</label>
+                        <input type="text" name="middleInitial" />
+                    </div>
+                </div>
+                <div className="form-group">
+                    <label>PERMANENT ADDRESS:</label>
+                    <input type="text" name="permanentAddress" />
+                </div>
+                <div className="form-group">
+                    <label>
+                        <input type="checkbox" name="currentlyResiding" />
+                        Check if Currently Residing in Dasmarinas
+                    </label>
+                </div>
+                <div className="form-group">
+                    <label>TEMPORARY ADDRESS (IF ANY):</label>
+                    <input type="text" name="temporaryAddress" />
+                </div>
+                <div className="form-row">
+                    <div className="form-group">
+                        <label>DATE OF BIRTH:</label>
+                        <input type="date" name="dateOfBirth" />
+                    </div>
+                    <div className="form-group">
+                        <label>AGE:</label>
+                        <input type="number" name="age" />
+                    </div>
+                    <div className="form-group">
+                        <label>PLACE OF BIRTH:</label>
+                        <input type="text" name="placeOfBirth" />
+                    </div>
+                </div>
+                <div className="form-row">
+                    <div className="form-group">
+                        <label>CITIZENSHIP:</label>
+                        <input type="text" name="citizenship" />
+                    </div>
+                    <div className="form-group">
+                        <label>CIVIL STATUS:</label>
+                        <input type="text" name="civilStatus" />
+                    </div>
+                    <div className="form-group gender-group">
+                        <label>GENDER:</label>
+                        <label>
+                            <input type="radio" name="gender" value="male" />
+                            Male
+                        </label>
+                        <label>
+                            <input type="radio" name="gender" value="female" />
+                            Female
+                        </label>
+                    </div>
+                </div>
+                <div className="form-row">
+                    <div className="form-group">
+                        <label>HEIGHT:</label>
+                        <input type="text" name="height" />
+                    </div>
+                    <div className="form-group">
+                        <label>WEIGHT:</label>
+                        <input type="text" name="weight" />
+                    </div>
+                </div>
+                <div className="form-group">
+                    <label>MOBILE/TEL. NO:</label>
+                    <input type="text" name="mobileTel" />
+                </div>
+                <div className="form-group">
+                    <label>EMAIL ADDRESS:</label>
+                    <input type="email" name="email" />
+                </div>
+                <div className="form-group">
+                    <label>EDUCATIONAL ATTAINMENT:</label>
+                    <input type="text" name="educationalAttainment" />
+                </div>
+                <div className="form-group">
+                    <label>NATURE OF WORK:</label>
+                    <input type="text" name="natureOfWork" />
+                </div>
+                <div className="form-group">
+                    <label>PLACE OF WORK:</label>
+                    <input type="text" name="placeOfWork" />
+                </div>
+                <div className="form-group">
+                    <label>COMPANY NAME:</label>
+                    <input type="text" name="companyName" />
+                </div>
+                <h2>In Case of Emergency</h2>
+                <div className="form-group">
+                    <label>NAME:</label>
+                    <input type="text" name="name" />
+                </div>
+                <div className="form-group">
+                    <label>MOBILE/TEL. NO:</label>
+                    <input type="text" name="mobileTel2" />
+                </div>
+                <div className="form-group">
+                    <label>ADDRESS:</label>
+                    <input type="text" name="address" />
+                </div>
+            </form>
+            <button className='closebuttonmodalviewapplication' onClick={closeWorkPermitApplicationModal}>Close</button>
+        </div>
+    </div>
+)}
             </div>
         </section>
     );

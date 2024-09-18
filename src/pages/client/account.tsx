@@ -88,34 +88,7 @@ const Account: React.FC = () => {
         <p>Loading user details...</p>
       )}
     </div>
-
-    <div className="businesspermittable">
-      <p>Application History</p>
-      <table className="permit-table">
-        <thead>
-          <tr>
-            <th>Action</th>
-            <th>Status</th>
-            <th>Transaction</th>
-            <th>ID No.</th>
-            <th>Date Issued</th>
-            <th>Expiry Date</th>
-          </tr>
-        </thead>
-        <tbody>
-          {/* Sample data rows (Replace with dynamic data as needed) */}
-          <tr>
-            <td><button className="table-button">View</button></td>
-            <td>Expired</td>
-            <td>Business Permit Renewal</td>
-            <td>123456</td>
-            <td>01/01/2024</td>
-            <td>01/01/2025</td>
-          </tr>
-        </tbody>
-      </table>
     </div>
-  </div>
 </section>
   );
 };
