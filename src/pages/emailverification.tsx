@@ -1,15 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
-import '../Styles/forgotpassword.css';
+import './Styles/emailverification.css';
 
-const ForgotPassword: React.FC = () => {
+const EmailVerification: React.FC = () => {
     const location = useLocation();
     const [email, setEmail] = useState(location.state?.email || ''); // Set initial state from location
     const [error, setError] = useState<string | null>(null);
     const [otp, setOtp] = useState('');
-    const [password, setPassword] = useState('');
-    const [confirmpassword, setConfirmPassword] = useState('');
     const [otpSent, setOtpSent] = useState(false);
     const [otpCountdown, setOtpCountdown] = useState<number | null>(null); // Timer countdown state
     const [success, setSuccess] = useState<string | null>(null);
@@ -17,8 +15,6 @@ const ForgotPassword: React.FC = () => {
 
     const handleSendOtp = async () => {
         if (!email) return;
-
-
 
         try {
             const response = await fetch('http://localhost:3000/send-otp', {
@@ -32,7 +28,7 @@ const ForgotPassword: React.FC = () => {
             if (response.ok) {
                 setSuccess('OTP sent to your email.');
                 setOtpSent(true); // Disable the button
-                setOtpCountdown(10); // Set the timer to 10 seconds
+                setOtpCountdown(300); // Set the timer to 10 seconds
                 setTimeout(() => {
                     setSuccess(null);
                 }, 3000);
@@ -69,23 +65,17 @@ const ForgotPassword: React.FC = () => {
 
     const handleVerifyOtp = async () => {
         if (!email || !otp) return;
-
-        if (confirmpassword !== password) {
-            setError('Password Not Match.');
-            return;
-        }
-
         try {
-            const response = await fetch('http://localhost:3000/update-password', {
+            const response = await fetch('http://localhost:3000/verify-emailotp', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ email, otp, password }),
+                body: JSON.stringify({ email, otp }),
             });
             const data = await response.json();
             if (response.ok) {
-                setSuccess('Password Changed');
+                setSuccess('Email verified successfully.');
                 navigate('/login');
                 setError(null);
             } else {
@@ -97,14 +87,10 @@ const ForgotPassword: React.FC = () => {
         }
     };
 
-    const handleCancel = () => {
-        navigate('/'); // Redirect to home page
-    };
-
     return (
         <body className="body">
             <div className="emailverification-container">
-                <h1>Forgot Password</h1>
+                <h1>Email Verification</h1>
                 {error && <p className="error">{error}</p>}
                 {success && <p className="success">{success}</p>}
                 <div className="input-row">
@@ -131,34 +117,7 @@ const ForgotPassword: React.FC = () => {
                         />
                     </div>
                 </div>
-                <div className="input-row">
-                    <div className="form-group">
-                        <label htmlFor="otp">Password:</label>
-                        <input
-                            type="password"
-                            id="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            required
-                        />
-                    </div>
-                </div>
-                <div className="input-row">
-                    <div className="form-group">
-                        <label htmlFor="otp">Confirm Password:</label>
-                        <input
-                            type="password"
-                            id="confirmpassword"
-                            value={confirmpassword}
-                            onChange={(e) => setConfirmPassword(e.target.value)}
-                            required
-                        />
-                    </div>
-                </div>
                 <div className="button-group">
-                <button type="button" className="cancelForgotPassword" onClick={handleCancel}>
-                    Cancel
-                </button>
                     <button
                         type="button"
                         className={`sendotp ${otpSent ? 'disabled-button' : ''}`}  // Add conditional class
@@ -175,7 +134,7 @@ const ForgotPassword: React.FC = () => {
                         className="verifyemail"
                         onClick={handleVerifyOtp}
                     >
-                        Change Password
+                        Verify Email
                     </button>
                 </div>
             </div>
@@ -183,4 +142,4 @@ const ForgotPassword: React.FC = () => {
     );
 };
 
-export default ForgotPassword;
+export default EmailVerification;

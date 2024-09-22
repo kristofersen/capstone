@@ -51,6 +51,7 @@ const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   isVerified: { type: Boolean },
+  userType: String,
   otp: { type: String }, // Store OTP
   otpExpires: { type: Date }, // Store OTP expiration
   otpAttempts: {
@@ -60,7 +61,8 @@ const userSchema = new mongoose.Schema({
   lastOtpSentAt: {
     type: Date,
     default: null
-  }
+  },
+  workPermits: [{ type: mongoose.Schema.Types.ObjectId, ref: 'WorkPermit' }],
 });
 
 const User = mongoose.model('User', userSchema);
@@ -107,6 +109,15 @@ const businessPermitSchema = new mongoose.Schema({
 const BusinessPermit = mongoose.model('BusinessPermit', businessPermitSchema);
 
 const workPermitSchema = new mongoose.Schema({
+  id: { type: String, required: true,},
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  permittype: { type: String, required: true, default: 'WP' },
+  workpermitstatus: { type: String, required: true, default: 'Pending' },
+  transaction: { type: String, required: true, default: 'Processing' },
+  dateIssued: { type: Date, default: Date.now },
+  expiryDate: { type: Date, default: () => Date.now() + 31536000000 },
+  formData:
+{
   personalInformation: {
     lastName: String,
     firstName: String,
@@ -131,15 +142,13 @@ const workPermitSchema = new mongoose.Schema({
   },
   emergencyContact: {
     name: String,
-    mobileTel: String,
+    mobileTel2: String,
     address: String
   },
-  statusWork: { type: String, required: true, default: 'Pending' },
-  transaction: { type: String, required: true, default: 'Processing' },
-  dateIssued: { type: Date, default: Date.now },
-  expiryDate: { type: Date, default: () => Date.now() + 31536000000 }
-
-}, { timestamps: true });
+}
+}, 
+{ timestamps: true },
+);
 
 const WorkPermit = mongoose.model('WorkPermit', workPermitSchema);
 
@@ -161,7 +170,8 @@ app.post('/signup', async (req, res) => {
 
     // Hash the password before saving it to the database
     const hashedPassword = await bcrypt.hash(password, 10);
-
+    // User is client when registering
+    const userType = "client"
     // Create new user
     const newUser = new User({
       firstName,
@@ -171,7 +181,8 @@ app.post('/signup', async (req, res) => {
       address,
       email,
       password: hashedPassword,
-      isVerified: false
+      isVerified: false,
+      userType: userType
     });
 
     await newUser.save();
@@ -193,7 +204,7 @@ app.post('/login', async (req, res) => {
     }
     if (user && await bcrypt.compare(password, user.password)) {
       // Generate JWT token
-      const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '1h' });
+      const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '3h' });
       res.status(200).json({ message: 'Login successful!', token });
     } else {
       res.status(400).json({ error: 'Invalid credentials' });
@@ -373,34 +384,93 @@ app.post('/businesspermitpage', async (req, res) => {
 });
 
 app.post('/workpermitpage', async (req, res) => {
+  const token = req.headers.authorization?.split(' ')[1]; // Extract token from 'Bearer <token>'
+  console.log('Received token:', token);
+  if (!token) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  const { formData} = req.body; // Extract form data and userId from request body
+  
 
   try {
-    // Get the userID from the decoded token
-    const token = req.headers.authorization?.split(' ')[1];
-    const decoded = jwt.verify(token, JWT_SECRET);
-    const userID = decoded.userId;
-
-    // Create a new work permit application
+    const decoded = jwt.verify(token, JWT_SECRET); // Decode the JWT to get the userId
+    console.log('Decoded token:', decoded);
+    const userId = decoded.userId;
+     const permitID = await generatePermitID('WP');
+    
+    // Insert form data into the 'workpermits' collection
     const newWorkPermit = new WorkPermit({
-      statusWork,
-      transaction,
-      dateIssued,
-      expiryDate
+      id: permitID,
+     formData,
+     userId
     });
+    const savedWorkPermit = await newWorkPermit.save(); // Save new work permit and retrieve its _id
+    const workPermitId = savedWorkPermit._id;
 
-    
-
-    // Save the new application to the database
-    await newWorkPermit.save();
-    
-       // Retrieve all working permit applications for the user
-      const workPermits = await WorkPermit.find({ userID });
-
-    res.status(200).json({ businessPermits });
-    res.status(201).json({ message: 'Work Permit Application submitted successfully!' });
+    await User.findByIdAndUpdate(userId,{$push: {workPermits: savedWorkPermit._id}})
+    res.status(200).json({ message: 'Application submitted successfully' });
   } catch (error) {
+    console.error('Error saving application:', error);
+    res.status(500).json({ message: 'Error submitting application' });
+  }
+});
+
+// Function to generate unique permit ID
+async function generatePermitID(permitType) {
+  const today = new Date();
+  // Get the current date in YYYYMMDD format
+  const year = today.getFullYear(); 
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const day = String(today.getDate()).padStart(2, '0');
+  const dateString = `${day}${month}${year}`;
+
+  try {
+      // Count the number of permits issued today for the given permit type
+      const permitCount = await WorkPermit.countDocuments({
+          permittype: permitType,
+          dateIssued: {
+              $gte: new Date(year, today.getMonth(), today.getDate()),
+              $lt: new Date(year, today.getMonth(), today.getDate() + 1) // Only include today
+          }
+      });
+
+      // Use the count to create a sequence number
+      const sequenceNumber = permitCount + 1; // Start counting from 1
+
+      // Pad sequence number to ensure it's always 4 digits
+      const sequenceString = String(sequenceNumber).padStart(4, '0');
+
+      // Construct the final permit ID
+      const permitID = `${permitType}${sequenceString}${dateString}`;
+
+      // Return only the permit ID
+      return permitID; 
+  } catch (error) {
+      console.error('Error generating permit ID:', error);
+      throw error; // or handle the error as needed
+  }
+}
+
+
+app.get('/workpermits', async (req, res) => {
+  const token = req.headers.authorization?.split(' ')[1]; // Extract token from 'Bearer <token>'
+  console.log('Received token:', token);
+  try {
     
-    console.error('Error saving work permit application:', error);
-    res.status(500).json({ error: 'An error occurred while saving the work permit application.' });
+    const decoded = jwt.verify(token, JWT_SECRET); // Decode the JWT to get the userId
+    console.log('Decoded token:', decoded);
+    const userId = decoded.userId;
+
+    // Fetch user and populate work permits
+    const user = await User.findById(userId).populate('workPermits');
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Send the populated work permits to the client
+    res.json(user.workPermits);
+  } catch (error) {
+    res.status(500).json({ message: 'Error retrieving work permits', error });
   }
 });

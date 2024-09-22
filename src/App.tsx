@@ -8,8 +8,8 @@ import Dashboard from './pages/client/dashboard';
 import Account from './pages/client/account'; 
 import BusinessPermit from './pages/client/businesspermitpage';
 import WorkPermit from './pages/client/workpermitpage';
-import EmailVerification from './pages/client/emailverification';
-import ForgotPassword from './pages/client/forgotpassword';
+import EmailVerification from './pages/emailverification';
+import ForgotPassword from './pages/forgotpassword';
 import ViewApplication from './pages/client/viewapplication';
 
 const App: React.FC = () => {
