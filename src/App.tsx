@@ -1,6 +1,8 @@
 // src/App.tsx
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Outlet } from 'react-router-dom';
+import { AuthProvider } from './AuthContext';
+
 import Home from './pages/home'; 
 import Login from './pages/login'; 
 import Signup from './pages/signup'; 
@@ -11,6 +13,20 @@ import WorkPermit from './pages/client/workpermitpage';
 import EmailVerification from './pages/client/emailverification';
 import ForgotPassword from './pages/client/forgotpassword';
 import ViewApplication from './pages/client/viewapplication';
+import SuperAdminLogin from './pages/superadmin/superadminlogin';
+import SuperAdminDashboard from './pages/superadmin/superadmindashboard';
+import SuperAdminEditUser from './pages/superadmin/superadminAccountEdit';
+import SuperAdminAccount from './pages/superadmin/superadminAccounts';
+import SuperAdminLogbook from './pages/superadmin/superadminLogbook';
+import SuperadminAddUser from './pages/superadmin/superadminAccountAdd';
+
+
+// SuperAdminLayout Component
+const SuperAdminLayout: React.FC = () => (
+  <AuthProvider>
+    <Outlet />
+  </AuthProvider>
+);
 
 const App: React.FC = () => {
   return (
@@ -27,6 +43,14 @@ const App: React.FC = () => {
         <Route path="/forgotpassword" element={<ForgotPassword />} />
         <Route path="/viewapplication" element={<ViewApplication />} />
         {/* Add more routes as needed */}
+        <Route path="/superadmin/login" element={<SuperAdminLogin />} />
+        <Route element={<SuperAdminLayout />}>
+          <Route path="/superadmin/dashboard" element={<SuperAdminDashboard />} />
+          <Route path="/superadmin/edutuser" element={<SuperAdminEditUser />} />
+          <Route path="/superadmin/accounts" element={<SuperAdminAccount />} />
+          <Route path="/superadmin/logbooks" element={<SuperAdminLogbook />} />
+          <Route path='/superadmin/accountadd' element={<SuperadminAddUser />} />
+        </Route>
       </Routes>
     </Router>
   );

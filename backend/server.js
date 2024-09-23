@@ -38,8 +38,10 @@ app.use(session({
 mongoose.connect('mongodb://localhost:27017/obpwlsdatabase', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-}).then(() => console.log('MongoDB connected'))
-  .catch(err => console.log(err));
+}).then(() => {
+  console.log('MongoDB connected');
+  seedSuperadmin(); // Seed superadmin on startup
+}).catch(err => console.log(err));
 
 // Define schemas and models
 const userSchema = new mongoose.Schema({
@@ -50,6 +52,8 @@ const userSchema = new mongoose.Schema({
   address: String,
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
+  role: { type: String, enum: ['user', 'admin', 'superadmin', 'dataController'], default: 'user' },
+  admins: [{ type: Schema.Types.ObjectId, ref: 'Admin' }], // Reference to the Admin model
   isVerified: { type: Boolean },
   otp: { type: String }, // Store OTP
   otpExpires: { type: Date }, // Store OTP expiration
@@ -62,6 +66,16 @@ const userSchema = new mongoose.Schema({
     default: null
   }
 });
+
+const adminSchema = new Schema({
+  firstName: String,
+  lastName: String,
+  email: String,
+  // Other fields related to the admin
+});
+
+const Admin = mongoose.model('Admin', adminSchema);
+module.exports = Admin;
 
 const User = mongoose.model('User', userSchema);
 
@@ -404,3 +418,207 @@ app.post('/workpermitpage', async (req, res) => {
     res.status(500).json({ error: 'An error occurred while saving the work permit application.' });
   }
 });
+
+//#region SuperAdmin
+
+// API fo superadmin login
+app.post('/superadmin/login', async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const user = await User.findOne({ email, role: 'superadmin' });
+    if (!user) {
+      console.log('Superadmin not found');
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      console.log('Password does not match');
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
+
+    const token = jwt.sign({ id: user._id }, 'your_jwt_secret', { expiresIn: '1h' });
+    res.json({ token });
+  } catch (error) {
+    console.error('Error during login:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+
+// Function to seed the superadmin account
+const seedSuperadmin = async () => {
+  try {
+    const existingSuperadmin = await User.findOne({ role: 'superadmin' });
+    if (existingSuperadmin) {
+      console.log('Superadmin already exists.');
+      return;
+    }
+
+    
+    const hashedPassword = await bcrypt.hash('admin123', 10);
+
+    const superadmin = new User({
+      Id: 'S0',
+      firstName: 'Super',
+      lastName: 'Admin',
+      email: 'awildandan@gmail.com',
+      password: hashedPassword,
+      role: 'superadmin',
+      online: false // Superadmin is offline by default
+    });
+
+    await superadmin.save();
+    console.log('Superadmin account created successfully!');
+  } catch (error) {
+    console.error('Error creating superadmin:', error);
+  }
+}; 
+
+// Middleware to check if the user is a superadmin
+function isSuperadmin(req, res, next) {
+  const token = req.headers.authorization?.split(' ')[1]; // Extract JWT from Authorization header
+  if (!token) {
+    return res.status(403).json({ error: 'No token provided' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET); // Decode the JWT
+    if (decoded.role !== 'superadmin') {
+      return res.status(403).json({ error: 'Unauthorized' });
+    }
+    req.user = decoded; // Attach decoded user info to request object
+    next();
+  } catch (error) {
+    res.status(403).json({ error: 'Invalid token' });
+  }
+}
+
+// Superadmin route to get all users
+app.post('/admin/users', isSuperadmin, async (req, res) => {
+  const { firstName, lastName, email, password, role } = req.body;
+
+  try {
+    // Check if the email already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ error: 'Email already exists' });
+    }
+
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create new user
+    const newUser = new User({
+      firstName,
+      lastName,
+      email,
+      password: hashedPassword,
+      role,
+      online: false // Users are offline by default
+    });
+
+    await newUser.save();
+    res.status(201).json({ message: 'User created successfully', user: newUser });
+  } catch (error) {
+    console.error('Error creating user:', error);
+    res.status(500).json({ error: 'Error creating user' });
+  }
+});
+
+// Superadmin route to get a user by ID
+app.get('/admin/users/:id', isSuperadmin, async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ message: 'Error fetching user data' });
+  }
+});
+
+// Superadmin route to edit a user
+app.put('/admin/users/:id', isSuperadmin, async (req, res) => {
+  const { firstName, lastName, email, role } = req.body;
+  const userId = req.params.id;
+
+  try {
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Update user details
+    user.firstName = firstName || user.firstName;
+    user.lastName = lastName || user.lastName;
+    user.email = email || user.email;
+    user.role = role || user.role;
+
+    await user.save();
+    res.status(200).json({ message: 'User updated successfully', user });
+  } catch (error) {
+    console.error('Error updating user:', error);
+    res.status(500).json({ error: 'Error updating user' });
+  }
+});
+
+app.get('/admins', async (req, res) => {
+  const token = req.headers.authorization?.split(' ')[1]; // Extract token from 'Bearer <token>'
+  console.log('Received token:', token);
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET); // Decode the JWT to get the userId
+    console.log('Decoded token:', decoded);
+    const userId = decoded.userId;
+
+    // Fetch all users with the role of 'admin'
+    const admins = await User.find({ role: 'admin' }).populate('admins');
+
+    if (!admins) {
+      return res.status(404).json({ message: 'No admins found' });
+    }
+
+    // Send the list of admins to the superadmin
+    res.json(admins);
+  } catch (error) {
+    console.error('Error retrieving admins:', error);
+    res.status(500).json({ message: 'Error retrieving admins', error });
+  }
+});
+
+// Create a new account
+app.post('/accounts', async (req, res) => {
+  const { firstName, middleName, lastName, contactNumber, address, email, password, role } = req.body;
+
+  // Basic validation
+  if (!firstName || !middleName || !lastName || !email || !password || !contactNumber || !address || !role) {
+    return res.status(400).json({ error: 'All fields are required.' });
+  }
+
+  try {
+    // Hash the password before saving
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create a new user
+    const newUser = new User({
+      firstName,
+      middleName,
+      lastName,
+      contactNumber,
+      address,
+      email,
+      password: hashedPassword,
+      role,
+    });
+
+    // Save the user to the database
+    await newUser.save();
+
+    res.status(201).json({ message: 'Account created successfully', user: newUser });
+  } catch (error) {
+    console.error('Error creating account:', error);
+    res.status(500).json({ error: 'Error creating account' });
+  }
+});
+
+//#endregion
