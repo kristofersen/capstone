@@ -4,6 +4,10 @@ import '../Styles/workpermitpage.css';
 
 const WorkPermit: React.FC = () => {
   const navigate = useNavigate();
+  const [step, setStep] = useState(1);
+  const token = localStorage.getItem('token');
+  
+
 
   // Form state
   const [formData, setFormData] = useState({
@@ -33,9 +37,21 @@ const WorkPermit: React.FC = () => {
       name: '',
       mobileTel2: '',
       address: ''
-    }
-    
+    },
   });
+
+      if (!token) {
+        navigate('/'); // Redirect to login if no token
+        return;
+      }
+      const goToNextStep = () => {
+        setStep(prevStep => prevStep + 1);
+      };
+    
+      const goToPreviousStep = () => {
+        setStep(prevStep => prevStep - 1);
+      };
+    
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -70,27 +86,31 @@ const WorkPermit: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+  
     try {
-      const token = localStorage.getItem('token');
       const response = await fetch('http://localhost:3000/workpermitpage', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          formData, // Form data
+        }),
       });
-  
+      const result = await response.json();
       if (response.ok) {
         alert('Work Permit Application submitted successfully!');
         navigate('/dashboard'); // Redirect to the dashboard or any other page
       } else {
-        alert('Failed to submit the application.');
+        console.error('Error submitting application:', result.message);
       }
     } catch (error) {
-      console.error('Error submitting work permit application:', error);
+      console.error('Error:', error);
     }
   };
+  
+  
 
   const handleLogout = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -125,7 +145,7 @@ const WorkPermit: React.FC = () => {
             </ul>
           </nav>
         </header>
-
+{step === 1 &&(
         <form className="workpermit-form" onSubmit={handleSubmit}>
           <h2>Personal Information</h2>
           <div className="form-row">
@@ -239,7 +259,25 @@ const WorkPermit: React.FC = () => {
             <input type="text" name="address" value={formData.emergencyContact.address} onChange={handleChange} />
           </div>
           <button type="submit" className="submitbuttonworkpermit">Submit</button>
+          <button type="button" onClick={goToNextStep}>Next</button>
         </form>
+)}{step === 2 && (
+  <div>
+    {/* Content for Step 2 */}
+    <button type="button" onClick={goToPreviousStep}>Back</button>
+    <button type="button" onClick={goToNextStep}>Next</button>
+  </div>
+)}
+
+{step === 3 && (
+  <div>
+    {/* Content for Step 3 */}
+    <button type="button" onClick={goToPreviousStep}>Back</button>
+    <input type="file" id="fileInput" name="file" />
+    <input type="submit" value="Upload File" />
+    <button type="submit">Submit</button>
+  </div>
+)}
       </div>
     </section>
   );

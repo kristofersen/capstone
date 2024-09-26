@@ -8,7 +8,7 @@ const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
 const app = express();
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 const JWT_SECRET = 'your_jwt_secret'; // Use a strong secret key in production
 
 // Setup Nodemailer Transporter
@@ -45,15 +45,15 @@ mongoose.connect('mongodb://localhost:27017/obpwlsdatabase', {
 
 // Define schemas and models
 const userSchema = new mongoose.Schema({
-  firstName: String,
-  middleName: String,
-  lastName: String,
-  contactNumber: String,
-  address: String,
+  firstName: { type: String, required: true },
+  middleInitial: String,
+  lastName: { type: String, required: true },
+  contactNumber: { type: String, required: true },
   email: { type: String, required: true, unique: true },
+  username: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  role: { type: String, enum: ['user', 'admin', 'superadmin', 'dataController'], default: 'user' },
-  admins: [{ type: Schema.Types.ObjectId, ref: 'Admin' }], // Reference to the Admin model
+  role: { type: String, enum: ['client', 'admin', 'data controller'], default: 'client', required: true },
+  empId: {type: String},
   isVerified: { type: Boolean },
   otp: { type: String }, // Store OTP
   otpExpires: { type: Date }, // Store OTP expiration
@@ -64,20 +64,13 @@ const userSchema = new mongoose.Schema({
   lastOtpSentAt: {
     type: Date,
     default: null
-  }
+  },
+  workPermits: [{ type: mongoose.Schema.Types.ObjectId, ref: 'WorkPermit' }],
 });
-
-const adminSchema = new Schema({
-  firstName: String,
-  lastName: String,
-  email: String,
-  // Other fields related to the admin
-});
-
-const Admin = mongoose.model('Admin', adminSchema);
-module.exports = Admin;
 
 const User = mongoose.model('User', userSchema);
+
+
 
 // Define schema and model for Business Permit Application
 const businessPermitSchema = new mongoose.Schema({
@@ -121,6 +114,15 @@ const businessPermitSchema = new mongoose.Schema({
 const BusinessPermit = mongoose.model('BusinessPermit', businessPermitSchema);
 
 const workPermitSchema = new mongoose.Schema({
+  id: { type: String, required: true,},
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  permittype: { type: String, required: true, default: 'WP' },
+  workpermitstatus: { type: String, required: true, default: 'Pending' },
+  transaction: { type: String, required: true, default: 'Processing' },
+  dateIssued: { type: Date, default: Date.now },
+  expiryDate: { type: Date, default: () => Date.now() + 31536000000 },
+  formData:
+{
   personalInformation: {
     lastName: String,
     firstName: String,
@@ -145,15 +147,13 @@ const workPermitSchema = new mongoose.Schema({
   },
   emergencyContact: {
     name: String,
-    mobileTel: String,
+    mobileTel2: String,
     address: String
   },
-  statusWork: { type: String, required: true, default: 'Pending' },
-  transaction: { type: String, required: true, default: 'Processing' },
-  dateIssued: { type: Date, default: Date.now },
-  expiryDate: { type: Date, default: () => Date.now() + 31536000000 }
-
-}, { timestamps: true });
+}
+}, 
+{ timestamps: true },
+);
 
 const WorkPermit = mongoose.model('WorkPermit', workPermitSchema);
 
@@ -175,7 +175,8 @@ app.post('/signup', async (req, res) => {
 
     // Hash the password before saving it to the database
     const hashedPassword = await bcrypt.hash(password, 10);
-
+    // User is client when registering
+    const userType = "client"
     // Create new user
     const newUser = new User({
       firstName,
@@ -185,7 +186,8 @@ app.post('/signup', async (req, res) => {
       address,
       email,
       password: hashedPassword,
-      isVerified: false
+      isVerified: false,
+      role: userType
     });
 
     await newUser.save();
@@ -207,7 +209,7 @@ app.post('/login', async (req, res) => {
     }
     if (user && await bcrypt.compare(password, user.password)) {
       // Generate JWT token
-      const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '1h' });
+      const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '3h' });
       res.status(200).json({ message: 'Login successful!', token });
     } else {
       res.status(400).json({ error: 'Invalid credentials' });
@@ -387,41 +389,100 @@ app.post('/businesspermitpage', async (req, res) => {
 });
 
 app.post('/workpermitpage', async (req, res) => {
+  const token = req.headers.authorization?.split(' ')[1]; // Extract token from 'Bearer <token>'
+  console.log('Received token:', token);
+  if (!token) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  const { formData} = req.body; // Extract form data and userId from request body
+  
 
   try {
-    // Get the userID from the decoded token
-    const token = req.headers.authorization?.split(' ')[1];
-    const decoded = jwt.verify(token, JWT_SECRET);
-    const userID = decoded.userId;
-
-    // Create a new work permit application
+    const decoded = jwt.verify(token, JWT_SECRET); // Decode the JWT to get the userId
+    console.log('Decoded token:', decoded);
+    const userId = decoded.userId;
+     const permitID = await generatePermitID('WP');
+    
+    // Insert form data into the 'workpermits' collection
     const newWorkPermit = new WorkPermit({
-      statusWork,
-      transaction,
-      dateIssued,
-      expiryDate
+      id: permitID,
+     formData,
+     userId
     });
+    const savedWorkPermit = await newWorkPermit.save(); // Save new work permit and retrieve its _id
+    const workPermitId = savedWorkPermit._id;
 
-    
-
-    // Save the new application to the database
-    await newWorkPermit.save();
-    
-       // Retrieve all working permit applications for the user
-      const workPermits = await WorkPermit.find({ userID });
-
-    res.status(200).json({ businessPermits });
-    res.status(201).json({ message: 'Work Permit Application submitted successfully!' });
+    await User.findByIdAndUpdate(userId,{$push: {workPermits: savedWorkPermit._id}})
+    res.status(200).json({ message: 'Application submitted successfully' });
   } catch (error) {
+    console.error('Error saving application:', error);
+    res.status(500).json({ message: 'Error submitting application' });
+  }
+});
+
+// Function to generate unique permit ID
+async function generatePermitID(permitType) {
+  const today = new Date();
+  // Get the current date in YYYYMMDD format
+  const year = today.getFullYear(); 
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const day = String(today.getDate()).padStart(2, '0');
+  const dateString = `${day}${month}${year}`;
+
+  try {
+      // Count the number of permits issued today for the given permit type
+      const permitCount = await WorkPermit.countDocuments({
+          permittype: permitType,
+          dateIssued: {
+              $gte: new Date(year, today.getMonth(), today.getDate()),
+              $lt: new Date(year, today.getMonth(), today.getDate() + 1) // Only include today
+          }
+      });
+
+      // Use the count to create a sequence number
+      const sequenceNumber = permitCount + 1; // Start counting from 1
+
+      // Pad sequence number to ensure it's always 4 digits
+      const sequenceString = String(sequenceNumber).padStart(4, '0');
+
+      // Construct the final permit ID
+      const permitID = `${permitType}${sequenceString}${dateString}`;
+
+      // Return only the permit ID
+      return permitID; 
+  } catch (error) {
+      console.error('Error generating permit ID:', error);
+      throw error; // or handle the error as needed
+  }
+}
+
+
+app.get('/workpermits', async (req, res) => {
+  const token = req.headers.authorization?.split(' ')[1]; // Extract token from 'Bearer <token>'
+  console.log('Received token:', token);
+  try {
     
-    console.error('Error saving work permit application:', error);
-    res.status(500).json({ error: 'An error occurred while saving the work permit application.' });
+    const decoded = jwt.verify(token, JWT_SECRET); // Decode the JWT to get the userId
+    console.log('Decoded token:', decoded);
+    const userId = decoded.userId;
+
+    // Fetch user and populate work permits
+    const user = await User.findById(userId).populate('workPermits');
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Send the populated work permits to the client
+    res.json(user.workPermits);
+  } catch (error) {
+    res.status(500).json({ message: 'Error retrieving work permits', error });
   }
 });
 
 //#region SuperAdmin
 
-// API fo superadmin login
+// API for superadmin login
 app.post('/superadmin/login', async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -437,11 +498,53 @@ app.post('/superadmin/login', async (req, res) => {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
-    const token = jwt.sign({ id: user._id }, 'your_jwt_secret', { expiresIn: '1h' });
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET || 'your_jwt_secret', { expiresIn: '1h' });
     res.json({ token });
   } catch (error) {
     console.error('Error during login:', error);
     res.status(500).json({ message: 'Server error' });
+  }
+});
+
+app.post('/adduser', async (req, res) => {
+  const { firstName, middleInitial, lastName, contactNumber, email, username, password, role } = req.body;
+
+  try {
+    // Check if the user already exists by email or username
+    const existingUser = await User.findOne({ $or: [{ email }, { username }] });
+    if (existingUser) {
+      return res.status(400).json({ message: 'Email or Username already in use' });
+    }
+
+    // Hash the password before saving
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    let empId = null;
+    if (role === 'admin' || role === 'data controller') {
+      empId = `EMP${Math.floor(100000 + Math.random() * 900000)}`; // Generate a random 6-digit number
+    }
+    
+    // Create a new user
+    const newUser = new User({
+      firstName,
+      middleInitial,
+      lastName,
+      contactNumber,
+      email,
+      username,
+      password: hashedPassword,
+      role,
+      empId,
+    });
+
+
+    // Save the user to the database
+    await newUser.save();
+
+    res.status(201).json({ message: 'User created successfully', user: newUser });
+  } catch (error) {
+    console.error('Error creating user:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
   }
 });
 
@@ -453,7 +556,7 @@ const seedSuperadmin = async () => {
     if (existingSuperadmin) {
       console.log('Superadmin already exists.');
       return;
-    }
+    };
 
     
     const hashedPassword = await bcrypt.hash('admin123', 10);
@@ -481,7 +584,6 @@ function isSuperadmin(req, res, next) {
   if (!token) {
     return res.status(403).json({ error: 'No token provided' });
   }
-
   try {
     const decoded = jwt.verify(token, JWT_SECRET); // Decode the JWT
     if (decoded.role !== 'superadmin') {
@@ -492,133 +594,11 @@ function isSuperadmin(req, res, next) {
   } catch (error) {
     res.status(403).json({ error: 'Invalid token' });
   }
-}
+};
 
-// Superadmin route to get all users
-app.post('/admin/users', isSuperadmin, async (req, res) => {
-  const { firstName, lastName, email, password, role } = req.body;
 
-  try {
-    // Check if the email already exists
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({ error: 'Email already exists' });
-    }
 
-    // Hash the password
-    const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create new user
-    const newUser = new User({
-      firstName,
-      lastName,
-      email,
-      password: hashedPassword,
-      role,
-      online: false // Users are offline by default
-    });
 
-    await newUser.save();
-    res.status(201).json({ message: 'User created successfully', user: newUser });
-  } catch (error) {
-    console.error('Error creating user:', error);
-    res.status(500).json({ error: 'Error creating user' });
-  }
-});
-
-// Superadmin route to get a user by ID
-app.get('/admin/users/:id', isSuperadmin, async (req, res) => {
-  try {
-    const user = await User.findById(req.params.id);
-    if (!user) return res.status(404).json({ message: 'User not found' });
-    res.json(user);
-  } catch (err) {
-    res.status(500).json({ message: 'Error fetching user data' });
-  }
-});
-
-// Superadmin route to edit a user
-app.put('/admin/users/:id', isSuperadmin, async (req, res) => {
-  const { firstName, lastName, email, role } = req.body;
-  const userId = req.params.id;
-
-  try {
-    const user = await User.findById(userId);
-
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-
-    // Update user details
-    user.firstName = firstName || user.firstName;
-    user.lastName = lastName || user.lastName;
-    user.email = email || user.email;
-    user.role = role || user.role;
-
-    await user.save();
-    res.status(200).json({ message: 'User updated successfully', user });
-  } catch (error) {
-    console.error('Error updating user:', error);
-    res.status(500).json({ error: 'Error updating user' });
-  }
-});
-
-app.get('/admins', async (req, res) => {
-  const token = req.headers.authorization?.split(' ')[1]; // Extract token from 'Bearer <token>'
-  console.log('Received token:', token);
-  try {
-    const decoded = jwt.verify(token, JWT_SECRET); // Decode the JWT to get the userId
-    console.log('Decoded token:', decoded);
-    const userId = decoded.userId;
-
-    // Fetch all users with the role of 'admin'
-    const admins = await User.find({ role: 'admin' }).populate('admins');
-
-    if (!admins) {
-      return res.status(404).json({ message: 'No admins found' });
-    }
-
-    // Send the list of admins to the superadmin
-    res.json(admins);
-  } catch (error) {
-    console.error('Error retrieving admins:', error);
-    res.status(500).json({ message: 'Error retrieving admins', error });
-  }
-});
-
-// Create a new account
-app.post('/accounts', async (req, res) => {
-  const { firstName, middleName, lastName, contactNumber, address, email, password, role } = req.body;
-
-  // Basic validation
-  if (!firstName || !middleName || !lastName || !email || !password || !contactNumber || !address || !role) {
-    return res.status(400).json({ error: 'All fields are required.' });
-  }
-
-  try {
-    // Hash the password before saving
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Create a new user
-    const newUser = new User({
-      firstName,
-      middleName,
-      lastName,
-      contactNumber,
-      address,
-      email,
-      password: hashedPassword,
-      role,
-    });
-
-    // Save the user to the database
-    await newUser.save();
-
-    res.status(201).json({ message: 'Account created successfully', user: newUser });
-  } catch (error) {
-    console.error('Error creating account:', error);
-    res.status(500).json({ error: 'Error creating account' });
-  }
-});
 
 //#endregion

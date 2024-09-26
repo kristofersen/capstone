@@ -1,205 +1,120 @@
-import React, { useState, ChangeEvent, FormEvent } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
 
-interface AccountData {
-  lastName: string;
-  firstName: string;
-  middleInitial: string;
-  username: string;
-  password: string;
-  email: string;
-  phoneNumber: string;
-  accountType: {
-    admin: boolean;
-    dataController: boolean;
- };
-}
-
-const SuperadminAddUser: React.FC = () => {
-const [formData, setFormData] = useState<AccountData>({
-    lastName: '',
-    firstName: '',
-    middleInitial: '',
-    username: '',
-    password: '',
-    email: '',
-    phoneNumber: '',
-    accountType: {
-    admin: false,
-    dataController: false,
-    },
-});
-
+const SuperadminAccountAdd = () => {
+  const [firstName, setFirstName] = useState('');
+  const [middleInitial, setMiddleInitial] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [contactNumber, setContactNumber] = useState('');
+  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [role, setRole] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
-  const handleInputChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-};
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    
+    // Build the payload to be sent to the server
+    const userData = {
+      firstName,
+      middleInitial,
+      lastName,
+      contactNumber,
+      email,
+      username,
+      password,
+      role,
+      // firstName: "John",
+      // middleInitial: "D",
+      // lastName: "Doe",
+      // contactNumber: "1234567890",
+      // email: "john.doe@example.com",
+      // username: "johndoe",
+      // password: "password123",
+      // role: "admin"
+    };
 
-const handleCheckboxChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, checked } = e.target;
-    setFormData({
-    ...formData,
-    accountType: {
-        admin: name === 'admin' ? checked : false,
-        dataController: name === 'dataController' ? checked : false,
-    },
-    });
-};
-
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setError(null);
-    setSuccess(null);
 
     try {
-      const response = await fetch('http://localhost:3000/accounts', {
+      const response = await fetch('http://localhost:3001/adduser', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(userData),
       });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Failed to create account: ${errorText}`);
-      }
+      const data = await response.json();
 
-      setSuccess('Account created successfully!');
-      setFormData({
-        lastName: '',
-        firstName: '',
-        middleInitial: '',
-        username: '',
-        password: '',
-        email: '',
-        phoneNumber: '',
-        accountType: {
-          admin: false,
-          dataController: false,
-        },
-      });
-    } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
+      if (response.ok) {
+        setSuccess('User created successfully!');
+        setError(null);
+        // Clear the form after successful submission
+        setFirstName('');
+        setMiddleInitial('');
+        setLastName('');
+        setContactNumber('');
+        setEmail('');
+        setUsername('');
+        setPassword('');
+        setRole('');
       } else {
-        setError('An unknown error occurred');
+        setError(data.message || 'Failed to create user');
+        setSuccess(null);
       }
+    } catch (error) {
+      setError('An error occurred while creating the user');
+      setSuccess(null);
     }
   };
 
   return (
-    <div className="create-account-page">
-      <header className="page-header">
-        <h1>Create Account</h1>
-        <Link to="/superadmin/dashboard">Home / Create Account</Link>
-      </header>
-
-      <section className="account-creation-section">
-        <h2>Account Creation</h2>
-        <form onSubmit={handleSubmit} className="account-form">
-          <div className="form-group">
-            <input
-              type="text"
-              name="lastName"
-              value={formData.lastName}
-              onChange={handleInputChange}
-              placeholder="Last Name"
-              required
-            />
-            <input
-              type="text"
-              name="firstName"
-              value={formData.firstName}
-              onChange={handleInputChange}
-              placeholder="First Name"
-              required
-            />
-            <input
-              type="text"
-              name="middleInitial"
-              value={formData.middleInitial}
-              onChange={handleInputChange}
-              placeholder="Middle Initial"
-              maxLength={1}
-            />
-          </div>
-
-          <div className="form-group">
-            <input
-              type="text"
-              name="username"
-              value={formData.username}
-              onChange={handleInputChange}
-              placeholder="Username"
-              required
-            />
-            <input
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleInputChange}
-              placeholder="Password"
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleInputChange}
-              placeholder="Email"
-              required
-            />
-            <input
-              type="text"
-              name="phoneNumber"
-              value={formData.phoneNumber}
-              onChange={handleInputChange}
-              placeholder="Phone Number"
-              required
-            />
-          </div>
-
-          <div className="form-group account-type">
-            <label>Account Type</label>
-            <label>
-              <input
-                type="checkbox"
-                name="admin"
-                checked={formData.accountType.admin}
-                onChange={handleCheckboxChange}
-              />
-              Admin
-            </label>
-            <label>
-              <input
-                type="checkbox"
-                name="dataController"
-                checked={formData.accountType.dataController}
-                onChange={handleCheckboxChange}
-              />
-              Data Controller
-            </label>
-          </div>
-
-          <button type="submit" className="create-account-btn">
-            Create Account
-          </button>
-        </form>
-
-        {error && <div style={{ color: 'red' }}>{error}</div>}
-        {success && <div style={{ color: 'green' }}>{success}</div>}
-      </section>
+    <div>
+      <h1>Create New User</h1>
+      <form onSubmit={handleSubmit}>
+        <label>
+          First Name:
+          <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} required />
+        </label>
+        <label>
+          Middle Initial:
+          <input type="text" value={middleInitial} onChange={(e) => setMiddleInitial(e.target.value)} />
+        </label>
+        <label>
+          Last Name:
+          <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} required />
+        </label>
+        <label>
+          Contact Number:
+          <input type="text" value={contactNumber} onChange={(e) => setContactNumber(e.target.value)} required />
+        </label>
+        <label>
+          Email:
+          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+        </label>
+        <label>
+          Username:
+          <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} required />
+        </label>
+        <label>
+          Password:
+          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+        </label>
+        <label>
+          Role:
+          <select value={role} onChange={(e) => setRole(e.target.value)} required>
+            <option value="">Select Role</option>
+            <option value="admin">Admin</option>
+            <option value="data controller">Data Controller</option>
+          </select>
+        </label>
+        <button type="submit">Create User</button>
+      </form>
+      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {success && <p style={{ color: 'green' }}>{success}</p>}
     </div>
   );
 };
 
-export default SuperadminAddUser;
+export default SuperadminAccountAdd;

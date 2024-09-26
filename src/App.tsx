@@ -10,11 +10,11 @@ import Dashboard from './pages/client/dashboard';
 import Account from './pages/client/account'; 
 import BusinessPermit from './pages/client/businesspermitpage';
 import WorkPermit from './pages/client/workpermitpage';
-import EmailVerification from './pages/client/emailverification';
-import ForgotPassword from './pages/client/forgotpassword';
+import EmailVerification from './pages/emailverification';
+import ForgotPassword from './pages/forgotpassword';
 import ViewApplication from './pages/client/viewapplication';
-import SuperAdminLogin from './pages/superadmin/superadminlogin';
-import SuperAdminDashboard from './pages/superadmin/superadmindashboard';
+import SuperAdminLogin from './pages/superadmin/superadminLogin';
+import SuperAdminDashboard from './pages/superadmin/superadminDashboard';
 import SuperAdminEditUser from './pages/superadmin/superadminAccountEdit';
 import SuperAdminAccount from './pages/superadmin/superadminAccounts';
 import SuperAdminLogbook from './pages/superadmin/superadminLogbook';
@@ -43,8 +43,8 @@ const App: React.FC = () => {
         <Route path="/forgotpassword" element={<ForgotPassword />} />
         <Route path="/viewapplication" element={<ViewApplication />} />
         {/* Add more routes as needed */}
-        <Route path="/superadmin/login" element={<SuperAdminLogin />} />
         <Route element={<SuperAdminLayout />}>
+        <Route path="/superadmin/login" element={<SuperAdminLogin />} />
           <Route path="/superadmin/dashboard" element={<SuperAdminDashboard />} />
           <Route path="/superadmin/edutuser" element={<SuperAdminEditUser />} />
           <Route path="/superadmin/accounts" element={<SuperAdminAccount />} />

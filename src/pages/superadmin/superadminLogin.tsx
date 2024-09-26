@@ -9,7 +9,7 @@ const SuperAdminLogin: React.FC = () => {
 
   const handleLogin = async () => {
     try {
-      const response = await fetch('http://localhost:3000/superadmin/login', { // Updated URL
+      const response = await fetch('http://localhost:3001/superadmin/login', { // Updated URL
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

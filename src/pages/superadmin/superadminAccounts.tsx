@@ -14,6 +14,10 @@ const Accounts: React.FC = () => {
   const [admins, setAdmins] = useState<Account[]>([]);
   const [dataControllers, setDataControllers] = useState<Account[]>([]);
   const [error, setError] = useState<string | null>(null);
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
   const navigate = useNavigate();
 
   useEffect(() => {
