@@ -27,6 +27,9 @@ const SuperAdminLayout: React.FC = () => (
     <Outlet />
   </AuthProvider>
 );
+import ViewApplicationDetails from './pages/client/viewapplicationdetails';
+import AppTest from './pages/apptest';
+import AppTest2 from './pages/apptest2';
 
 const App: React.FC = () => {
   return (
@@ -42,6 +45,10 @@ const App: React.FC = () => {
         <Route path="/emailverification" element={<EmailVerification />} />
         <Route path="/forgotpassword" element={<ForgotPassword />} />
         <Route path="/viewapplication" element={<ViewApplication />} />
+        <Route path="/viewapplicationdetails/:id" element={<ViewApplicationDetails />} />
+        <Route path="/viewapplicationdetails/" element={<ViewApplicationDetails />} />
+        <Route path="/apptest" element={<AppTest />} />
+        <Route path="/apptest2" element={<AppTest2 />} />
         {/* Add more routes as needed */}
         <Route element={<SuperAdminLayout />}>
         <Route path="/superadmin/login" element={<SuperAdminLogin />} />

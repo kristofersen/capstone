@@ -5,16 +5,17 @@ import '../Styles/account.css'; // Import your CSS file
 const Account: React.FC = () => {
   const [userDetails, setUserDetails] = useState<{ email: string; firstName: string; middleName: string; lastName: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const token = localStorage.getItem('token');
   const navigate = useNavigate();
 
   useEffect(() => {
+    
+    if (!token) {
+      navigate('/'); // Redirect to login if no token
+      return;
+    } else{
     const fetchUserDetails = async () => {
-      const token = localStorage.getItem('token');
 
-      if (!token) {
-        navigate('/'); // Redirect to login if no token
-        return;
-      }
 
       try {
         const response = await fetch('http://localhost:3000/profile', {
@@ -37,8 +38,8 @@ const Account: React.FC = () => {
         setError('Failed to fetch user details, please try again.');
       }
     };
-    fetchUserDetails();
-  }, [navigate]);
+    fetchUserDetails();}
+  }, [token, navigate]);
 
   const handleLogout = () => {
     localStorage.removeItem('token'); // Remove token from localStorage
