@@ -7,6 +7,10 @@ const session = require('express-session');
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
 const app = express();
+const multer = require('multer');
+const path = require('path');
+const { v4: uuidv4 } = require('uuid');
+
 
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = 'your_jwt_secret'; // Use a strong secret key in production
@@ -33,6 +37,16 @@ app.use(session({
   saveUninitialized: false,
   cookie: { secure: false } // Set to true in production with HTTPS
 }));
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/');
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + '-' + file.originalname);
+  },
+});
+
+const upload = multer({ storage });
 
 // Connect to MongoDB
 mongoose.connect('mongodb://localhost:27017/obpwlsdatabase', {
@@ -112,10 +126,10 @@ const workPermitSchema = new mongoose.Schema({
   id: { type: String, required: true,},
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   permittype: { type: String, required: true, default: 'WP' },
-  workpermitstatus: { type: String, required: true, default: 'Pending' },
-  transaction: { type: String, required: true, default: 'Processing' },
+  workpermitstatus: { type: String, required: true, },
+  transaction: { type: String, required: true, },
+  transactionstatus: { type: String, required: true, },
   dateIssued: { type: Date, default: Date.now },
-  expiryDate: { type: Date, default: () => Date.now() + 31536000000 },
   formData:
 {
   personalInformation: {
@@ -141,10 +155,22 @@ const workPermitSchema = new mongoose.Schema({
     companyName: String,
   },
   emergencyContact: {
-    name: String,
+    name2: String,
     mobileTel2: String,
     address: String
   },
+  files: {
+    document1: String,
+    document2: String,
+    document3: String,
+    document4: String,
+  },
+  receipt: {
+    receiptId: String,
+    modeOfPayment: String,
+    receiptDate: String,
+    amountPaid: String,
+  }
 }
 }, 
 { timestamps: true },
@@ -383,59 +409,170 @@ app.post('/businesspermitpage', async (req, res) => {
   }
 });
 
-app.post('/workpermitpage', async (req, res) => {
+app.post('/workpermitpage', upload.fields([
+  { name: 'document1', maxCount: 1 },
+  { name: 'document2', maxCount: 1 },
+  { name: 'document3', maxCount: 1 },
+  { name: 'document4', maxCount: 1 }
+]), async (req, res) => {
   const token = req.headers.authorization?.split(' ')[1]; // Extract token from 'Bearer <token>'
   console.log('Received token:', token);
+  
   if (!token) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
-  const { formData} = req.body; // Extract form data and userId from request body
-  
 
+  const files = req.files;
+  const {
+    lastName,
+    firstName,
+    middleInitial,
+    permanentAddress,
+    currentlyResiding,
+    temporaryAddress,
+    dateOfBirth,
+    age,
+    placeOfBirth,
+    citizenship,
+    civilStatus,
+    gender,
+    height,
+    weight,
+    mobileTel,
+    email,
+    educationalAttainment,
+    natureOfWork,
+    placeOfWork,
+    companyName,
+    name2,
+    mobileTel2,
+    address,
+    transaction,
+  } = req.body;
+  console.log('Incoming data:', req.body);
+  console.log(req.files)
   try {
     const decoded = jwt.verify(token, JWT_SECRET); // Decode the JWT to get the userId
     console.log('Decoded token:', decoded);
-    const userId = decoded.userId;
-     const permitID = await generatePermitID('WP');
     
-    // Insert form data into the 'workpermits' collection
+    const userId = decoded.userId;
+    const permitID = await generatePermitID('WP');
+    
+    // Check mode of payment
+    if (transaction === "Online") {
+
+      workpermitstatus = "Pending"
+      transactionstatus = "Paid"
+      receiptId = uuidv4(); // Generate a unique receipt ID
+      modeOfPayment = "Online Payment";
+      receiptDate = new Date();// Current date as receipt date
+      amountPaid = 200;
+
+    } else if (transaction === "Offline"){
+
+      workpermitstatus = "Payment Pending"
+      transactionstatus = "Not Paid"
+      receiptId = null; // Generate a unique receipt ID
+      modeOfPayment = null;
+      receiptDate = null;// Current date as receipt date
+      amountPaid = null; 
+      // For onsite/offline payment, receiptId can be null
+      // receiptDate can also be set to null or a specific value if needed
+    }
+
+    // Create a new WorkPermit instance
     const newWorkPermit = new WorkPermit({
       id: permitID,
-     formData,
-     userId
+      userId,
+      workpermitstatus,
+      transaction,
+      transactionstatus,
+      formData: {
+        personalInformation: {
+          lastName,
+          firstName,
+          middleInitial,
+          permanentAddress,
+          currentlyResiding: currentlyResiding === 'true',
+          temporaryAddress,
+          dateOfBirth,
+          age,
+          placeOfBirth,
+          citizenship,
+          civilStatus,
+          gender,
+          height,
+          weight,
+          mobileTel,
+          email,
+          educationalAttainment,
+          natureOfWork,
+          placeOfWork,
+          companyName,
+        },
+        emergencyContact: {
+          name2,
+          mobileTel2,
+          address,
+        },
+        files: {
+          document1: files.document1 ? files.document1[0].path : null,
+          document2: files.document2 ? files.document2[0].path : null,
+          document3: files.document3 ? files.document3[0].path : null,
+          document4: files.document4 ? files.document4[0].path : null,
+        },
+        receipt:{
+          receiptId,
+          modeOfPayment,
+          receiptDate,
+          amountPaid
+        }
+      },
     });
-    const savedWorkPermit = await newWorkPermit.save(); // Save new work permit and retrieve its _id
-    const workPermitId = savedWorkPermit._id;
 
-    await User.findByIdAndUpdate(userId,{$push: {workPermits: savedWorkPermit._id}})
+    // Save new work permit and retrieve its _id
+    const savedWorkPermit = await newWorkPermit.save();
+    console.log('Saved WorkPermit ID:', savedWorkPermit._id); // Log the saved ID
+    
+    await User.findByIdAndUpdate(userId, { $push: { workPermits: savedWorkPermit._id } });
+    
     res.status(200).json({ message: 'Application submitted successfully' });
   } catch (error) {
-    console.error('Error saving application:', error);
-    res.status(500).json({ message: 'Error submitting application' });
+    console.error('Error saving application:', error.message); // Log the error message
+    res.status(500).json({ message: 'Error submitting application', error: error.message });
   }
 });
+
 
 // Function to generate unique permit ID
 async function generatePermitID(permitType) {
   const today = new Date();
-  // Get the current date in YYYYMMDD format
+  
+  // Get the current date in DDMMYYYY format
   const year = today.getFullYear(); 
   const month = String(today.getMonth() + 1).padStart(2, '0');
   const day = String(today.getDate()).padStart(2, '0');
   const dateString = `${day}${month}${year}`;
 
   try {
-      // Count the number of permits issued today for the given permit type
-      const permitCount = await WorkPermit.countDocuments({
-          permittype: permitType,
-          dateIssued: {
-              $gte: new Date(year, today.getMonth(), today.getDate()),
-              $lt: new Date(year, today.getMonth(), today.getDate() + 1) // Only include today
-          }
-      });
+      // Fetch the latest permit ID for the given permit type
+      const latestPermit = await WorkPermit.findOne({
+          permittype: permitType
+      }).sort({ id: -1 }); // Sort to get the latest permit ID
 
-      // Use the count to create a sequence number
-      const sequenceNumber = permitCount + 1; // Start counting from 1
+      let sequenceNumber = 1; // Default to 1 if no permits exist
+
+      if (latestPermit) {
+          // Extract the sequence number from the latest permit ID
+          const latestPermitID = latestPermit.id;
+
+          // Use a regex to extract the sequence part (assuming format: WP0002...)
+          const match = latestPermitID.match(/(\d{4})/); // Match the 4 digits
+
+          if (match) {
+              sequenceNumber = parseInt(match[0], 10) + 1; // Increment by 1
+          }
+      }
 
       // Pad sequence number to ensure it's always 4 digits
       const sequenceString = String(sequenceNumber).padStart(4, '0');
@@ -443,7 +580,7 @@ async function generatePermitID(permitType) {
       // Construct the final permit ID
       const permitID = `${permitType}${sequenceString}${dateString}`;
 
-      // Return only the permit ID
+      // Return the constructed permit ID
       return permitID; 
   } catch (error) {
       console.error('Error generating permit ID:', error);
@@ -451,6 +588,12 @@ async function generatePermitID(permitType) {
   }
 }
 
+// Function to generate receipt ID
+const generateReceiptId = () => {
+  const timestamp = Date.now(); // Current timestamp
+  const randomPart = Math.floor(Math.random() * 1000000); // Random number
+  return `REC-${timestamp}-${randomPart}`; // Generates a receipt ID like 'REC-1634012900000-123456'
+};
 
 app.get('/workpermits', async (req, res) => {
   const token = req.headers.authorization?.split(' ')[1]; // Extract token from 'Bearer <token>'
@@ -474,3 +617,111 @@ app.get('/workpermits', async (req, res) => {
     res.status(500).json({ message: 'Error retrieving work permits', error });
   }
 });
+
+
+app.get('/workpermitdetails/:id', async (req, res) => {
+  const { id } = req.params;
+  const token = req.headers.authorization?.split(' ')[1]; // Extract token from 'Bearer <token>'
+  
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET); // Decode the JWT to get userId
+    const userId = decoded.userId;
+console.log(userId);
+    // Find the user by ID
+    const user = await User.findById(userId).populate('workPermits'); // Populate work permits
+console.log(id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Check if the user has the specified work permit
+    const workPermit = user.workPermits.find(permit => permit._id.toString() === id);
+    console.log(workPermit);
+    if (!workPermit) {
+      return res.status(404).json({ message: 'Work permit not found for this user' });
+    }
+
+    // Return the specific work permit details
+    res.json(workPermit);
+  } catch (error) {
+    console.error('Error retrieving work permit:', error);
+    res.status(500).json({ message: 'Error retrieving work permit', error });
+  }
+});
+
+
+
+const PersonSchema = new mongoose.Schema({
+  name: String,
+  email: String,
+  applicationForm: {
+    age: Number,
+    address: String,
+    phoneNumber: String,
+    isActive: Boolean,
+  },
+  files: {
+    document1: String,
+    document2: String,
+    document3: String,
+  },
+});
+
+const Person = mongoose.model('Person', PersonSchema);
+
+
+app.post('/apptesting', upload.fields([
+  { name: 'document1', maxCount: 1 },
+  { name: 'document2', maxCount: 1 },
+  { name: 'document3', maxCount: 1 },
+]), async (req, res) => {
+  const { name, email, age, address, phoneNumber, isActive } = req.body;
+  const files = req.files;
+  try {
+    const newPerson = new Person({
+      name,
+      email,
+      applicationForm: {
+        age,
+        address,
+        phoneNumber,
+        isActive: isActive === 'true',
+      },
+     files: {
+        document1: files.document1 ? files.document1[0].path : null,
+        document2: files.document2 ? files.document2[0].path : null,
+       document3: files.document3 ? files.document3[0].path : null,
+
+      },
+    });
+
+    await newPerson.save();
+    res.status(201).json(newPerson);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+
+app.get('/api/:searchTerm', async (req, res) => {
+  const { searchTerm } = req.params;
+  
+  try {
+    const users = await Person.find({
+      $or: [
+        { name: { $regex: searchTerm, $options: 'i' } },
+        { email: { $regex: searchTerm, $options: 'i' } }
+      ]
+    });
+    
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+
+// Serve static files from the 'uploads' directory
+app.use('/uploads', express.static(path.join(__dirname)));
+
+
