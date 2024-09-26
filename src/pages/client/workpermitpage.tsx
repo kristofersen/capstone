@@ -141,7 +141,8 @@ if (!token) {
           alert('Work Permit Application submitted successfully!');
           navigate('/dashboard'); // Redirect to the dashboard or any other page
         } else {
-          console.error('Error submitting application:', response.data.message);
+          const errorMessage = (response.data as { message: string }).message;
+          console.error('Error submitting application:', errorMessage);
         }
       } catch (error) {
         console.error('Error:', error);

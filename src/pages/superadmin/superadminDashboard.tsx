@@ -3,19 +3,19 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../AuthContext'; // Adjust the import path as necessary
 
 
-interface DataController {
-  _id: string;
-  firstName: string;
-  lastName: string;
-  EmpID: string;
-}
+// interface DataController {
+//   _id: string;
+//   firstName: string;
+//   lastName: string;
+//   EmpID: string;
+// }
 
-interface Admin {
-  _id: string;
-  firstName: string;
-  lastName: string;
-  EmpID: string; 
-}
+// interface Admin {
+//   _id: string;
+//   firstName: string;
+//   lastName: string;
+//   EmpID: string; 
+// }
 
 const SuperAdminDashboard: React.FC = () => {
 

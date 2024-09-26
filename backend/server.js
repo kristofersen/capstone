@@ -26,6 +26,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+
 // Middleware
 app.use(cors());
 app.use(bodyParser.json());
@@ -704,15 +705,6 @@ app.post('/apptesting', upload.fields([
 
     await newPerson.save();
     res.status(201).json(newPerson);
-      id: permitID,
-     formData,
-     userId
-    });
-    const savedWorkPermit = await newWorkPermit.save(); // Save new work permit and retrieve its _id
-    const workPermitId = savedWorkPermit._id;
-
-    await User.findByIdAndUpdate(userId,{$push: {workPermits: savedWorkPermit._id}})
-    res.status(200).json({ message: 'Application submitted successfully' });
   } catch (error) {
     console.error('Error saving application:', error);
     res.status(500).json({ message: 'Error submitting application' });
@@ -779,6 +771,27 @@ app.get('/workpermits', async (req, res) => {
   }
 });
 
+app.get('/api/:searchTerm', async (req, res) => {
+  const { searchTerm } = req.params;
+  
+  try {
+    const users = await Person.find({
+      $or: [
+        { name: { $regex: searchTerm, $options: 'i' } },
+        { email: { $regex: searchTerm, $options: 'i' } }
+      ]
+    });
+    
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Serve static files from the 'uploads' directory
+app.use('/uploads', express.static(path.join(__dirname)));
+
+
 //#region SuperAdmin
 
 // API for superadmin login
@@ -804,34 +817,6 @@ app.post('/superadmin/login', async (req, res) => {
   }
 });
 
-
-app.get('/api/:searchTerm', async (req, res) => {
-  const { searchTerm } = req.params;
-  
-  try {
-    const users = await Person.find({
-      $or: [
-        { name: { $regex: searchTerm, $options: 'i' } },
-        { email: { $regex: searchTerm, $options: 'i' } }
-      ]
-    });
-    
-    res.json(users);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-
-// Serve static files from the 'uploads' directory
-app.use('/uploads', express.static(path.join(__dirname)));
-
-
-
-    console.error('Error during login:', error);
-    res.status(500).json({ message: 'Server error' });
-  }
-});
 
 app.post('/adduser', async (req, res) => {
   const { firstName, middleInitial, lastName, contactNumber, email, username, password, role } = req.body;
