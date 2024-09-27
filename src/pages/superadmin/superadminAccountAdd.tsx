@@ -37,7 +37,7 @@ const SuperadminAccountAdd = () => {
 
 
     try {
-      const response = await fetch('http://localhost:3001/adduser', {
+      const response = await fetch('http://localhost:3000/adduser', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -93,6 +93,7 @@ const SuperadminAccountAdd = () => {
           Email:
           <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
         </label>
+        {/* optional username */}
         <label>
           Username:
           <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} required />

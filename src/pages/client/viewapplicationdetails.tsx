@@ -86,7 +86,7 @@ const ViewApplicationDetails: React.FC = () => {
             Authorization: `Bearer ${token}`, // Include token in the request
           },
         });
-        setWorkPermit(response.data); // Set the work permit details to state
+        setWorkPermit(response.data as WorkPermit); // Set the work permit details to state
       } catch (error) {
         console.error('Error fetching work permit details:', error);
         setError('Failed to fetch work permit details.'); // Set error message

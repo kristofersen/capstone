@@ -12,7 +12,7 @@ const path = require('path');
 const { v4: uuidv4 } = require('uuid');
 
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3000;
 const JWT_SECRET = 'your_jwt_secret'; // Use a strong secret key in production
 
 // Setup Nodemailer Transporter
@@ -60,15 +60,13 @@ mongoose.connect('mongodb://localhost:27017/obpwlsdatabase', {
 
 // Define schemas and models
 const userSchema = new mongoose.Schema({
-  firstName: { type: String, required: true },
-  middleInitial: String,
-  lastName: { type: String, required: true },
-  contactNumber: { type: String, required: true },
+  firstName: String,
+  middleName: String,
+  lastName: String,
+  contactNumber: String,
+  address: String,
   email: { type: String, required: true, unique: true },
-  username: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  role: { type: String, enum: ['client', 'admin', 'data controller'], default: 'client', required: true },
-  empId: {type: String},
   isVerified: { type: Boolean },
   userType: String,
   otp: { type: String }, // Store OTP
@@ -86,6 +84,20 @@ const userSchema = new mongoose.Schema({
 
 const User = mongoose.model('User', userSchema);
 
+//data controller and admin schema
+const specialuserSchema = new mongoose.Schema({
+  firstName: { type: String, required: true },
+  middleInitial: String,
+  lastName: { type: String, required: true },
+  contactNumber: { type: String, required: true },
+  email: { type: String, required: true, unique: true },
+  username: String,
+  password: { type: String, required: true },
+  role: { type: String, enum: ['client', 'admin', 'data controller'], default: 'client', required: true },
+  empId: {type: String},
+});
+
+const SpecialUser = mongoose.model('SpecialUser', specialuserSchema);
 
 
 // Define schema and model for Business Permit Application
@@ -185,7 +197,7 @@ const workPermitSchema = new mongoose.Schema({
 
 const WorkPermit = mongoose.model('WorkPermit', workPermitSchema);
 
-// Routes
+// #region Client
 app.post('/signup', async (req, res) => {
   const { firstName, middleName, lastName, contactNumber, address, email, password } = req.body;
 
@@ -791,8 +803,7 @@ app.get('/api/:searchTerm', async (req, res) => {
 // Serve static files from the 'uploads' directory
 app.use('/uploads', express.static(path.join(__dirname)));
 
-
-//#region SuperAdmin
+//#endregion
 
 // API for superadmin login
 app.post('/superadmin/login', async (req, res) => {
@@ -823,7 +834,7 @@ app.post('/adduser', async (req, res) => {
 
   try {
     // Check if the user already exists by email or username
-    const existingUser = await User.findOne({ $or: [{ email }, { username }] });
+    const existingUser = await SpecialUser.findOne({ $or: [{ email }, { username }] });
     if (existingUser) {
       return res.status(400).json({ message: 'Email or Username already in use' });
     }
@@ -837,7 +848,7 @@ app.post('/adduser', async (req, res) => {
     }
     
     // Create a new user
-    const newUser = new User({
+    const newUser = new SpecialUser({
       firstName,
       middleInitial,
       lastName,
@@ -907,9 +918,6 @@ function isSuperadmin(req, res, next) {
     res.status(403).json({ error: 'Invalid token' });
   }
 };
-
-
-
 
 
 
