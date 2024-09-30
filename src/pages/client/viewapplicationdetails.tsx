@@ -68,8 +68,7 @@ export interface PersonalInformation {
 const ViewApplicationDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>(); // Extract work permit ID from URL
   const [workPermit, setWorkPermit] = useState<WorkPermit | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  
   const token = localStorage.getItem('token'); // Assuming the token is stored in local storage
   const navigate = useNavigate();
 
@@ -89,11 +88,8 @@ const ViewApplicationDetails: React.FC = () => {
         setWorkPermit(response.data as WorkPermit); // Set the work permit details to state
       } catch (error) {
         console.error('Error fetching work permit details:', error);
-        setError('Failed to fetch work permit details.'); // Set error message
-      } finally {
-        setLoading(false); // Set loading to false regardless of success or failure
-      }
-    };
+     
+      } }
 
     fetchWorkPermitDetails(); // Call the fetch function
   }, [id, token, navigate]);
@@ -104,13 +100,7 @@ const ViewApplicationDetails: React.FC = () => {
   };
 
 
-  if (loading) {
-    return <div>Loading...</div>; // Show loading indicator
-  }
-
-  if (error) {
-    return <div style={{ color: 'red' }}>{error}</div>; // Show error message
-  }
+ 
 
   return (
     <section className="dashboard-container">

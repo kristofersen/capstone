@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import '../Styles/SAaccoundAdd.css';
 
 const SuperadminAccountAdd = () => {
   const [firstName, setFirstName] = useState('');
@@ -63,6 +64,7 @@ const SuperadminAccountAdd = () => {
         setError(data.message || 'Failed to create user');
         setSuccess(null);
       }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       setError('An error occurred while creating the user');
       setSuccess(null);
@@ -70,51 +72,68 @@ const SuperadminAccountAdd = () => {
   };
 
   return (
-    <div>
-      <h1>Create New User</h1>
-      <form onSubmit={handleSubmit}>
-        <label>
-          First Name:
-          <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} required />
-        </label>
-        <label>
-          Middle Initial:
-          <input type="text" value={middleInitial} onChange={(e) => setMiddleInitial(e.target.value)} />
-        </label>
-        <label>
-          Last Name:
-          <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} required />
-        </label>
-        <label>
-          Contact Number:
-          <input type="text" value={contactNumber} onChange={(e) => setContactNumber(e.target.value)} required />
-        </label>
-        <label>
-          Email:
-          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-        </label>
-        {/* optional username */}
-        <label>
-          Username:
-          <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} required />
-        </label>
-        <label>
-          Password:
-          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-        </label>
-        <label>
-          Role:
-          <select value={role} onChange={(e) => setRole(e.target.value)} required>
-            <option value="">Select Role</option>
-            <option value="admin">Admin</option>
-            <option value="data controller">Data Controller</option>
-          </select>
-        </label>
-        <button type="submit">Create User</button>
-      </form>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      {success && <p style={{ color: 'green' }}>{success}</p>}
+  <div>
+  <h1 className='SAaccountaddH1'>Create New User</h1>
+  <form className="SaAccountAddForm"onSubmit={handleSubmit}>
+    {/* First Name, Middle Initial, Last Name in one row */}
+    <div className="flex-row">
+      <label>
+        First Name:
+        <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} required />
+      </label>
+      <label>
+        Middle Initial:
+        <input type="text" value={middleInitial} onChange={(e) => setMiddleInitial(e.target.value)} />
+      </label>
+      <label>
+        Last Name:
+        <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} required />
+      </label>
     </div>
+
+    {/* Contact Number and Email in one row */}
+    <div className="flex-row">
+      <label>
+        Contact Number:
+        <input type="text" value={contactNumber} onChange={(e) => setContactNumber(e.target.value)} required />
+      </label>
+      <label>
+        Email:
+        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+      </label>
+    </div>
+
+    {/* Username and Password in one row */}
+    <div className="flex-row">
+      <label>
+        Username:
+        <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} required />
+      </label>
+      <label>
+        Password:
+        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+      </label>
+    </div>
+
+    {/* Role Dropdown */}
+    <label>
+      Role:
+      <select value={role} onChange={(e) => setRole(e.target.value)} required>
+        <option value="">Select Role</option>
+        <option value="admin">Admin</option>
+        <option value="data controller">Data Controller</option>
+      </select>
+    </label>
+
+    {/* Submit Button */}
+    <button type="submit" className="SAcreateAccountButton">Create User</button>
+  </form>
+
+  {/* Error and Success Messages */}
+  {error && <p style={{ color: 'red' }}>{error}</p>}
+  {success && <p style={{ color: 'green' }}>{success}</p>}
+</div>
+
   );
 };
 

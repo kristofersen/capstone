@@ -13,7 +13,7 @@ const Home: React.FC = () => {
   return (
     <section className="bodylandingpage">
     <div>
-      <header>
+      <header className="homeheader">
         <h1>Online Business and Work Permit Licensing System</h1>
         <nav>
           <ul>

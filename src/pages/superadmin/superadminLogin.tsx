@@ -1,6 +1,6 @@
-// SuperAdminLogin.tsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import '../Styles/SAlogin.css'; // Import your CSS file
 
 const SuperAdminLogin: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -9,7 +9,7 @@ const SuperAdminLogin: React.FC = () => {
 
   const handleLogin = async () => {
     try {
-      const response = await fetch('http://localhost:3000/superadmin/login', { // Updated URL
+      const response = await fetch('http://localhost:3000/superadmin/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -34,10 +34,11 @@ const SuperAdminLogin: React.FC = () => {
   };
 
   return (
-    <div>
+    <section className="SAloginbody">
+    <div className="SAlogin-container">
       <h2>Super Admin Login</h2>
       <form onSubmit={(e) => { e.preventDefault(); handleLogin(); }}>
-        <div>
+        <div className="form-group">
           <label>Email:</label>
           <input
             type="email"
@@ -46,7 +47,7 @@ const SuperAdminLogin: React.FC = () => {
             required
           />
         </div>
-        <div>
+        <div className="form-group">
           <label>Password:</label>
           <input
             type="password"
@@ -55,9 +56,12 @@ const SuperAdminLogin: React.FC = () => {
             required
           />
         </div>
-        <button type="submit">Login</button>
+        <div className="SAbtn-container">
+          <button type="submit" className="SAlogin-btn">Log in</button>
+        </div>
       </form>
     </div>
+    </section>
   );
 };
 

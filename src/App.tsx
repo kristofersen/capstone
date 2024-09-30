@@ -3,16 +3,21 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Outlet } from 'react-router-dom';
 import { AuthProvider } from './AuthContext';
 
+// MAIN PAGES
 import Home from './pages/home'; 
-import Login from './pages/login'; 
 import Signup from './pages/signup'; 
+import Login from './pages/login'; 
+import EmailVerification from './pages/emailverification';
+import ForgotPassword from './pages/forgotpassword';
+
+// CLIENT PAGES
 import Dashboard from './pages/client/dashboard'; 
 import Account from './pages/client/account'; 
 import BusinessPermit from './pages/client/businesspermitpage';
 import WorkPermit from './pages/client/workpermitpage';
-import EmailVerification from './pages/emailverification';
-import ForgotPassword from './pages/forgotpassword';
 import ViewApplication from './pages/client/viewapplication';
+
+// SUPERADMIN PAGES
 import SuperAdminLogin from './pages/superadmin/superadminLogin';
 import SuperAdminDashboard from './pages/superadmin/superadminDashboard';
 import SuperAdminEditUser from './pages/superadmin/superadminAccountEdit';
@@ -20,6 +25,8 @@ import SuperAdminAccount from './pages/superadmin/superadminAccounts';
 import SuperAdminLogbook from './pages/superadmin/superadminLogbook';
 import SuperadminAddUser from './pages/superadmin/superadminAccountAdd';
 
+// DATA CONTROLLER PAGES
+import DataControllerDashboard from './pages/datacontroller/DAdashboard';
 
 // SuperAdminLayout Component
 const SuperAdminLayout: React.FC = () => (
@@ -49,6 +56,7 @@ const App: React.FC = () => {
         <Route path="/viewapplicationdetails/" element={<ViewApplicationDetails />} />
         <Route path="/apptest" element={<AppTest />} />
         <Route path="/apptest2" element={<AppTest2 />} />
+        <Route path="/DAdashboard" element={<DataControllerDashboard />} />
         {/* Add more routes as needed */}
         <Route element={<SuperAdminLayout />}>
         <Route path="/superadmin/login" element={<SuperAdminLogin />} />

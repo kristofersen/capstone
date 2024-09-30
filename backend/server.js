@@ -723,42 +723,6 @@ app.post('/apptesting', upload.fields([
   }
 });
 
-// Function to generate unique permit ID
-async function generatePermitID(permitType) {
-  const today = new Date();
-  // Get the current date in YYYYMMDD format
-  const year = today.getFullYear(); 
-  const month = String(today.getMonth() + 1).padStart(2, '0');
-  const day = String(today.getDate()).padStart(2, '0');
-  const dateString = `${day}${month}${year}`;
-
-  try {
-      // Count the number of permits issued today for the given permit type
-      const permitCount = await WorkPermit.countDocuments({
-          permittype: permitType,
-          dateIssued: {
-              $gte: new Date(year, today.getMonth(), today.getDate()),
-              $lt: new Date(year, today.getMonth(), today.getDate() + 1) // Only include today
-          }
-      });
-
-      // Use the count to create a sequence number
-      const sequenceNumber = permitCount + 1; // Start counting from 1
-
-      // Pad sequence number to ensure it's always 4 digits
-      const sequenceString = String(sequenceNumber).padStart(4, '0');
-
-      // Construct the final permit ID
-      const permitID = `${permitType}${sequenceString}${dateString}`;
-
-      // Return only the permit ID
-      return permitID; 
-  } catch (error) {
-      console.error('Error generating permit ID:', error);
-      throw error; // or handle the error as needed
-  }
-}
-
 
 app.get('/workpermits', async (req, res) => {
   const token = req.headers.authorization?.split(' ')[1]; // Extract token from 'Bearer <token>'
@@ -888,7 +852,7 @@ const seedSuperadmin = async () => {
       Id: 'S0',
       firstName: 'Super',
       lastName: 'Admin',
-      email: 'awildandan@gmail.com',
+      email: 'superadmin@gmail.com',
       password: hashedPassword,
       role: 'superadmin',
       online: false // Superadmin is offline by default

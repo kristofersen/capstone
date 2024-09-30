@@ -9,7 +9,7 @@ body {
 }
 
 /* NAVBAR */
-header {
+.homeheader {
   background: #00712D;
   color: #ffffff;
   padding: 1rem 2rem; /* Add padding on the sides */

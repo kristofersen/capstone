@@ -1,0 +1,83 @@
+/* Form Container */
+.SaAccountAddForm {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-width: 700px; /* Increased width for better alignment */
+    margin: 20px auto;
+    font-family: Arial, sans-serif;
+  }
+  
+  /* Heading */
+  .SAaccountaddH1 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+  }
+  
+  /* Flexbox Layout */
+  .flex-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+  }
+  
+  .flex-row label {
+    flex: 1;
+    margin-right: 15px;
+  }
+  
+  .flex-row label:last-child {
+    margin-right: 0;
+  }
+  
+  label {
+    display: block;
+    color: #555;
+    font-size: 14px;
+  }
+  
+  /* Inputs */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  select {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+    font-size: 16px;
+  }
+  
+  input:focus,
+  select:focus {
+    border-color: #28a745;
+    outline: none;
+  }
+  
+  /* Submit Button */
+  .SAcreateAccountButton {
+    width: 100%;
+    padding: 10px;
+    background-color: #000000;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 20px;
+  }
+  
+  .SAcreateAccountButton:hover {
+    background-color: #4e4e4e;
+  }
+  
+  /* Error and Success Messages */
+  p {
+    text-align: center;
+    font-size: 14px;
+  }
+  

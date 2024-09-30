@@ -1,0 +1,82 @@
+/* Centering the container in the middle of the page */
+.SAloginbody {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #eaeaea;
+}
+
+  /* Login Container Styles */
+.SAlogin-container {
+    width: 90%; /* Container will take 90% of the screen width */
+    max-width: 400px; /* But will not exceed 400px */
+    margin: 0 6rem; /* Adjusted margin for balanced look */
+    padding: 24px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    font-family: Arial, sans-serif;
+}
+
+h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+}
+
+label {
+    margin-bottom: 5px;
+    font-size: 14px;
+    color: #555;
+}
+
+input {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+input:focus {
+    border-color: #28a745;
+    outline: none;
+}
+
+  /* Button container to align the button to the right */
+.SAbtn-container {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.SAlogin-btn {
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    padding: 8px 16px;
+    font-size: 0.875rem;
+    font-weight: bold;
+    background-color: #000000;
+    color: white;
+    transition: background-color 0.3s ease;
+}
+
+.SAlogin-btn:hover {
+    background-color: #4e4e4e;
+}
+
+  /* Responsive Adjustment */
+@media (max-width: 768px) {
+    .SAlogin-container {
+    margin-right: 2rem;
+    }
+}

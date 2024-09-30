@@ -110,7 +110,7 @@ const handleLogout = () => {
     };
     fetchWorkPermits(token);
     fetchProfile(token);
-   
+
   }, [navigate]);
 
   return (
