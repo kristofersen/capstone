@@ -1,0 +1,228 @@
+/* DASHBOARD CONTAINER STYLE */
+.dashboard-container {
+    display: flex; /* Use flexbox to create a side-by-side layout */
+    height: 100vh; /* Full height of the viewport */
+    overflow: hidden; /* Prevents scrolling */
+}
+
+  /* SIDEBAR CONTAINER STYLE */
+.sidebar-container {
+    width: 225px; /* Fixed width for the sidebar */
+    z-index: 1000; /* Ensure it's above other content */
+}
+
+  /* SIDEBAR STYLE */
+.sidebar {
+    width: 100%; /* Full width within its container */
+    height: 100vh; /* Full height */
+    background-color: #00712D; /* Dark background color */
+    padding-top: 20px;
+    position: relative; /* Relative positioning within its container */
+    overflow-y: auto; /* Add vertical scrolling if necessary */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+  /* LOGO STYLE */
+.sidebar-logo {
+    margin-bottom: 20px;
+}
+
+.logo-image {
+    width: 150px; /* Adjust the width as needed */
+    height: 150px; /* Adjust the height as needed */
+}
+
+  /* SIDEBAR LIST STYLE */
+.sidebar-list {
+    list-style-type: none; /* Remove bullets */
+    padding: 0; /* Remove default padding */
+    margin: 0; /* Remove default margin */
+    width: 100%; /* Full width for sidebar links */
+}
+
+  /* SIDEBAR LINK STYLE */
+.sidebar-link {
+    display: block;
+    padding: 15px 20px;
+    color: #ffffff; /* White text color */
+    text-decoration: none; /* Remove underline */
+    transition: background-color 0.3s; /* Smooth hover effect */
+}
+
+.sidebar-linkactive{
+    display: block;
+    padding: 15px 20px;
+    color: #ffffff; /* White text color */
+    text-decoration: none; /* Remove underline */
+    background-color: #399918;
+}
+
+.sidebar-link:hover {
+    background-color: #399918; /* Darker background on hover */
+}
+
+/* CONTENT STYLES */
+.contentcontainer {
+    width: 100%; /* Ensure the container takes full width */
+    display: flex;
+    flex-direction: column; /* Stack elements vertically */
+    align-items: center; /* Center the content horizontally */
+}
+.applicationStatusContainer,
+.paymentandviewpermitcontainer{
+    display: flex;
+    justify-content: space-around; /* Distribute items with space around */
+    width: 100%; /* Occupy most of the container's width */
+}
+
+
+.applicationstatusBusinessPermit,
+.applicationstatusWorkPermit,
+.payment,
+.viewpermit {
+    flex-grow: 1; /* Each element will grow to take available space */
+    margin: 0 10px; /* Space between buttons */
+    margin-top: 1rem;
+    background-color: #ffffff; /* Button background */
+    color: #000000; /* Text color */
+    padding: 1rem; /* Padding for button */
+    border-radius: 8px; /* Rounded corners */
+    text-decoration: none; /* Removes underline */
+    text-align: center; /* Centers text */
+    transition: background-color 0.3s, transform 0.3s; /* Smooth hover effects */
+    display: inline-block; /* Makes buttons inline elements */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional shadow */
+    width: 100%;
+}
+
+.paymentbuttoncontainer{
+display: flex;
+justify-content: space-around; /* Distribute items with space around */
+width: 100%; /* Occupy most of the container's width */
+}
+
+.paybutton,
+.viewReceiptbutton,
+.viewpermitbutton,
+.viewapplicationbutton
+{
+    border: none;
+    border-radius: 4px; /* Rounded corners */
+    cursor: pointer;
+    padding: 0.5rem;
+    width: 7rem;
+    font-size: 0.875rem; /* Smaller font size for buttons */
+    font-weight: bold; /* Bold text */
+    background-color: #28a745; /* Green background */
+    color: white;
+}
+
+.paybutton:hover,
+.viewReceiptbutton:hover,
+.viewpermitbutton:hover,
+.viewapplicationbutton:hover{
+    background-color: #6cc251; /* Light green color */
+}
+
+/* TABLE STYLES */
+.application-history-container {
+    width: 97%; /* Extend the table container to full width */
+    margin-top: 1rem;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Consistent shadow */
+    padding: 1rem;
+}
+
+.table-title {
+    font-weight: bold;
+    color: #000000;
+    margin-bottom: 1rem;
+}
+
+.application-history-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.application-history-table th, 
+.application-history-table td {
+    padding: 1rem;
+    border-bottom: 1px solid #ddd;
+}
+
+.application-history-table th {
+    background-color: #F1C93B; /* Match sidebar color */
+    color: black;
+    text-align: center;
+}
+
+.application-history-table td {
+    text-align: center;
+}
+
+.application-history-table tr:hover {
+    background-color: #f1f1f1; /* Subtle hover effect */
+}
+
+/* MODAL STYLES */
+/* Modal Overlay */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Modal Content */
+.modal-content {
+    background: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    max-width: 90%;
+    max-height: 80vh; /* Adjust height as needed */
+    overflow-y: auto; /* Enables vertical scrolling if needed */
+}
+
+.paymentbuttons p{
+    background-color: #F1C93B;
+    padding: 1rem;
+    border-radius: 1rem;
+}
+
+.paymentbuttons p:hover{
+    background-color: #f3be00;
+}
+
+.closebuttonmodalpayment,
+.closebuttonmodalviewreceipt,
+.closebuttonmodalviewpermit,
+.closebuttonmodalviewapplication {
+    background-color: #28a745;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.closebuttonmodalpayment:hover,
+.closebuttonmodalviewreceipt:hover,
+.closebuttonmodalviewpermit:hover,
+.closebuttonmodalviewapplication:hover {
+    background-color: #218838;
+}
+
+
+
+
+
+

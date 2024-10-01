@@ -111,7 +111,7 @@ const handleLogout = () => {
     fetchWorkPermits(token);
     fetchProfile(token);
 
-  }, [navigate]);
+  }, [navigate, token]);
 
   return (
     <section className="dashboard-container">

@@ -15,13 +15,14 @@ const Login: React.FC = () => {
       setError('All fields are required.');
       return;
     }
+
     try {
       const response = await fetch('http://localhost:3000/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password, }),
       });
       const data = await response.json();
       if (response.ok) {
@@ -29,12 +30,26 @@ const Login: React.FC = () => {
         localStorage.setItem('token', data.token);
         setSuccess(data.message);
         setError(null);
-        navigate('/dashboard'); // Redirect to home page
+        
+        // Check the user's role and navigate accordingly
+        switch (data.role) {
+          case 'Admin':
+            navigate('/admin-dashboard'); // Redirect to admin dashboard
+            break;
+          case 'Client':
+            navigate('/dashboard'); // Redirect to client dashboard
+            break;
+          case 'Data Controller':
+            navigate('/DAdashboard'); // Redirect to data controller dashboard
+            break;
+          default:
+            navigate('/'); // Fallback dashboard
+        }
       } 
+      
       if (data.error === 'Email is not verified') {
         navigate('/emailverification', { state: { email } }); // Redirect to email verification page if email not verified
-      }
-      else {
+      } else {
         setError(data.error);
         setTimeout(() => {
           setError(null);
@@ -45,6 +60,7 @@ const Login: React.FC = () => {
       console.error('Error logging in', error);
     }
   };
+  
 
   const handleCancel = () => {
     navigate('/'); // Redirect to home page

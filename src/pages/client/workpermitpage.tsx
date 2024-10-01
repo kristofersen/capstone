@@ -32,7 +32,7 @@ const WorkPermit: React.FC = () => {
   const [name2, setName2] = useState('');
   const [mobileTel2, setMobileTel2] = useState('');
   const [address, setAddress] = useState('');
-  const [transaction, setTransaction] = useState('');
+  const [workpermitclassification, setWorkPermitClassification] =useState ('');
   const [files, setFiles] = useState<{
     document1: File | null;
     document2: File | null;
@@ -54,7 +54,7 @@ if (!token) {
           // Perform validation based on the current step
        if (step === 1) {
      // Check if required fields are filled for step 1
-    if (!firstName || !lastName) {
+    if (!firstName || !lastName || !workpermitclassification) {
       setIsFormValid(false); // Set form as invalid
       return; // Prevent moving to the next step
     }
@@ -119,7 +119,7 @@ if (!token) {
     formData.append('name2', name2);
     formData.append('mobileTel2', mobileTel2);
     formData.append('address', address);
-    formData.append('transaction', transaction);
+    formData.append('workpermitclassification', workpermitclassification);
 
     if (files.document1) formData.append('document1', files.document1);
     if (files.document2) formData.append('document2', files.document2);
@@ -238,18 +238,18 @@ if (!token) {
             <div className="form-group">
               <label>CIVIL STATUS:</label>
               <input type="text" value={civilStatus} onChange={(e) => setCivilStatus(e.target.value)} placeholder="CivilStatus"  />
-            </div>
-              <div className="form-group gender-group">
-              <label>GENDER:</label>
-              <label>
-              <input 
+              </div>
+                  <div className="form-group gender-group">
+                 <label>GENDER:</label>
+                <label>
+                <input 
                 type="radio" 
                 name="gender" // Grouping name for radio buttons
                 value="Male" // Set the value directly here
                 checked={gender === "Male"} // Set checked based on state
                 onChange={() => setGender("Male")} 
-              /> Male
-               </label>
+                 /> Male
+                 </label>
               <label>
               <input 
                   type="radio" 
@@ -260,13 +260,13 @@ if (!token) {
                />Female
                  </label>
                 </div>
-          </div>
-          <div className="form-row">
-            <div className="form-group">
+                </div>
+              <div className="form-row">
+               <div className="form-group">
               <label>HEIGHT:</label>
               <input type="text" value={height} onChange={(e) => setHeight(e.target.value)} placeholder="Height"  />
-            </div>
-            <div className="form-group">
+               </div>
+              <div className="form-group">
               <label>WEIGHT:</label>
               <input type="text" value={weight} onChange={(e) => setWeight(e.target.value)} placeholder="Weight"  />
             </div>
@@ -295,6 +295,36 @@ if (!token) {
             <label>COMPANY NAME:</label>
             <input type="text" value={companyName} onChange={(e) => setCompanyName(e.target.value)} placeholder="CompanyName"  />
           </div>
+          <div className="form-group gender-group">
+                 <label>Work Permit Classification:</label>
+                <label>
+                <input 
+                type="radio" 
+                name="Classification" // Grouping name for radio buttons
+                value="New" // Set the value directly here
+                checked={workpermitclassification === "New"} // Set checked based on state
+                onChange={() => setWorkPermitClassification("New")} 
+                required
+                 /> New Work Permit
+                 </label>
+              <label>
+              <input 
+                  type="radio" 
+                  name="Classification" // Grouping name for radio buttons
+                  value="Renew" // Set the value directly here
+                  checked={workpermitclassification === "Renewal"} // Set checked based on state
+                  onChange={() => setWorkPermitClassification("Renewal")} 
+               />Work Permit Renewal
+               <input 
+                  type="radio" 
+                  name="Classification" // Grouping name for radio buttons
+                  value="First-Time" // Set the value directly here
+                  checked={workpermitclassification === "First-Time"} // Set checked based on state
+                  onChange={() => setWorkPermitClassification("First-Time")} 
+               />First Time Job Seeker
+                 </label>
+                 
+                </div>
           <h2>In Case of Emergency</h2>
           <div className="form-group">
             <label>NAME:</label>
@@ -315,7 +345,6 @@ if (!token) {
   <div>
     {/* Content for Step 2 */}
     <button type="button" onClick={goToPreviousStep}>Back</button>
-    <button type="button" onClick={goToNextStep}>Next</button>
       <label>Upload 1x1 Picture:</label>
       <input type="file" onChange={(e) => handleFileChange(e, 'document1')}  />
       <label>Upload Cedula</label>
@@ -324,42 +353,10 @@ if (!token) {
       <input type="file" onChange={(e) => handleFileChange(e, 'document3')}  />
       <label>Upload FTJS Cert.</label>
       <input type="file" onChange={(e) => handleFileChange(e, 'document4')}  />
-
+      <button type="submit" className="submitbuttonworkpermit">Submit</button>
   </div>
 )}
-{step === 3 && (
-  <div>
-    {/* Content for Step 3 */}
-    <button type="button" onClick={goToPreviousStep}>Back</button>
 
-    <div className="form-group payment-group">
-              <label>Mode of Payment:</label>
-              <label>
-              <input 
-                type="radio" 
-                name="payment" // Grouping name for radio buttons
-                value="Online" // Set the value directly here
-                checked={transaction === "Online"} // Set checked based on state
-                onChange={() => setTransaction("Online")} 
-                required
-              /> Online Payment
-               </label>
-              <label>
-              <input 
-                  type="radio" 
-                  name="payment" // Grouping name for radio buttons
-                  value="Offline" // Set the value directly here
-                  checked={transaction === "Offline"} // Set checked based on state
-                  onChange={() => setTransaction("Offline")} 
-               />Onsite/Offline Payment
-                 </label>
-                </div>
-    <button type="submit" className="submitbuttonworkpermit">Submit</button>
-
-
-    
-  </div>
-)}
 </form>
       </div>
     </section>

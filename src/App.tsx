@@ -15,6 +15,7 @@ import Dashboard from './pages/client/dashboard';
 import Account from './pages/client/account'; 
 import BusinessPermit from './pages/client/businesspermitpage';
 import WorkPermit from './pages/client/workpermitpage';
+import ViewBusinessApplication from './pages/client/viewbusinessapplication';
 import ViewApplication from './pages/client/viewapplication';
 
 // SUPERADMIN PAGES
@@ -52,6 +53,7 @@ const App: React.FC = () => {
         <Route path="/emailverification" element={<EmailVerification />} />
         <Route path="/forgotpassword" element={<ForgotPassword />} />
         <Route path="/viewapplication" element={<ViewApplication />} />
+        <Route path="/viewbusinessapplication/" element={<ViewBusinessApplication />} />
         <Route path="/viewapplicationdetails/:id" element={<ViewApplicationDetails />} />
         <Route path="/viewapplicationdetails/" element={<ViewApplicationDetails />} />
         <Route path="/apptest" element={<AppTest />} />

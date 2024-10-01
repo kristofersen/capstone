@@ -14,12 +14,11 @@ const Accounts: React.FC = () => {
   const [admins, setAdmins] = useState<Account[]>([]);
   const [dataControllers, setDataControllers] = useState<Account[]>([]);
   const [error, setError] = useState<string | null>(null);
-
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
   const navigate = useNavigate();
 
+  
+
+  
   useEffect(() => {
     const fetchAccounts = async () => {
       try {
@@ -52,6 +51,11 @@ const Accounts: React.FC = () => {
 
     fetchAccounts();
   }, []);
+
+
+  if (error) {
+    return <div>Error: {error}</div>; // Error message
+}
 
   const handleEdit = (account: Account) => {
     navigate(`http://localhost:3000/superadmin/AccountEdit/${account.id}`);

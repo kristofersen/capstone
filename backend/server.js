@@ -60,15 +60,19 @@ mongoose.connect('mongodb://localhost:27017/obpwlsdatabase', {
 
 // Define schemas and models
 const userSchema = new mongoose.Schema({
+  //For All
+  email: { type: String, required: true, unique: true },
+  userId: { type: String, required: true, unique: true },
+  userrole: { type: String, required: true },
+  password: { type: String, required: true },
+  isVerified: { type: Boolean },
   firstName: String,
   middleName: String,
   lastName: String,
   contactNumber: String,
   address: String,
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-  isVerified: { type: Boolean },
-  userType: String,
+  //Otp Group
+  otpcontent:{
   otp: { type: String }, // Store OTP
   otpExpires: { type: Date }, // Store OTP expiration
   otpAttempts: {
@@ -79,6 +83,8 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: null
   },
+  },
+  //For Client
   workPermits: [{ type: mongoose.Schema.Types.ObjectId, ref: 'WorkPermit' }],
 });
 
@@ -146,8 +152,9 @@ const workPermitSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   permittype: { type: String, required: true, default: 'WP' },
   workpermitstatus: { type: String, required: true, },
-  transaction: { type: String, required: true, },
-  transactionstatus: { type: String, required: true, },
+  classification: { type: String, required: true, },
+  transaction: { type: String },
+  transactionstatus: { type: String },
   dateIssued: { type: Date, default: Date.now },
   formData:
 {
@@ -172,6 +179,7 @@ const workPermitSchema = new mongoose.Schema({
     natureOfWork: String,
     placeOfWork: String,
     companyName: String,
+    workpermitclassification: String,
   },
   emergencyContact: {
     name2: String,
@@ -212,11 +220,11 @@ app.post('/signup', async (req, res) => {
     if (existingUser) {
       return res.status(400).json({ error: 'User already exists.' });
     }
-
-    // Hash the password before saving it to the database
+    const userID = await generateUserId('CL');
+    // Hash the password before saving it to the database 
     const hashedPassword = await bcrypt.hash(password, 10);
     // User is client when registering
-    const userType = "client"
+    const userRole = "Client"
     // Create new user
     const newUser = new User({
       firstName,
@@ -227,8 +235,11 @@ app.post('/signup', async (req, res) => {
       email,
       password: hashedPassword,
       isVerified: false,
-      role: userType,
-      userType: userType
+      userrole: userRole,
+      userId: userID,
+  
+    
+
     });
 
     await newUser.save();
@@ -244,21 +255,31 @@ app.post('/login', async (req, res) => {
   
   try {
     const user = await User.findOne({ email });
+    
     // Check if the email is verified
-    if (!user.isVerified) {
+    if (!user || !user.isVerified) {
       return res.status(400).json({ error: 'Email is not verified' });
     }
+    
     if (user && await bcrypt.compare(password, user.password)) {
       // Generate JWT token
       const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '3h' });
-      res.status(200).json({ message: 'Login successful!', token });
+      
+      // Return the role along with the token
+      res.status(200).json({ 
+        message: 'Login successful!', 
+        token, 
+        role: user.userrole // Assuming the field is named `userrole`
+      });
     } else {
       res.status(400).json({ error: 'Invalid credentials' });
     }
   } catch (error) {
+    console.error('Error logging in:', error); // Log the error for debugging
     res.status(500).json({ error: 'Error logging in' });
   }
 });
+
 
 
 app.get('/profile', async (req, res) => {
@@ -301,8 +322,8 @@ app.post('/send-otp', async (req, res) => {
 
     // Check if cooldown period has passed
     const now = new Date();
-    const lastOtpSentAt = user.lastOtpSentAt;
-    const otpAttempts = user.otpAttempts;
+    const lastOtpSentAt = user.otpcontent.lastOtpSentAt;
+    const otpAttempts = user.otpcontent.otpAttempts;
 
     if (lastOtpSentAt && otpAttempts >= 5 && (now - lastOtpSentAt) < 3 * 60 * 60 * 1000) { // 3 hours
       return res.status(429).json({ error: 'OTP limit reached. Please try again later.' });
@@ -311,8 +332,8 @@ app.post('/send-otp', async (req, res) => {
     // Generate new OTP
     const otp = generateOtp();
     const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // OTP valid for 10 minutes
-    user.otp = otp;
-    user.otpExpires = otpExpires;
+    user.otpcontent.otp = otp;
+    user.otpcontent.otpExpires = otpExpires;
     await user.save();
 
     // Send OTP email
@@ -323,8 +344,8 @@ app.post('/send-otp', async (req, res) => {
     });
 
     // Update OTP attempt and timestamp
-    user.otpAttempts = otpAttempts + 1;
-    user.lastOtpSentAt = now;
+    user.otpcontent.otpAttempts = otpAttempts + 1;
+    user.otpcontent.lastOtpSentAt = now;
     await user.save();
 
     res.status(200).json({ message: 'OTP sent to your email.' });
@@ -346,12 +367,12 @@ app.post('/verify-emailotp', async (req, res) => {
     }
 
     // Check if OTP matches and is still valid
-    if (user.otp === otp && user.otpExpires > new Date()) {
+    if (user.otpcontent.otp === otp && user.otpcontent.otpExpires > new Date()) {
       user.isVerified = true; // Mark email as verified
-      user.otp = null; // Clear OTP
-      user.otpExpires = null; // Clear OTP expiration
-      user.otpAttempts = null;
-      user.lastOtpSentAt = null;
+      user.otpcontent.otp = null; // Clear OTP
+      user.otpcontent.otpExpires = null; // Clear OTP expiration
+      user.otpcontent.otpAttempts = null;
+      user.otpcontent.lastOtpSentAt = null;
       await user.save();
       res.json({ message: 'Email verified successfully.' });
     } else {
@@ -375,16 +396,16 @@ app.post('/update-password', async (req, res) => {
     }
 
     // Check if OTP matches and is still valid
-    if (user.otp === otp && user.otpExpires > new Date()) {
+    if (user.otpcontent.otp === otp && user.otpcontent.otpExpires > new Date()) {
       // Hash the new password
       const hashedPassword = await bcrypt.hash(password, 10);
       
       // Update the user's password
       user.password = hashedPassword;
-      user.otp = null; // Clear OTP after use
-      user.otpExpires = null; // Clear OTP expiration
-      user.otpAttempts = null;
-      user.lastOtpSentAt = null;
+      user.otpcontent.otp = null; // Clear OTP after use
+      user.otpcontent.otpExpires = null; // Clear OTP expiration
+      user.otpcontent.otpAttempts = null;
+      user.otpcontent.lastOtpSentAt = null;
       await user.save();
 
       res.json({ message: 'Password updated successfully.' });
@@ -467,7 +488,7 @@ app.post('/workpermitpage', upload.fields([
     name2,
     mobileTel2,
     address,
-    transaction,
+    workpermitclassification,
   } = req.body;
   console.log('Incoming data:', req.body);
   console.log(req.files)
@@ -477,36 +498,14 @@ app.post('/workpermitpage', upload.fields([
     
     const userId = decoded.userId;
     const permitID = await generatePermitID('WP');
-    
-    // Check mode of payment
-    if (transaction === "Online") {
-
-      workpermitstatus = "Pending"
-      transactionstatus = "Paid"
-      receiptId = uuidv4(); // Generate a unique receipt ID
-      modeOfPayment = "Online Payment";
-      receiptDate = new Date();// Current date as receipt date
-      amountPaid = 200;
-
-    } else if (transaction === "Offline"){
-
-      workpermitstatus = "Payment Pending"
-      transactionstatus = "Not Paid"
-      receiptId = null; // Generate a unique receipt ID
-      modeOfPayment = null;
-      receiptDate = null;// Current date as receipt date
-      amountPaid = null; 
-      // For onsite/offline payment, receiptId can be null
-      // receiptDate can also be set to null or a specific value if needed
-    }
-
+    const status = "Pending";
+    const classification = workpermitclassification;
     // Create a new WorkPermit instance
     const newWorkPermit = new WorkPermit({
       id: permitID,
       userId,
-      workpermitstatus,
-      transaction,
-      transactionstatus,
+      workpermitstatus: status,
+      classification: classification,
       formData: {
         personalInformation: {
           lastName,
@@ -529,6 +528,7 @@ app.post('/workpermitpage', upload.fields([
           natureOfWork,
           placeOfWork,
           companyName,
+          workpermitclassification,
         },
         emergencyContact: {
           name2,
@@ -541,12 +541,6 @@ app.post('/workpermitpage', upload.fields([
           document3: files.document3 ? files.document3[0].path : null,
           document4: files.document4 ? files.document4[0].path : null,
         },
-        receipt:{
-          receiptId,
-          modeOfPayment,
-          receiptDate,
-          amountPaid
-        }
       },
     });
 
@@ -575,22 +569,23 @@ async function generatePermitID(permitType) {
   const dateString = `${day}${month}${year}`;
 
   try {
-      // Fetch the latest permit ID for the given permit type
+      // Fetch the latest permit ID for the given permit type where the ID matches today's date exactly
       const latestPermit = await WorkPermit.findOne({
-          permittype: permitType
-      }).sort({ id: -1 }); // Sort to get the latest permit ID
+          permittype: permitType,
+          id: { $regex: `^${permitType}\\d{4}${dateString}$` } // Match permits for today
+      }).sort({ id: -1 }); // Sort to get the latest permit ID for today
 
-      let sequenceNumber = 1; // Default to 1 if no permits exist
+      let sequenceNumber = 1; // Default to 1 if no permits exist for today
 
       if (latestPermit) {
           // Extract the sequence number from the latest permit ID
           const latestPermitID = latestPermit.id;
 
-          // Use a regex to extract the sequence part (assuming format: WP0002...)
-          const match = latestPermitID.match(/(\d{4})/); // Match the 4 digits
+          // Use a regex to extract the 4-digit sequence part (assuming format: WP0001DDMMYYYY)
+          const match = latestPermitID.match(new RegExp(`^${permitType}(\\d{4})${dateString}$`));
 
           if (match) {
-              sequenceNumber = parseInt(match[0], 10) + 1; // Increment by 1
+              sequenceNumber = parseInt(match[1], 10) + 1; // Increment by 1
           }
       }
 
@@ -608,12 +603,62 @@ async function generatePermitID(permitType) {
   }
 }
 
-// Function to generate receipt ID
-const generateReceiptId = () => {
-  const timestamp = Date.now(); // Current timestamp
-  const randomPart = Math.floor(Math.random() * 1000000); // Random number
-  return `REC-${timestamp}-${randomPart}`; // Generates a receipt ID like 'REC-1634012900000-123456'
-};
+async function generateUserId(role) {
+  const today = new Date();
+
+  // Get the current date in YYYYMMDD format
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const day = String(today.getDate()).padStart(2, '0');
+  const formattedDate = `${year}${month}${day}`; // YYYYMMDD format
+
+  try {
+      // Fetch the latest user ID for the given role
+      const latestUser = await User.findOne({
+          userId: { $regex: `^USER${role}\\d{4}${formattedDate}$` } // Match users for today
+      }).sort({ userId: -1 }); // Sort to get the latest user ID for today
+
+      let sequenceNumber = 1; // Default to 1 if no users exist for today
+
+      if (latestUser) {
+          // Extract the sequence number from the latest user ID
+          const latestUserID = latestUser.userId;
+
+          // Use a regex to extract the 4-digit sequence part (assuming format: USER<role><seq><date>)
+          const match = latestUserID.match(new RegExp(`^USER${role}(\\d{4})${formattedDate}$`));
+
+          if (match) {
+              sequenceNumber = parseInt(match[1], 10) + 1; // Increment by 1
+          }
+      }
+
+      // Pad sequence number to ensure it's always 4 digits
+      const sequenceString = String(sequenceNumber).padStart(4, '0');
+
+      // Construct the final user ID
+      const userID = `USER${role}${sequenceString}${formattedDate}`;
+
+      // Return the constructed user ID
+      return userID; 
+  } catch (error) {
+      console.error('Error generating user ID:', error);
+      throw error; // or handle the error as needed
+  }
+}
+
+// Example usage
+async function createUser(role) {
+  const userId = await generateUserId(role);
+  console.log('Generated User ID:', userId);
+  // Here you can create the user in your database with the generated user ID
+}
+
+// Example calls
+//createUser('ADM'); // For Admin
+//createUser('DC'); // For Data Controller
+//createUser('CL'); // For Client
+
+
 
 app.get('/workpermits', async (req, res) => {
   const token = req.headers.authorization?.split(' ')[1]; // Extract token from 'Bearer <token>'
@@ -773,7 +818,7 @@ app.use('/uploads', express.static(path.join(__dirname)));
 app.post('/superadmin/login', async (req, res) => {
   const { email, password } = req.body;
   try {
-    const user = await User.findOne({ email, role: 'superadmin' });
+    const user = await User.findOne({ email, userrole: 'superadmin' });
     if (!user) {
       console.log('Superadmin not found');
       return res.status(401).json({ message: 'Invalid credentials' });
@@ -794,75 +839,92 @@ app.post('/superadmin/login', async (req, res) => {
 
 
 app.post('/adduser', async (req, res) => {
-  const { firstName, middleInitial, lastName, contactNumber, email, username, password, role } = req.body;
+  const { firstName, middleName, lastName, contactNumber, email, address, password, userrole } = req.body;
 
+  console.log('Incoming data:', req.body);
+  
   try {
-    // Check if the user already exists by email or username
-    const existingUser = await SpecialUser.findOne({ $or: [{ email }, { username }] });
+    // Check if the user already exists by email
+    const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({ message: 'Email or Username already in use' });
+      return res.status(400).json({ message: 'Email already in use' });
+    }
+
+    // Declare variables for userRole and userID
+    let userRole;
+    let userID;
+
+    // Assign userRole and userID based on the userrole from the request
+    if (userrole === 'ADM') {
+      userRole = 'Admin';
+      userID = await generateUserId(userrole);
+    } else if (userrole === 'CL') {
+      userRole = 'Client';
+      userID = await generateUserId(userrole);
+    } else if (userrole === 'DC') {
+      userRole = 'Data Controller';
+      userID = await generateUserId(userrole);
+    } else {
+      return res.status(400).json({ message: 'Invalid user role' });
     }
 
     // Hash the password before saving
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    let empId = null;
-    if (role === 'admin' || role === 'data controller') {
-      empId = `EMP${Math.floor(100000 + Math.random() * 900000)}`; // Generate a random 6-digit number
-    }
-    
     // Create a new user
-    const newUser = new SpecialUser({
+    const newUser = new User({
       firstName,
-      middleInitial,
+      middleName,
       lastName,
       contactNumber,
       email,
-      username,
+      address,
+      userId: userID,
       password: hashedPassword,
-      role,
-      empId,
+      userrole: userRole, // Correct the variable name
+      isVerified: true,
     });
-
 
     // Save the user to the database
     await newUser.save();
 
-    res.status(201).json({ message: 'User created successfully', user: newUser });
+    return res.status(201).json({ message: 'User created successfully' });
   } catch (error) {
     console.error('Error creating user:', error);
-    res.status(500).json({ message: 'Internal Server Error' });
+    return res.status(500).json({ message: 'Internal Server Error' });
   }
 });
 
 
+
+
 // Function to seed the superadmin account
 const seedSuperadmin = async () => {
-  try {
-    const existingSuperadmin = await User.findOne({ role: 'superadmin' });
-    if (existingSuperadmin) {
-      console.log('Superadmin already exists.');
-      return;
-    };
+  const SuperAdmin_Email = 'superadmin@example.com'; // Change to your super admin email
+    const SuperAdmin_Password = 'admin123'; // Change to a secure password
 
-    
-    const hashedPassword = await bcrypt.hash('admin123', 10);
+    try {
+        const superadminExists = await User.findOne({ email: SuperAdmin_Email });
+        if (!superadminExists) {
 
-    const superadmin = new User({
-      Id: 'S0',
-      firstName: 'Super',
-      lastName: 'Admin',
-      email: 'superadmin@gmail.com',
-      password: hashedPassword,
-      role: 'superadmin',
-      online: false // Superadmin is offline by default
-    });
+          const hashedPassword = await bcrypt.hash(SuperAdmin_Password, 10);
 
-    await superadmin.save();
-    console.log('Superadmin account created successfully!');
-  } catch (error) {
-    console.error('Error creating superadmin:', error);
-  }
+            const superadminUser = new User({
+                email: SuperAdmin_Email,
+                password: hashedPassword, // This should be hashed in the User model
+                userrole: 'superadmin',
+                userId: 'superadmin',
+                isVerified: true,
+            });
+
+            await superadminUser.save();
+            console.log('Superadmin user created!');
+        } else {
+            console.log('Superadmin user already exists.');
+        }
+    } catch (error) {
+        console.error('Error seeding superadmin user:', error);
+    }
 }; 
 
 // Middleware to check if the user is a superadmin
@@ -873,7 +935,7 @@ function isSuperadmin(req, res, next) {
   }
   try {
     const decoded = jwt.verify(token, JWT_SECRET); // Decode the JWT
-    if (decoded.role !== 'superadmin') {
+    if (decoded.userrole !== 'superadmin') {
       return res.status(403).json({ error: 'Unauthorized' });
     }
     req.user = decoded; // Attach decoded user info to request object
@@ -886,3 +948,11 @@ function isSuperadmin(req, res, next) {
 
 
 //#endregion
+
+
+//Additional code for client @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+// Get the latest work permit application ID for a user
+
+
+//End additional code for client @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+

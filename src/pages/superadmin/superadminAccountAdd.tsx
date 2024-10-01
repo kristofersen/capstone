@@ -1,75 +1,64 @@
 import React, { useState } from 'react';
 import '../Styles/SAaccoundAdd.css';
 
+
 const SuperadminAccountAdd = () => {
   const [firstName, setFirstName] = useState('');
-  const [middleInitial, setMiddleInitial] = useState('');
+  const [middleName, setMiddleInitial] = useState('');
   const [lastName, setLastName] = useState('');
   const [contactNumber, setContactNumber] = useState('');
   const [email, setEmail] = useState('');
-  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState('');
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
+  const [address, setAddress] = useState('');
+  const [userrole, setRole] = useState('');
 
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
-    
-    // Build the payload to be sent to the server
-    const userData = {
-      firstName,
-      middleInitial,
-      lastName,
-      contactNumber,
-      email,
-      username,
-      password,
-      role,
-      // firstName: "John",
-      // middleInitial: "D",
-      // lastName: "Doe",
-      // contactNumber: "1234567890",
-      // email: "john.doe@example.com",
-      // username: "johndoe",
-      // password: "password123",
-      // role: "admin"
-    };
+  const logFormData = (formData: FormData) => {
+    for (const [key, value] of formData.entries()) {
+      console.log(`${key}:`, value);
+    }
+  };
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
+    const formData = new FormData();
+    formData.append('lastName', lastName);
+    formData.append('firstName', firstName);
+    formData.append('middleInitial', middleName);
+    formData.append('contactNumber', contactNumber);
+    formData.append('password', password);
+    formData.append('address', address);
+    formData.append('userrole', userrole);
+    formData.append('email', email);
+
+    logFormData(formData);
+
+  
     try {
       const response = await fetch('http://localhost:3000/adduser', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(userData),
+        body: JSON.stringify({
+          firstName,
+          middleName,
+          lastName,
+          contactNumber,
+          email,
+          address,
+          password,
+          
+          
+          
+        }),
       });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setSuccess('User created successfully!');
-        setError(null);
-        // Clear the form after successful submission
-        setFirstName('');
-        setMiddleInitial('');
-        setLastName('');
-        setContactNumber('');
-        setEmail('');
-        setUsername('');
-        setPassword('');
-        setRole('');
-      } else {
-        setError(data.message || 'Failed to create user');
-        setSuccess(null);
+     await response.json();
+      } catch (error) {
+        console.error('Error:', error);
       }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (error) {
-      setError('An error occurred while creating the user');
-      setSuccess(null);
-    }
   };
+  
 
   return (
   <div>
@@ -83,7 +72,7 @@ const SuperadminAccountAdd = () => {
       </label>
       <label>
         Middle Initial:
-        <input type="text" value={middleInitial} onChange={(e) => setMiddleInitial(e.target.value)} />
+        <input type="text" value={middleName} onChange={(e) => setMiddleInitial(e.target.value)} />
       </label>
       <label>
         Last Name:
@@ -105,9 +94,9 @@ const SuperadminAccountAdd = () => {
 
     {/* Username and Password in one row */}
     <div className="flex-row">
-      <label>
-        Username:
-        <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} required />
+    <label>
+        Address:
+        <input type="text" value={address} onChange={(e) => setAddress(e.target.value)} required />
       </label>
       <label>
         Password:
@@ -118,20 +107,20 @@ const SuperadminAccountAdd = () => {
     {/* Role Dropdown */}
     <label>
       Role:
-      <select value={role} onChange={(e) => setRole(e.target.value)} required>
-        <option value="">Select Role</option>
-        <option value="admin">Admin</option>
-        <option value="data controller">Data Controller</option>
+      <select value={userrole} onChange={(e) => setRole(e.target.value)} required>
+        <option value="" disabled>Select a role</option> {/* Placeholder option */}
+        <option value="CL">Client</option>
+        <option value="ADM">Admin</option>
+        <option value="DC">Data Controller</option>
       </select>
     </label>
+
 
     {/* Submit Button */}
     <button type="submit" className="SAcreateAccountButton">Create User</button>
   </form>
 
-  {/* Error and Success Messages */}
-  {error && <p style={{ color: 'red' }}>{error}</p>}
-  {success && <p style={{ color: 'green' }}>{success}</p>}
+
 </div>
 
   );

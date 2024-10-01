@@ -38,6 +38,7 @@ const SuperadminAccountEdit: React.FC = () => {
         });
       } catch (error) {
         setError('Error fetching user data');
+        console.error('Error fetching user data:', error);
       }
     };
     fetchUser();
@@ -67,6 +68,7 @@ const SuperadminAccountEdit: React.FC = () => {
       setSuccessMessage('User updated successfully');
       setTimeout(() => navigate('/superadmin/accounts'), 2000); // Redirect after 2 seconds
     } catch (error) {
+      console.error('Error updating user:', error);
       setError('Error updating user');
     }
   };
