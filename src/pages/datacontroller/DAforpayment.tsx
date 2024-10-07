@@ -1,7 +1,7 @@
-import '../Styles/DAdashboard.css'; 
+import '../Styles/DAforpayment.css';
 import { useNavigate } from 'react-router-dom';// Import your CSS file
 
-const DAdashboard: React.FC = () => {
+const DataControllerForPayment: React.FC = () => {
     const navigate = useNavigate();
 
     const handleLogout = () => {
@@ -10,15 +10,15 @@ const DAdashboard: React.FC = () => {
     };
 
 return (
-    <section className="DAdashboard-container">
+    <section className="DAforpayment-container">
         <div className="DAsidebar-container">
             <div className="DAsidebar">
                 <div className="DAsidebar-logo">
-                    <img src="/obpwlsDAlogo.svg" alt="Logo" className="DAlogo-image" />
+                        <img src="/obpwlsDAlogo.svg" alt="Logo" className="logo-image" />
                 </div>
-                    <ul className="DAsidebar-list">
+                <ul className="DAsidebar-list">
                         <li>
-                            <a href="/DAdashboard" className="DAsidebar-linkactive">
+                            <a href="/DAdashboard" className="DAsidebar-link">
                             <img src="/dashboardlogo.svg" alt="Logo" className="sidebarlogoimage" />Dashboard
                             </a>
                         </li>
@@ -28,7 +28,7 @@ return (
                             </a>
                         </li>
                         <li>
-                            <a href="/DAforpayment" className="DAsidebar-link">
+                            <a href="/DAforpayment" className="DAsidebar-linkactive">
                             <img src="paymentlogo.svg" alt="Logo" className="sidebarlogoimage" />For Payment
                             </a>
                         </li>
@@ -61,4 +61,4 @@ return (
 
 };
 
-export default DAdashboard;
+export default DataControllerForPayment;

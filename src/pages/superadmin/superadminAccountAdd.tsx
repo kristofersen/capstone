@@ -48,8 +48,7 @@ const SuperadminAccountAdd = () => {
           email,
           address,
           password,
-          
-          
+          userrole,
           
         }),
       });

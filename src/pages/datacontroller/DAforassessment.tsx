@@ -1,7 +1,7 @@
-import '../Styles/DAdashboard.css'; 
+import '../Styles/DAforassessment.css'; 
 import { useNavigate } from 'react-router-dom';// Import your CSS file
 
-const DAdashboard: React.FC = () => {
+const DataControllerForAssessment: React.FC = () => {
     const navigate = useNavigate();
 
     const handleLogout = () => {
@@ -10,20 +10,20 @@ const DAdashboard: React.FC = () => {
     };
 
 return (
-    <section className="DAdashboard-container">
+    <section className="DAforassessment-container">
         <div className="DAsidebar-container">
             <div className="DAsidebar">
                 <div className="DAsidebar-logo">
-                    <img src="/obpwlsDAlogo.svg" alt="Logo" className="DAlogo-image" />
+                        <img src="/obpwlsDAlogo.svg" alt="Logo" className="logo-image" />
                 </div>
-                    <ul className="DAsidebar-list">
+                <ul className="DAsidebar-list">
                         <li>
-                            <a href="/DAdashboard" className="DAsidebar-linkactive">
+                            <a href="/DAdashboard" className="DAsidebar-link">
                             <img src="/dashboardlogo.svg" alt="Logo" className="sidebarlogoimage" />Dashboard
                             </a>
                         </li>
                         <li>
-                            <a href="/DAforassessment" className="DAsidebar-link">
+                            <a href="/DAforassessment" className="DAsidebar-linkactive">
                             <img src="/DAforassessmentlogo.svg" alt="Logo" className="sidebarlogoimage" />For Assessment
                             </a>
                         </li>
@@ -61,4 +61,4 @@ return (
 
 };
 
-export default DAdashboard;
+export default DataControllerForAssessment;

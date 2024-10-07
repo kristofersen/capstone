@@ -34,6 +34,14 @@
     height: 150px; /* Adjust the height as needed */
 }
 
+/* SIDEBAR LOGO STYLES */
+.sidebarlogoimage {
+    width: 24px; /* Adjust the size of the logo */
+    height: auto; /* Maintain aspect ratio */
+    margin-right: 8px; /* Space between logo and text */
+    vertical-align: middle; /* Align with the text */
+}
+
   /* SIDEBAR LIST STYLE */
 .sidebar-list {
     list-style-type: none; /* Remove bullets */
@@ -44,11 +52,13 @@
 
   /* SIDEBAR LINK STYLE */
 .sidebar-link {
-    display: block;
+    display: flex; /* Use flexbox to align items */
+    align-items: center; /* Vertically center the text and logo */
     padding: 15px 20px;
     color: #ffffff; /* White text color */
     text-decoration: none; /* Remove underline */
     transition: background-color 0.3s; /* Smooth hover effect */
+    white-space: nowrap; /* Prevent text from wrapping */
 }
 
 .sidebar-linkactive{

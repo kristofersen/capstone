@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import '../Styles/viewapplication.css';
+import { useNavigate } from 'react-router-dom';
+import '../Styles/viewallapplication.css';
 
 // Define the WorkPermit interface
 interface WorkPermit {
@@ -10,7 +10,7 @@ interface WorkPermit {
   }
 
 
-const ViewApplication: React.FC = () => {
+const ViewWorkPermitApplication: React.FC = () => {
     const navigate = useNavigate();
     const [workPermits, setWorkPermits] = useState<WorkPermit[]>([]);
     const [, setError] = useState<string | null>(null);
@@ -148,25 +148,53 @@ useEffect(() => {
                         <img src="/obpwlslogo.svg" alt="Logo" className="logo-image" />
                     </div>
                     <ul className="sidebar-list">
-                        <li><Link to="/dashboard" className="sidebar-link">Dashboard</Link></li>
-                        <li><Link to="/workpermitpage" className="sidebar-link">Apply for Work Permit</Link></li>
-                        <li><Link to="/businesspermitpage" className="sidebar-link">Apply for Business Permit</Link></li>
-                        <li><Link to="/viewapplication" className="sidebar-linkactive">View Work Permit Applications</Link></li>
-                        <li><Link to="/viewbusinessapplication" className="sidebar-link">View Business Permit Applications</Link></li>
-                        <li><Link to="/" onClick={handleLogout} className="sidebar-link">Log Out</Link></li>
-                    </ul>
+            <li>
+                <a href="/dashboard" className="sidebar-link">
+                <img src="/dashboardlogo.svg" alt="Logo" className="sidebarlogoimage" />Dashboard
+                </a>
+            </li>
+            <li>
+                <a href="/workpermitpage" className="sidebar-link">
+                <img src="/applicationslogo.svg" alt="Logo" className="sidebarlogoimage" />Work Permit
+                </a>
+            </li>
+            <li>
+                <a href="/businesspermitpage" className="sidebar-link">
+                <img src="/applicationslogo.svg" alt="Logo" className="sidebarlogoimage" />Business Permit
+                </a>
+            </li>
+            <li>
+                <a href="/viewworkpermitapplication" className="sidebar-link">
+                <img src="/viewspecificapplicationlogo.svg" alt="Logo" className="sidebarlogoimage" />View WP Applications
+                </a>
+            </li>
+            <li>
+                <a href="/viewbusinessapplication" className="sidebar-link">
+                <img src="/viewspecificapplicationlogo.svg" alt="Logo" className="sidebarlogoimage" />View BP Applications
+                </a>
+            </li>
+            <li>
+                <a href="/viewallapplication" className="sidebar-linkactive">
+                <img src="/viewallapplicationslogo.svg" alt="Logo" className="sidebarlogoimage" />View All Applications
+                </a>
+            </li>
+            <li>
+                <a href="/account" className="sidebar-link">
+                <img src="/accountlogo.svg" alt="Logo" className="sidebarlogoimage" />Account
+                </a>
+            </li>
+            <li>
+                <a href="/" onClick={handleLogout} className="sidebar-link">
+                <img src="/logoutlogo.svg" alt="Logo" className="sidebarlogoimage" />Log Out
+                </a>
+            </li>
+        </ul>
                 </div>
             </div>
 
             <div className="content">
                 <header>
-                    <h1>View Applications</h1>
-                    <nav>
-                        <ul>
-                            <li><Link to="/account" className="button">Account</Link></li>
-                            <li><Link to="/" onClick={handleLogout} className="button">Logout</Link></li>
-                        </ul>
-                    </nav>
+                    <h1>All Applications</h1>
                 </header>
 
                 <div className="contentcontainer">
@@ -241,4 +269,4 @@ useEffect(() => {
     );
 };
 
-export default ViewApplication;
+export default ViewWorkPermitApplication;

@@ -752,10 +752,10 @@ app.post('/apptesting', upload.fields([
         phoneNumber,
         isActive: isActive === 'true',
       },
-     files: {
+    files: {
         document1: files.document1 ? files.document1[0].path : null,
         document2: files.document2 ? files.document2[0].path : null,
-       document3: files.document3 ? files.document3[0].path : null,
+      document3: files.document3 ? files.document3[0].path : null,
 
       },
     });
@@ -884,7 +884,7 @@ app.post('/adduser', async (req, res) => {
       userrole: userRole, // Correct the variable name
       isVerified: true,
     });
-
+console.log(newUser);
     // Save the user to the database
     await newUser.save();
 

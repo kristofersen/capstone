@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import '../Styles/businesspermitpage.css';
 
 const BusinessPermit: React.FC = () => {
@@ -153,11 +153,46 @@ const BusinessPermit: React.FC = () => {
             <img src="/obpwlslogo.svg" alt="Logo" className="logo-image" />
           </div>
           <ul className="sidebar-list">
-            <li><Link to="/dashboard" className="sidebar-link">Dashboard</Link></li>
-            <li><Link to="/workpermitpage" className="sidebar-link">Apply for Work Permit</Link></li>
-            <li><Link to="/businesspermitpage" className="sidebar-linkactive">Apply for Business Permit</Link></li>
-            <li><Link to="/viewapplication" className="sidebar-link">View Applications</Link></li>
-            <li><Link to="/" onClick={handleLogout} className="sidebar-link">Log Out</Link></li>
+            <li>
+              <a href="/dashboard" className="sidebar-link">
+              <img src="/dashboardlogo.svg" alt="Logo" className="sidebarlogoimage" />Dashboard
+              </a>
+            </li>
+            <li>
+              <a href="/workpermitpage" className="sidebar-link">
+              <img src="/applicationslogo.svg" alt="Logo" className="sidebarlogoimage" />Work Permit
+              </a>
+            </li>
+            <li>
+              <a href="/businesspermitpage" className="sidebar-linkactive">
+              <img src="/applicationslogo.svg" alt="Logo" className="sidebarlogoimage" />Business Permit
+              </a>
+            </li>
+            <li>
+              <a href="/viewworkpermitapplication" className="sidebar-link">
+              <img src="/viewspecificapplicationlogo.svg" alt="Logo" className="sidebarlogoimage" />View WP Applications
+              </a>
+            </li>
+            <li>
+              <a href="/viewbusinessapplication" className="sidebar-link">
+              <img src="/viewspecificapplicationlogo.svg" alt="Logo" className="sidebarlogoimage" />View BP Applications
+              </a>
+            </li>
+            <li>
+              <a href="/viewallapplication" className="sidebar-link">
+              <img src="/viewallapplicationslogo.svg" alt="Logo" className="sidebarlogoimage" />View All Applications
+              </a>
+            </li>
+            <li>
+              <a href="/account" className="sidebar-link">
+              <img src="/accountlogo.svg" alt="Logo" className="sidebarlogoimage" />Account
+              </a>
+            </li>
+            <li>
+              <a href="/" onClick={handleLogout} className="sidebar-link">
+              <img src="/logoutlogo.svg" alt="Logo" className="sidebarlogoimage" />Log Out
+              </a>
+            </li>
           </ul>
         </div>
       </div>
@@ -165,12 +200,6 @@ const BusinessPermit: React.FC = () => {
       <div className="content">
         <header>
           <h1>Business Permit Application</h1>
-          <nav>
-            <ul>
-              <li><Link to="/account" className="button">Account</Link></li>
-              <li><Link to="/" onClick={handleLogout} className="button">Logout</Link></li>
-            </ul>
-          </nav>
         </header>
 
         {/* Owner Information Form */}
