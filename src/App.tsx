@@ -40,6 +40,7 @@ const SuperAdminLayout: React.FC = () => (
     <Outlet />
   </AuthProvider>
 );
+import ViewApplicationDetails from './pages/client/viewapplicationdetails';
 import AppTest from './pages/apptest';
 import AppTest2 from './pages/apptest2';
 
@@ -59,6 +60,8 @@ const App: React.FC = () => {
         <Route path="/viewbusinessapplication" element={<ViewBusinessApplication />} />
         <Route path="/viewworkpermitapplication" element={<ViewWorkPermitApplication />} />
         <Route path="/viewallapplication" element={<ViewAllApplication />} />
+        <Route path="/viewapplicationdetails/:id" element={<ViewApplicationDetails />} />
+        <Route path="/viewapplicationdetails/" element={<ViewApplicationDetails />} />
         <Route path="/apptest" element={<AppTest />} />
         <Route path="/apptest2" element={<AppTest2 />} />
 

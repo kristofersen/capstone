@@ -165,46 +165,11 @@ if (!token) {
             <img src="/obpwlslogo.svg" alt="Logo" className="logo-image" />
           </div>
           <ul className="sidebar-list">
-            <li>
-              <a href="/dashboard" className="sidebar-link">
-              <img src="/dashboardlogo.svg" alt="Logo" className="sidebarlogoimage" />Dashboard
-              </a>
-            </li>
-            <li>
-              <a href="/workpermitpage" className="sidebar-linkactive">
-              <img src="/applicationslogo.svg" alt="Logo" className="sidebarlogoimage" />Work Permit
-              </a>
-            </li>
-            <li>
-              <a href="/businesspermitpage" className="sidebar-link">
-              <img src="/applicationslogo.svg" alt="Logo" className="sidebarlogoimage" />Business Permit
-              </a>
-            </li>
-            <li>
-              <a href="/viewworkpermitapplication" className="sidebar-link">
-              <img src="/viewspecificapplicationlogo.svg" alt="Logo" className="sidebarlogoimage" />View WP Applications
-              </a>
-            </li>
-            <li>
-              <a href="/viewbusinessapplication" className="sidebar-link">
-              <img src="/viewspecificapplicationlogo.svg" alt="Logo" className="sidebarlogoimage" />View BP Applications
-              </a>
-            </li>
-            <li>
-              <a href="/viewallapplication" className="sidebar-link">
-              <img src="/viewallapplicationslogo.svg" alt="Logo" className="sidebarlogoimage" />View All Applications
-              </a>
-            </li>
-            <li>
-              <a href="/account" className="sidebar-link">
-              <img src="/accountlogo.svg" alt="Logo" className="sidebarlogoimage" />Account
-              </a>
-            </li>
-            <li>
-              <a href="/" onClick={handleLogout} className="sidebar-link">
-              <img src="/logoutlogo.svg" alt="Logo" className="sidebarlogoimage" />Log Out
-              </a>
-            </li>
+            <li><a href="/dashboard" className="sidebar-link">Dashboard</a></li>
+            <li><a href="/workpermitpage" className="sidebar-linkactive">Apply for Work Permit</a></li>
+            <li><a href="/businesspermitpage" className="sidebar-link">Apply for Business Permit</a></li>
+            <li><a href="/viewapplication" className="sidebar-link">View Applications</a></li>
+            <li><a href="/" onClick={handleLogout} className="sidebar-link">Log Out</a></li>
           </ul>
         </div>
       </div>
@@ -212,6 +177,12 @@ if (!token) {
       <div className="content">
         <header>
           <h1>Work Permit Application</h1>
+          <nav>
+            <ul>
+              <li><a href="/account" className="button">Account</a></li>
+              <li><a href="/" onClick={handleLogout} className="button">Logout</a></li>
+            </ul>
+          </nav>
         </header>
         <form onSubmit={handleSubmit}>
 {step === 1 &&(
@@ -344,13 +315,6 @@ if (!token) {
                   checked={workpermitclassification === "Renewal"} // Set checked based on state
                   onChange={() => setWorkPermitClassification("Renewal")} 
                />Work Permit Renewal
-               <input 
-                  type="radio" 
-                  name="Classification" // Grouping name for radio buttons
-                  value="First-Time" // Set the value directly here
-                  checked={workpermitclassification === "First-Time"} // Set checked based on state
-                  onChange={() => setWorkPermitClassification("First-Time")} 
-               />First Time Job Seeker
                  </label>
                  
                 </div>
@@ -379,9 +343,9 @@ if (!token) {
       <label>Upload Cedula</label>
       <input type="file" onChange={(e) => handleFileChange(e, 'document2')}  />
       <label>Upload Referral Letter</label>
-      <input type="file" onChange={(e) => handleFileChange(e, 'document3')}  />
+      <input type="file" onChange={(e) => handleFileChange(e, 'document3')} disabled={currentlyResiding} />
       <label>Upload FTJS Cert.</label>
-      <input type="file" onChange={(e) => handleFileChange(e, 'document4')}  />
+      <input type="file" onChange={(e) => handleFileChange(e, 'document4')} disabled={workpermitclassification === "Renewal"} />
       <button type="submit" className="submitbuttonworkpermit">Submit</button>
   </div>
 )}

@@ -715,7 +715,7 @@ console.log(id);
 });
 
 
-
+// Apptest Codes @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 const PersonSchema = new mongoose.Schema({
   name: String,
   email: String,
@@ -752,10 +752,10 @@ app.post('/apptesting', upload.fields([
         phoneNumber,
         isActive: isActive === 'true',
       },
-    files: {
+     files: {
         document1: files.document1 ? files.document1[0].path : null,
         document2: files.document2 ? files.document2[0].path : null,
-      document3: files.document3 ? files.document3[0].path : null,
+       document3: files.document3 ? files.document3[0].path : null,
 
       },
     });
@@ -767,7 +767,7 @@ app.post('/apptesting', upload.fields([
     res.status(500).json({ message: 'Error submitting application' });
   }
 });
-
+// Apptest Codes @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 app.get('/workpermits', async (req, res) => {
   const token = req.headers.authorization?.split(' ')[1]; // Extract token from 'Bearer <token>'
@@ -792,6 +792,8 @@ app.get('/workpermits', async (req, res) => {
   }
 });
 
+// Apptest Codes @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
 app.get('/api/:searchTerm', async (req, res) => {
   const { searchTerm } = req.params;
   
@@ -811,6 +813,10 @@ app.get('/api/:searchTerm', async (req, res) => {
 
 // Serve static files from the 'uploads' directory
 app.use('/uploads', express.static(path.join(__dirname)));
+// Apptest Codes @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+
+
 
 //#endregion
 
@@ -884,7 +890,7 @@ app.post('/adduser', async (req, res) => {
       userrole: userRole, // Correct the variable name
       isVerified: true,
     });
-console.log(newUser);
+
     // Save the user to the database
     await newUser.save();
 

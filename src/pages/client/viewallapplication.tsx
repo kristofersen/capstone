@@ -17,6 +17,7 @@ const ViewWorkPermitApplication: React.FC = () => {
     const token = localStorage.getItem('token');
     const [latestPermitID, setLatestPermitID] = useState<string | null>(null);
     const [latestPermitmainID, setLatestPermitmainID] = useState<string | null>(null);
+    const [latestStatus, setLatestStatus] = useState<string | null>(null);
 
 // CODE FOR TABLE @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 const [activePermit, setActivePermit] = useState<WorkPermit | null>(null);
@@ -136,6 +137,7 @@ useEffect(() => {
       // The first item in the sorted array is the latest
       setLatestPermitID(sortedPermits[0].id);
       setLatestPermitmainID(sortedPermits[0]._id);
+      setLatestStatus(sortedPermits[0].workpermitstatus);
     }
 
   }, [navigate, token, workPermits]);
@@ -203,7 +205,10 @@ useEffect(() => {
                             <h2>Current Application Status For Work Permit:</h2>
                             <div>
       {latestPermitID ? (
+        <>
         <p>Latest Work Permit Application ID: {latestPermitID}</p>
+        <p>Latest Status: {latestStatus}</p>
+        </>
       ) : (
         <p>No work permits found</p>
       )}
