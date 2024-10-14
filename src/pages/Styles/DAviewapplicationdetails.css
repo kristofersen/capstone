@@ -1,0 +1,90 @@
+/* DASHBOARD CONTAINER STYLE */
+.DAdreleasedpermits-container {
+    display: flex; /* Use flexbox to create a side-by-side layout */
+    height: 100vh; /* Full height of the viewport */
+    overflow: hidden; /* Prevents scrolling */
+}
+
+  /* SIDEBAR CONTAINER STYLE */
+.DAsidebar-container {
+    width: 225px; /* Fixed width for the sidebar */
+    z-index: 1000; /* Ensure it's above other content */
+}
+
+  /* SIDEBAR STYLE */
+.DAsidebar {
+    width: 100%; /* Full width within its container */
+    height: 100vh; /* Full height */
+    background-color: #0047AB; /* Dark background color */
+    padding-top: 20px;
+    position: relative; /* Relative positioning within its container */
+    overflow-y: auto; /* Add vertical scrolling if necessary */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+  /* LOGO STYLE */
+.DAsidebar-logo {
+    margin-bottom: 20px;
+}
+
+.DAlogo-image {
+    width: 150px; /* Adjust the width as needed */
+    height: 150px; /* Adjust the height as needed */
+}
+
+/* SIDEBAR LOGO STYLES */
+.sidebarlogoimage {
+    width: 24px; /* Adjust the size of the logo */
+    height: auto; /* Maintain aspect ratio */
+    margin-right: 8px; /* Space between logo and text */
+    vertical-align: middle; /* Align with the text */
+}
+
+/* SIDEBAR LIST STYLE */
+.DAsidebar-list {
+    list-style-type: none; /* Remove bullets */
+    padding: 0; /* Remove default padding */
+    margin: 0; /* Remove default margin */
+    width: 100%; /* Full width for sidebar links */
+}
+
+/* SIDEBAR LINK STYLE */
+.DAsidebar-link {
+    display: block;
+    padding: 15px 20px;
+    color: #ffffff; /* White text color */
+    text-decoration: none; /* Remove underline */
+    transition: background-color 0.3s; /* Smooth hover effect */
+}
+
+.DAsidebar-linkactive{
+    display: block;
+    padding: 15px 20px;
+    color: #ffffff; /* White text color */
+    text-decoration: none; /* Remove underline */
+    background-color: #0000FF;
+}
+
+.DAsidebar-link:hover {
+    background-color: #0000FF; /* Darker background on hover */
+}
+
+/* CONTENT STYLE */
+.DAcontent {
+    flex-grow: 1; /* Allow content area to expand to fill available space */
+    padding: 20px; /* Add padding around the content */
+    overflow-y: auto; /* Enable vertical scrolling for content if necessary */
+}
+
+/* HEADER AND NAVIGATION */
+.DAheader {
+    margin-bottom: 20px; /* Space below the header */
+    background-color: #0047AB; /* Example background color */
+    color: #ffffff; /* White text color for contrast */
+    padding: 20px; /* Padding inside the header */
+    border-radius: 10px; /* Rounded corners */
+    text-align: center; /* Center-align the header text */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional: subtle shadow for depth */
+}

@@ -33,6 +33,7 @@ import DataControllerForAssessment from './pages/datacontroller/DAforassessment'
 import DataControllerForPayment from './pages/datacontroller/DAforpayment';
 import DataControllerReleasedPermit from './pages/datacontroller/DAreleasedpermits';
 import DataControllerReportandGraph from './pages/datacontroller/DAreportsngraph';
+import DataControllerViewApplicationDetails from './pages/datacontroller/DAviewapplicationdetails';
 
 // SuperAdminLayout Component
 const SuperAdminLayout: React.FC = () => (
@@ -71,6 +72,8 @@ const App: React.FC = () => {
         <Route path="/DAforpayment" element={<DataControllerForPayment />} />
         <Route path="/DAreleasedpermits" element={<DataControllerReleasedPermit />} />
         <Route path="/DAreportsngraph" element={<DataControllerReportandGraph />} />
+        <Route path="/DAviewapplicationdetails/" element={<DataControllerViewApplicationDetails />} />
+        <Route path="/DAviewapplicationdetails/:id" element={<DataControllerViewApplicationDetails />} />
 
         {/* Add more routes as needed */}
         <Route element={<SuperAdminLayout />}>
