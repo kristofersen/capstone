@@ -2,11 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 interface Account {
-  id: string;
-  employeeName: string;
-  employeeID: string;
-  username: string;
-  mobileNo: string;
+  userId: string;
+  firstName: string;
+  lastName: string;
+  contactNumber: string;
   email: string;
 }
 
@@ -22,8 +21,8 @@ const Accounts: React.FC = () => {
   useEffect(() => {
     const fetchAccounts = async () => {
       try {
-        const adminResponse = await fetch('http://localhost:3000/admins');
-        const dataControllerResponse = await fetch('http://localhost:3000/dataControllers');
+        const adminResponse = await fetch('http://localhost:3000/adminusers');
+        const dataControllerResponse = await fetch('http://localhost:3000/datacontrollers');
 
         if (!adminResponse.ok) {
           const errorText = await adminResponse.text();
@@ -58,12 +57,12 @@ const Accounts: React.FC = () => {
 }
 
   const handleEdit = (account: Account) => {
-    navigate(`http://localhost:3000/superadmin/AccountEdit/${account.id}`);
+    navigate(`/superadmin/edituser/${account.userId}`);
   };
 
   const handleRemove = async (account: Account) => {
     try {
-      const response = await fetch(`http://localhost:3000/accounts/${account.id}`, {
+      const response = await fetch(`http://localhost:3000/accounts/${account.userId}`, {
         method: 'DELETE',
       });
 
@@ -73,9 +72,9 @@ const Accounts: React.FC = () => {
       }
 
       // Update the state to remove the deleted account
-      setAdmins((prevAdmins) => prevAdmins.filter((admin) => admin.id !== account.id));
+      setAdmins((prevAdmins) => prevAdmins.filter((admin) => admin.userId !== account.userId));
       setDataControllers((prevDataControllers) =>
-        prevDataControllers.filter((controller) => controller.id !== account.id)
+        prevDataControllers.filter((controller) => controller.userId !== account.userId)
       );
     } catch (err) {
       if (err instanceof Error) {
@@ -126,7 +125,6 @@ const Accounts: React.FC = () => {
             <tr>
               <th>Employee Name</th>
               <th>Employee ID</th>
-              <th>Username</th>
               <th>Mobile No.</th>
               <th>Email</th>
               <th>Actions</th>
@@ -135,10 +133,9 @@ const Accounts: React.FC = () => {
           <tbody>
             {admins.map((admin, index) => (
               <tr key={index}>
-                <td>{admin.employeeName}</td>
-                <td>{admin.employeeID}</td>
-                <td>{admin.username}</td>
-                <td>{admin.mobileNo}</td>
+                <td>{admin.firstName} {admin.lastName}</td>
+                <td>{admin.userId}</td>
+                <td>{admin.contactNumber}</td>
                 <td>{admin.email}</td>
                 <td>{renderActionsDropdown(admin)}</td>
               </tr>
@@ -169,10 +166,9 @@ const Accounts: React.FC = () => {
           <tbody>
             {dataControllers.map((controller, index) => (
               <tr key={index}>
-                <td>{controller.employeeName}</td>
-                <td>{controller.employeeID}</td>
-                <td>{controller.username}</td>
-                <td>{controller.mobileNo}</td>
+                <td>{controller.firstName} {controller.lastName}</td>
+                <td>{controller.userId}</td>
+                <td>{controller.contactNumber}</td>
                 <td>{controller.email}</td>
                 <td>{renderActionsDropdown(controller)}</td>
               </tr>

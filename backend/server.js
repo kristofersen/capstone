@@ -71,6 +71,12 @@ const userSchema = new mongoose.Schema({
   lastName: String,
   contactNumber: String,
   address: String,
+  logs: [
+    {
+      dateTime: Date,
+      action: String
+    }
+  ],
   //Otp Group
   otpcontent:{
   otp: { type: String }, // Store OTP
@@ -86,24 +92,15 @@ const userSchema = new mongoose.Schema({
   },
   //For Client
   workPermits: [{ type: mongoose.Schema.Types.ObjectId, ref: 'WorkPermit' }],
+  timeIn: { type: Date },
+  timeOut: { type: Date }
+}, {
+  timestamps: true
+  
 });
 
 const User = mongoose.model('User', userSchema);
 
-//data controller and admin schema
-const specialuserSchema = new mongoose.Schema({
-  firstName: { type: String, required: true },
-  middleInitial: String,
-  lastName: { type: String, required: true },
-  contactNumber: { type: String, required: true },
-  email: { type: String, required: true, unique: true },
-  username: String,
-  password: { type: String, required: true },
-  role: { type: String, enum: ['client', 'admin', 'data controller'], default: 'client', required: true },
-  empId: {type: String},
-});
-
-const SpecialUser = mongoose.model('SpecialUser', specialuserSchema);
 
 
 // Define schema and model for Business Permit Application
@@ -927,23 +924,107 @@ const seedSuperadmin = async () => {
     }
 }; 
 
-// Middleware to check if the user is a superadmin
-function isSuperadmin(req, res, next) {
-  const token = req.headers.authorization?.split(' ')[1]; // Extract JWT from Authorization header
-  if (!token) {
-    return res.status(403).json({ error: 'No token provided' });
-  }
+app.get('/adminusers', async (req, res) => {
   try {
-    const decoded = jwt.verify(token, JWT_SECRET); // Decode the JWT
-    if (decoded.userrole !== 'superadmin') {
-      return res.status(403).json({ error: 'Unauthorized' });
-    }
-    req.user = decoded; // Attach decoded user info to request object
-    next();
+    const users = await User.find({ userrole: 'Admin' });
+    res.json(users);
   } catch (error) {
-    res.status(403).json({ error: 'Invalid token' });
+    res.status(500).json({ message: error.message });
   }
-};
+});
+
+app.get('/datacontrollers', async (req, res) => {
+  try {
+    const users = await User.find({ userrole: 'Data Controller' });
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+
+
+
+app.get('/account/:userId', async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// API endpoint to fetch user data by ID
+app.get('/accounts/:id', async (req, res) => {
+  try {
+    const user = await User.findOne({ userId: req.params.id });
+    if (!user) {
+      return res.status(404).send('User not found');
+    }
+    res.send(user);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
+// API endpoint to update user data by ID
+app.put('/accounts/:id', async (req, res) => {
+  try {
+    const user = await User.findOneAndUpdate({ userId: req.params.id }, req.body, { new: true });
+    if (!user) {
+      return res.status(404).send('User not found');
+    }
+    res.send(user);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
+// API endpoint to fetch admin logs
+app.get('/adminLogs', async (req, res) => {
+  try {
+    const adminLogs = await User.find({ role: 'admin' }); // Assuming LogEntry has a role field
+    res.json(adminLogs);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
+// API endpoint to fetch data controller logs
+app.get('/dataControllerLogs', async (req, res) => {
+  try {
+    const dataControllerLogs = await User.find({ role: 'dataController' }); // Assuming LogEntry has a role field
+    res.json(dataControllerLogs);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
+// API endpoint to fetch online admins
+app.get('/api/onlineAdmins', async (req, res) => {
+  try {
+    const onlineAdmins = await User.find({ role: 'admin', status: 'online' });
+    res.json(onlineAdmins);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
+// API endpoint to fetch online data controllers
+app.get('/api/onlineDataControllers', async (req, res) => {
+  try {
+    const onlineDataControllers = await User.find({ role: 'dataController', status: 'online' });
+    res.json(onlineDataControllers);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
 
 
 

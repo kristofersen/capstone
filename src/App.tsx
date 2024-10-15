@@ -63,10 +63,10 @@ const App: React.FC = () => {
         <Route element={<SuperAdminLayout />}>
         <Route path="/superadmin/login" element={<SuperAdminLogin />} />
           <Route path="/superadmin/dashboard" element={<SuperAdminDashboard />} />
-          <Route path="/superadmin/edutuser" element={<SuperAdminEditUser />} />
-          <Route path="/superadmin/accounts" element={<SuperAdminAccount />} />
+          <Route path="/superadmin/edituser/:id" element={<SuperAdminEditUser />} />
+          <Route path="/superadmin/account" element={<SuperAdminAccount />} />
           <Route path="/superadmin/logbooks" element={<SuperAdminLogbook />} />
-          <Route path='/superadmin/accountadd' element={<SuperadminAddUser />} />
+          <Route path="/superadmin/accountadd" element={<SuperadminAddUser />} />
         </Route>
       </Routes>
     </Router>
