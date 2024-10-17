@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import jsPDF from 'jspdf';
 
 const AppTest: React.FC = () => {
   const [name, setName] = useState('');
@@ -67,6 +68,54 @@ const logFormData = (formData: FormData) => {
     }
   };
 
+
+
+// Pdf Creation for reciepts and permits @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+  const generateReceiptPDF = () => {
+    const doc = new jsPDF();
+    
+    // Add title
+    doc.setFontSize(16);
+    doc.text("Receipt", 105, 20, { align: "center" });
+
+    // Add user information
+    doc.setFontSize(12);
+    doc.text(`Name: ${name}`, 20, 40);
+    doc.text(`Email: ${email}`, 20, 50);
+    doc.text(`Age: ${age}`, 20, 60);
+    doc.text(`Address: ${address}`, 20, 70);
+    doc.text(`Phone Number: ${phoneNumber}`, 20, 80);
+    doc.text(`Is Active: ${isActive ? 'Yes' : 'No'}`, 20, 90);
+
+    // Add footer
+    doc.text("Thank you for submitting your information!", 20, 120);
+
+    // Save the PDF
+    doc.save(`receipt_${name}.pdf`);
+  };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   return (
     <form onSubmit={handleSubmit}>
       <input
@@ -116,7 +165,17 @@ const logFormData = (formData: FormData) => {
       <input type="file" onChange={(e) => handleFileChange(e, 'document2')} required />
       <input type="file" onChange={(e) => handleFileChange(e, 'document3')} required />
       <button type="submit">Submit</button>
+
+      <div>
+      <h1>Receipt Page</h1>
+      <button onClick={generateReceiptPDF}>
+        Download Receipt
+      </button>
+    </div>
     </form>
+    
+
+    
   );
 };
 

@@ -15,8 +15,9 @@ import Dashboard from './pages/client/dashboard';
 import Account from './pages/client/account'; 
 import BusinessPermit from './pages/client/businesspermitpage';
 import WorkPermit from './pages/client/workpermitpage';
+import ViewWorkPermitApplication from './pages/client/viewworkpermitapplication';
 import ViewBusinessApplication from './pages/client/viewbusinessapplication';
-import ViewApplication from './pages/client/viewapplication';
+import ViewAllApplication from './pages/client/viewallapplication';
 
 // SUPERADMIN PAGES
 import SuperAdminLogin from './pages/superadmin/superadminLogin';
@@ -28,6 +29,11 @@ import SuperadminAddUser from './pages/superadmin/superadminAccountAdd';
 
 // DATA CONTROLLER PAGES
 import DataControllerDashboard from './pages/datacontroller/DAdashboard';
+import DataControllerForAssessment from './pages/datacontroller/DAforassessment';
+import DataControllerForPayment from './pages/datacontroller/DAforpayment';
+import DataControllerReleasedPermit from './pages/datacontroller/DAreleasedpermits';
+import DataControllerReportandGraph from './pages/datacontroller/DAreportsngraph';
+import DataControllerViewApplicationDetails from './pages/datacontroller/DAviewapplicationdetails';
 
 // SuperAdminLayout Component
 const SuperAdminLayout: React.FC = () => (
@@ -52,13 +58,23 @@ const App: React.FC = () => {
         <Route path="/workpermitpage" element={<WorkPermit />} />
         <Route path="/emailverification" element={<EmailVerification />} />
         <Route path="/forgotpassword" element={<ForgotPassword />} />
-        <Route path="/viewapplication" element={<ViewApplication />} />
-        <Route path="/viewbusinessapplication/" element={<ViewBusinessApplication />} />
+        <Route path="/viewbusinessapplication" element={<ViewBusinessApplication />} />
+        <Route path="/viewworkpermitapplication" element={<ViewWorkPermitApplication />} />
+        <Route path="/viewallapplication" element={<ViewAllApplication />} />
         <Route path="/viewapplicationdetails/:id" element={<ViewApplicationDetails />} />
         <Route path="/viewapplicationdetails/" element={<ViewApplicationDetails />} />
         <Route path="/apptest" element={<AppTest />} />
         <Route path="/apptest2" element={<AppTest2 />} />
+
+        {/* Routes for Data Controller */}
         <Route path="/DAdashboard" element={<DataControllerDashboard />} />
+        <Route path="/DAforassessment" element={<DataControllerForAssessment />} />
+        <Route path="/DAforpayment" element={<DataControllerForPayment />} />
+        <Route path="/DAreleasedpermits" element={<DataControllerReleasedPermit />} />
+        <Route path="/DAreportsngraph" element={<DataControllerReportandGraph />} />
+        <Route path="/DAviewapplicationdetails/" element={<DataControllerViewApplicationDetails />} />
+        <Route path="/DAviewapplicationdetails/:id" element={<DataControllerViewApplicationDetails />} />
+
         {/* Add more routes as needed */}
         <Route element={<SuperAdminLayout />}>
         <Route path="/superadmin/login" element={<SuperAdminLogin />} />

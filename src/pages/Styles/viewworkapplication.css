@@ -62,6 +62,7 @@
 .sidebar-linkactive{
     display: block;
     padding: 15px 20px;
+    font-size: 15.8px;
     color: #ffffff; /* White text color */
     text-decoration: none; /* Remove underline */
     background-color: #399918;

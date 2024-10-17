@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import '../Styles/viewbusinessapplication.css';
+import '../Styles/viewworkapplication.css';
 
 const ViewBusinessApplication: React.FC = () => {
     const navigate = useNavigate();
@@ -53,12 +53,12 @@ const ViewBusinessApplication: React.FC = () => {
                 </a>
             </li>
             <li>
-                <a href="/viewworkpermitapplication" className="sidebar-link">
+                <a href="/viewworkpermitapplication" className="sidebar-linkactive">
                 <img src="/viewspecificapplicationlogo.svg" alt="Logo" className="sidebarlogoimage" />View WP Applications
                 </a>
             </li>
             <li>
-                <a href="/viewbusinessapplication" className="sidebar-linkactive">
+                <a href="/viewbusinessapplication" className="sidebar-link">
                 <img src="/viewspecificapplicationlogo.svg" alt="Logo" className="sidebarlogoimage" />View BP Applications
                 </a>
             </li>
@@ -83,13 +83,13 @@ const ViewBusinessApplication: React.FC = () => {
 
             <div className="content">
                 <header>
-                    <h1>View Business Permit Applications</h1>
+                    <h1>View Work Permit Applications</h1>
                 </header>
 
                 <div className="contentcontainer">
                     <div className="applicationStatusContainer">
                         <div className="applicationstatusBusinessPermit">
-                            <h2>Current Application Status For Business Permit:</h2>
+                            <h2>Current Application Status For Work Permit:</h2>
                             <button className='viewapplicationbutton' onClick={openBusinessPermitApplicationModal}>View Application</button>
                         </div>
                     </div>

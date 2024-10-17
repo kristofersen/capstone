@@ -9,7 +9,9 @@ const bcrypt = require('bcrypt');
 const app = express();
 const multer = require('multer');
 const path = require('path');
+const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
+const PDFDocument = require('pdfkit'); 
 
 
 const PORT = process.env.PORT || 3000;
@@ -146,7 +148,8 @@ const workPermitSchema = new mongoose.Schema({
   workpermitstatus: { type: String, required: true, },
   classification: { type: String, required: true, },
   transaction: { type: String },
-  transactionstatus: { type: String },
+  amountToPay: {type: String },
+  permitFile: {type: String},
   dateIssued: { type: Date, default: Date.now },
   formData:
 {
@@ -184,13 +187,18 @@ const workPermitSchema = new mongoose.Schema({
     document3: String,
     document4: String,
   },
-  receipt: {
-    receiptId: String,
-    modeOfPayment: String,
-    receiptDate: String,
-    amountPaid: String,
-  }
-}
+},
+receipt: {
+  receiptId: String, //Generated
+  modeOfPayment: String, //online, onsite
+  paymentType: String, // gcash, bank payment, onsite
+  paymentNumber: String, // gcashnumber, card number
+  receiptName: String, //user's name
+  receiptAddress: String, // user's address
+  receiptDate: String, //date
+  amountPaid: String, // amount
+  receiptFile: String,
+},
 }, 
 { timestamps: true },
 );
@@ -494,12 +502,23 @@ app.post('/workpermitpage', upload.fields([
     const permitID = await generatePermitID('WP');
     const status = "Pending";
     const classification = workpermitclassification;
+    let amount; // Declare amountToPay outside the if-else block
+
+    if (classification === "New") {
+      amount = "0"; // Set amount for New classification
+    } else if (classification === "Renew") {
+      amount = "200"; // Set amount for Renew classification
+    }
+
     // Create a new WorkPermit instance
     const newWorkPermit = new WorkPermit({
       id: permitID,
       userId,
       workpermitstatus: status,
       classification: classification,
+      transaction: null,
+      amountToPay: amount,
+      permitFile: null,
       formData: {
         personalInformation: {
           lastName,
@@ -536,6 +555,16 @@ app.post('/workpermitpage', upload.fields([
           document4: files.document4 ? files.document4[0].path : null,
         },
       },
+      receipt: {
+      receiptId: null, //Generated
+      modeOfPayment: null, //online, onsite
+      paymentType: null, // gcash, bank payment, onsite
+      paymentNumber: null, // gcashnumber, card number
+      receiptName: null, //user's name
+      receiptDate: null, //date
+      amountPaid: null, // amount
+      receiptFile: null,
+      }
     });
 
     // Save new work permit and retrieve its _id
@@ -709,7 +738,7 @@ console.log(id);
 });
 
 
-
+// Apptest Codes @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 const PersonSchema = new mongoose.Schema({
   name: String,
   email: String,
@@ -761,7 +790,7 @@ app.post('/apptesting', upload.fields([
     res.status(500).json({ message: 'Error submitting application' });
   }
 });
-
+// Apptest Codes @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 app.get('/workpermits', async (req, res) => {
   const token = req.headers.authorization?.split(' ')[1]; // Extract token from 'Bearer <token>'
@@ -786,6 +815,8 @@ app.get('/workpermits', async (req, res) => {
   }
 });
 
+// Apptest Codes @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
 app.get('/api/:searchTerm', async (req, res) => {
   const { searchTerm } = req.params;
   
@@ -805,6 +836,10 @@ app.get('/api/:searchTerm', async (req, res) => {
 
 // Serve static files from the 'uploads' directory
 app.use('/uploads', express.static(path.join(__dirname)));
+// Apptest Codes @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+
+
 
 //#endregion
 
@@ -941,8 +976,6 @@ app.get('/datacontrollers', async (req, res) => {
 });
 
 
-
-
 app.get('/account/:userId', async (req, res) => {
   try {
     const userId = req.params.userId;
@@ -1023,3 +1056,194 @@ app.get('/api/onlineDataControllers', async (req, res) => {
 
 //End additional code for client @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
+
+
+// Code for DATA CONTROLLER @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+app.get('/getworkpermits', async (req, res) => {
+  try {
+    const allWorkPermits = await WorkPermit.find(); // Retrieve all documents
+    res.json(allWorkPermits); // Send them as a JSON response
+  } catch (error) {
+    console.error('Error fetching work permits:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+});
+
+app.get('/DCworkpermitdetails/:id', async (req, res) => {
+  const { id } = req.params;  // Extract the work permit ID from the route parameters
+
+  try {
+    // Find the work permit directly by its ID
+    const workPermit = await WorkPermit.findById(id);
+
+    if (!workPermit) {
+      return res.status(404).json({ message: 'Work permit not found' });
+    }
+
+    // Return the work permit details
+    res.json(workPermit);
+  } catch (error) {
+    console.error('Error retrieving work permit:', error);
+    res.status(500).json({ message: 'Error retrieving work permit', error });
+  }
+});
+
+
+app.put('/work-permits/:id', async (req, res) => {
+  console.log('Request body:', req.body); // Log incoming request body
+  const { id } = req.params;
+  const { status } = req.body;
+
+  try {
+    const updatedPermit = await WorkPermit.findByIdAndUpdate(
+      id,
+      { workpermitstatus: status },
+    );
+
+    if (!updatedPermit) {
+      return res.status(404).json({ message: 'Work permit not found' });
+    }
+
+    res.json(updatedPermit);
+  } catch (error) {
+    console.error('Error updating work permit:', error); // Log error
+    res.status(500).json({ error: 'Error updating work permit' });
+  }
+});
+
+
+
+app.put('/handlepayments/:id', async (req, res) => {
+  console.log('Request params:', req.params); // Log incoming request body
+  console.log('Request body:', req.body); 
+  const { id, }= req.params;
+  const receiptID = uuidv4();
+  const { accountNumber, amount, paymentName, paymentMethod, paymentType } = req.body;
+  const ContentData = {
+    accountNumber: accountNumber, 
+    amount: amount, 
+    paymentName: paymentName, 
+    paymentMethod: paymentMethod, 
+    paymentType: paymentType,
+    receiptID: receiptID,
+    id: id,
+  };
+
+  try {
+    const receiptFileName = generateReceiptPDF(ContentData);
+    const workpermitFileName = await generateWorkPermitPDF(ContentData);
+    console.log(workpermitFileName);
+    const updatedPermit = await WorkPermit.findByIdAndUpdate(
+      id,
+      { $set: {
+        workpermitstatus: "Released",
+        transaction: paymentMethod,
+        permitFile: workpermitFileName,
+        receipt: {
+        receiptID: receiptID,
+        modeOfPayment: paymentMethod,
+        paymentType: paymentType,
+        paymentNumber: accountNumber,
+        receiptName: paymentName,
+        receiptDate: new Date().toISOString(),
+        amountPaid: amount,
+        receiptFile: receiptFileName,
+      }
+    }
+    }
+    );
+
+    if (!updatedPermit) {
+      return res.status(404).json({ message: 'Work permit not found' });
+    }
+
+    res.json(updatedPermit);
+  } catch (error) {
+    console.error('Error updating work permit:', error); // Log error
+    res.status(500).json({ error: 'Error updating work permit' });
+  }
+});
+
+
+
+
+// Function to generate PDF
+const generateReceiptPDF = (ContentData) => {
+    const doc = new PDFDocument();
+    const receiptFileName = `receipt_${Date.now()}.pdf`;
+    const receiptPath = path.join(receiptsDir, receiptFileName);
+
+    const writeStream = fs.createWriteStream(receiptPath);
+    doc.pipe(writeStream);
+    doc.fontSize(25).text('Receipt', { align: 'center' });
+    doc.moveDown();
+    doc.fontSize(12).text(`Date: ${new Date().toLocaleDateString()}`);
+    doc.text(`Receipt ID: ${ContentData.receiptID}`);
+    doc.text(`Customer: ${ContentData.paymentName}`);
+    doc.text(`Account Number: ${ContentData.accountNumber}`);
+    doc.text(`Mode of Payment: ${ContentData.paymentMethod}`);
+    doc.moveDown();
+    doc.text(`Total Amount: ₱${ContentData.amount}`, { bold: true });
+    doc.end();
+
+    return receiptFileName;
+};
+
+
+// Ensure the receipts directory exists
+const receiptsDir = path.join(__dirname, 'receipts');
+if (!fs.existsSync(receiptsDir)) {
+    fs.mkdirSync(receiptsDir);
+}
+// Serve static files from the receipts directory
+app.use('/receipts', express.static(receiptsDir));
+
+
+
+// Define and create the workPermitsDir
+const workPermitsDir = path.join(__dirname, 'permits'); 
+if (!fs.existsSync(workPermitsDir)) {
+  fs.mkdirSync(workPermitsDir);
+}
+// Serve the 'workpermits' directory as static files
+app.use('/permits', express.static(workPermitsDir));
+
+
+// Directory for work permit PDFs
+const generateWorkPermitPDF = async (ContentData) => {
+  const doc = new PDFDocument();
+  const workPermitFileName = `workpermit_${ContentData.id}.pdf`;  // File name based on the ID
+  const workPermitPath = path.join(workPermitsDir, workPermitFileName);
+
+  try {
+      // Fetch the work permit data by ID
+      const workPermit = await WorkPermit.findById(ContentData.id);
+
+      if (!workPermit) {
+          throw new Error('Work permit not found');
+      }
+
+
+      const writeStream = fs.createWriteStream(workPermitPath);
+      doc.pipe(writeStream);
+      // Add content to the PDF
+      doc.fontSize(20).text('Work Permit', { align: 'center' });
+      doc.moveDown();
+      doc.fontSize(12).text(`Work Permit ID: ${workPermit._id}`);
+      doc.text(`Issued To: ${workPermit.formData.personalInformation.firstName}`);
+      doc.text(`Mode of Payment: ${ContentData.paymentMethod}`);
+      doc.text(`Payment Type: ${ContentData.paymentType}`);
+      doc.text(`Permit Status: Released`);
+      doc.text(`Issue Date: ${new Date(workPermit.receipt.receiptDate).toLocaleString()}`);
+      doc.text(`Expiration Date: ${new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toLocaleString()}`);
+
+      doc.end();
+
+      console.log(`Work Permit PDF created at ${workPermitFileName}`);
+
+      return workPermitFileName;  // Return the path to the generated PDF
+  } catch (error) {
+      console.error('Error generating work permit PDF:', error);
+      throw error;
+  }
+};

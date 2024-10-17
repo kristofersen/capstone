@@ -48,7 +48,8 @@ const SuperadminAccountAdd = () => {
           email,
           address,
           password,
-          userrole
+          userrole,
+          
         }),
       });
      await response.json();

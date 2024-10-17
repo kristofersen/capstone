@@ -315,13 +315,6 @@ if (!token) {
                   checked={workpermitclassification === "Renewal"} // Set checked based on state
                   onChange={() => setWorkPermitClassification("Renewal")} 
                />Work Permit Renewal
-               <input 
-                  type="radio" 
-                  name="Classification" // Grouping name for radio buttons
-                  value="First-Time" // Set the value directly here
-                  checked={workpermitclassification === "First-Time"} // Set checked based on state
-                  onChange={() => setWorkPermitClassification("First-Time")} 
-               />First Time Job Seeker
                  </label>
                  
                 </div>
@@ -350,9 +343,9 @@ if (!token) {
       <label>Upload Cedula</label>
       <input type="file" onChange={(e) => handleFileChange(e, 'document2')}  />
       <label>Upload Referral Letter</label>
-      <input type="file" onChange={(e) => handleFileChange(e, 'document3')}  />
+      <input type="file" onChange={(e) => handleFileChange(e, 'document3')} disabled={currentlyResiding} />
       <label>Upload FTJS Cert.</label>
-      <input type="file" onChange={(e) => handleFileChange(e, 'document4')}  />
+      <input type="file" onChange={(e) => handleFileChange(e, 'document4')} disabled={workpermitclassification === "Renewal"} />
       <button type="submit" className="submitbuttonworkpermit">Submit</button>
   </div>
 )}

@@ -1,5 +1,5 @@
 /* DASHBOARD CONTAINER STYLE */
-.DAdashboard-container {
+.DAreportsngraph-container{
     display: flex; /* Use flexbox to create a side-by-side layout */
     height: 100vh; /* Full height of the viewport */
     overflow: hidden; /* Prevents scrolling */
@@ -41,6 +41,7 @@
     margin-right: 8px; /* Space between logo and text */
     vertical-align: middle; /* Align with the text */
 }
+
 /* SIDEBAR LIST STYLE */
 .DAsidebar-list {
     list-style-type: none; /* Remove bullets */

@@ -1,7 +1,7 @@
-import '../Styles/DAdashboard.css'; 
+import '../Styles/DAreportsngraph.css'; 
 import { useNavigate } from 'react-router-dom';// Import your CSS file
 
-const DAdashboard: React.FC = () => {
+const DataControllerReportandGraph: React.FC = () => {
     const navigate = useNavigate();
 
     const handleLogout = () => {
@@ -10,15 +10,15 @@ const DAdashboard: React.FC = () => {
     };
 
 return (
-    <section className="DAdashboard-container">
-        <div className="DAsidebar-container">
-            <div className="DAsidebar">
-                <div className="DAsidebar-logo">
-                    <img src="/obpwlsDAlogo.svg" alt="Logo" className="DAlogo-image" />
-                </div>
-                    <ul className="DAsidebar-list">
+    <section className="DAreportsngraph-container">
+    <div className="DAsidebar-container">
+        <div className="DAsidebar">
+        <div className="DAsidebar-logo">
+            <img src="/obpwlsDAlogo.svg" alt="Logo" className="logo-image" />
+        </div>
+        <ul className="DAsidebar-list">
                         <li>
-                            <a href="/DAdashboard" className="DAsidebar-linkactive">
+                            <a href="/DAdashboard" className="DAsidebar-link">
                             <img src="/dashboardlogo.svg" alt="Logo" className="sidebarlogoimage" />Dashboard
                             </a>
                         </li>
@@ -38,7 +38,7 @@ return (
                             </a>
                         </li>
                         <li>
-                            <a href="/DAreportsngraph" className="DAsidebar-link">
+                            <a href="/DAreportsngraph" className="DAsidebar-linkactive">
                             <img src="reportsngraphlogo.svg" alt="Logo" className="sidebarlogoimage" />Reports/Graphs
                             </a>
                         </li>
@@ -61,4 +61,4 @@ return (
 
 };
 
-export default DAdashboard;
+export default DataControllerReportandGraph;
