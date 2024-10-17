@@ -5,7 +5,7 @@ interface LogEntry {
     firstName: string;
     lastName: string;
     dateTime: string;
-    action: string;
+    accountOpenedDate: string;
 }
 
 interface OnlineEmployee {
@@ -24,8 +24,8 @@ const Logbook: React.FC = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const adminLogsResponse = await fetch('http://localhost:3000/adminLogs');
-                const dataControllerLogsResponse = await fetch('http://localhost:3000/dataControllerLogs');
+                const adminLogsResponse = await fetch('http://localhost:3000/adminusers');
+                const dataControllerLogsResponse = await fetch('http://localhost:3000/datacontrollers');
                 const onlineAdminsResponse = await fetch('http://localhost:3000/api/onlineAdmins');
                 const onlineDataControllersResponse = await fetch('http://localhost:3000/api/onlineDataControllers');
 
@@ -65,23 +65,26 @@ const Logbook: React.FC = () => {
             <table>
                 <thead>
                     <tr>
+                        <th>Account</th>
                         <th>DateTime</th>
                         <th>First Name</th>
                         <th>Last Name</th>
                         <th>User ID</th>
-                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {adminLogs.map((log, index) => (
-                        <tr key={index}>
+                    {adminLogs.map(log => {
+                        return (
+                            <tr key={log.userId}>
+                            <td>{log.accountOpenedDate}</td>
                             <td>{log.dateTime}</td>
                             <td>{log.firstName}</td>
                             <td>{log.lastName}</td>
                             <td>{log.userId}</td>
-                            <td>{log.action}</td>
                         </tr>
-                    ))}
+                        );
+                    })
+                }
                 </tbody>
             </table>
 
@@ -93,19 +96,20 @@ const Logbook: React.FC = () => {
                         <th>First Name</th>
                         <th>Last Name</th>
                         <th>User ID</th>
-                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {dataControllerLogs.map((log, index) => (
-                        <tr key={index}>
+                    {dataControllerLogs.map(log => {
+                        return (
+                            <tr key={log.userId}>
                             <td>{log.dateTime}</td>
                             <td>{log.firstName}</td>
                             <td>{log.lastName}</td>
                             <td>{log.userId}</td>
-                            <td>{log.action}</td>
                         </tr>
-                    ))}
+                          );
+                        })
+                    }
                 </tbody>
             </table>
 
@@ -120,14 +124,17 @@ const Logbook: React.FC = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {onlineAdmins.map((admin, index) => (
-                        <tr key={index}>
+                    {onlineAdmins.map(admin => {
+                        return (
+                            <tr key={admin.userId}>
                             <td>{admin.firstName}</td>
                             <td>{admin.lastName}</td>
                             <td>{admin.userId}</td>
                             <td>{admin.onlineStatus ? 'Online' : 'Offline'}</td>
                         </tr>
-                    ))}
+                        );
+                    }
+                )}
                 </tbody>
             </table>
 
@@ -142,14 +149,17 @@ const Logbook: React.FC = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {onlineDataControllers.map((controller, index) => (
-                        <tr key={index}>
+                    {onlineDataControllers.map(controller => {
+                        return (
+                            <tr key={controller.userId}>
                             <td>{controller.firstName}</td>
                             <td>{controller.lastName}</td>
                             <td>{controller.userId}</td>
                             <td>{controller.onlineStatus ? 'Online' : 'Offline'}</td>
                         </tr>
-                    ))}
+                        );
+                    } 
+                )}
                 </tbody>
             </table>
         </div>

@@ -71,12 +71,7 @@ const userSchema = new mongoose.Schema({
   lastName: String,
   contactNumber: String,
   address: String,
-  logs: [
-    {
-      dateTime: Date,
-      action: String
-    }
-  ],
+  accountOpenedDate: String,
   //Otp Group
   otpcontent:{
   otp: { type: String }, // Store OTP
@@ -201,6 +196,8 @@ const workPermitSchema = new mongoose.Schema({
 );
 
 const WorkPermit = mongoose.model('WorkPermit', workPermitSchema);
+
+
 
 // #region Client
 app.post('/signup', async (req, res) => {
@@ -880,6 +877,7 @@ app.post('/adduser', async (req, res) => {
       password: hashedPassword,
       userrole: userRole, // Correct the variable name
       isVerified: true,
+      accountOpenedDate: new Date().toISOString() 
     });
 
     // Save the user to the database
@@ -976,35 +974,23 @@ app.get('/accounts/:id', async (req, res) => {
 // API endpoint to update user data by ID
 app.put('/accounts/:id', async (req, res) => {
   try {
-    const user = await User.findOneAndUpdate({ userId: req.params.id }, req.body, { new: true });
+    console.log('Request Body:', req.body); // Log the request body
+    const user = await User.findOneAndUpdate(
+      { userId: req.params.id },
+      req.body,
+      { new: true }
+    );
     if (!user) {
       return res.status(404).send('User not found');
     }
+    console.log('Updated User:', user); // Log the updated user
     res.send(user);
   } catch (error) {
+    console.error('Error updating user:', error); // Log the error
     res.status(500).send(error);
   }
 });
 
-// API endpoint to fetch admin logs
-app.get('/adminLogs', async (req, res) => {
-  try {
-    const adminLogs = await User.find({ role: 'admin' }); // Assuming LogEntry has a role field
-    res.json(adminLogs);
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
-
-// API endpoint to fetch data controller logs
-app.get('/dataControllerLogs', async (req, res) => {
-  try {
-    const dataControllerLogs = await User.find({ role: 'dataController' }); // Assuming LogEntry has a role field
-    res.json(dataControllerLogs);
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
 
 // API endpoint to fetch online admins
 app.get('/api/onlineAdmins', async (req, res) => {
