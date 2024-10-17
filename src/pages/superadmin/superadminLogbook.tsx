@@ -5,7 +5,7 @@ interface LogEntry {
     firstName: string;
     lastName: string;
     dateTime: string;
-    action: string;
+    accountOpenedDate: string;
 }
 
 interface OnlineEmployee {
@@ -24,8 +24,8 @@ const Logbook: React.FC = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const adminLogsResponse = await fetch('http://localhost:3000/adminLogs');
-                const dataControllerLogsResponse = await fetch('http://localhost:3000/dataControllerLogs');
+                const adminLogsResponse = await fetch('http://localhost:3000/adminusers');
+                const dataControllerLogsResponse = await fetch('http://localhost:3000/datacontrollers');
                 const onlineAdminsResponse = await fetch('http://localhost:3000/api/onlineAdmins');
                 const onlineDataControllersResponse = await fetch('http://localhost:3000/api/onlineDataControllers');
 
@@ -65,15 +65,15 @@ const Logbook: React.FC = () => {
             <table>
                 <thead>
                     <tr>
+                        <th>Account</th>
                         <th>DateTime</th>
                         <th>First Name</th>
                         <th>Last Name</th>
                         <th>User ID</th>
-                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
-                   {adminLogs.map(log => {
+                    {adminLogs.map(log => {
                         return (
                             <tr key={log.userId}>
                             <td>{log.accountOpenedDate}</td>
@@ -96,7 +96,6 @@ const Logbook: React.FC = () => {
                         <th>First Name</th>
                         <th>Last Name</th>
                         <th>User ID</th>
-                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
