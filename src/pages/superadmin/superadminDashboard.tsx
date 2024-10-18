@@ -23,9 +23,9 @@ interface Admin {
 
 interface UserLog {
   userId: string;
-  username: string;
-  timeIn: string;
-  timeOut: string;
+  firstName: string;
+  lastName: string;
+  accountOpenedDate: string;
 }
 
 
@@ -88,7 +88,6 @@ useEffect(() => {
 
   fetchUserLogs();
 }, []);
-
 
   
 useEffect(() => {
@@ -223,9 +222,10 @@ useEffect(() => {
             userLogs.map(log => {
               return (
             <tr key={log.userId}>
+              <td>{log.firstName} {log.lastName}</td>
               <td>{log.userId}</td>
-              <td>{new Date(log.timeIn).toLocaleString()}</td>
-              <td>{new Date(log.timeOut).toLocaleString()}</td>
+              
+              
             </tr>
               );
             }
@@ -238,15 +238,25 @@ useEffect(() => {
       {/* Online Accounts Panel */}
 
       <div className="panel online-accounts-panel">
-        <h3>Online Accounts</h3>
-        <ul>
-        {onlineUsers.map(user => (
-          <li key={user.userId}>
-            {user.firstName} {user.lastName} ({user.userrole})
-          </li>
-        ))}
-        </ul>
-      </div>
+  <h3>Online Accounts</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>First Name</th>
+        <th>Last Name</th>
+        <th>Role</th>
+      </tr>
+    </thead>
+    <tbody>
+      {onlineUsers.map(user => (
+        <tr key={user.userId}>
+          <td>{user.firstName} {user.lastName}</td>
+          <td>{user.userrole}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
     </div>
   </div>
 </div>
