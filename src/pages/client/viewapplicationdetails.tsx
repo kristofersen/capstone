@@ -45,13 +45,14 @@ export interface PersonalInformation {
     modeOfPayment?: string; // Optional
     receiptDate?: string; // Optional
     amountPaid?: string; // Optional
+    receiptFile?: string;
   }
   
   export interface FormData {
     personalInformation: PersonalInformation;
     emergencyContact: EmergencyContact;
     files: Files;
-    receipt: Receipt;
+  
   }
   
   export interface WorkPermit {
@@ -62,8 +63,11 @@ export interface PersonalInformation {
     workpermitstatus: string;
     transaction: string;
     transactionstatus: string;
-    dateIssued?: Date; // Optional
     formData: FormData;
+    createdAt?: string;
+    receipt: Receipt;
+    permitFile?: string;
+    applicationComments: string;
   }
 
 const ViewApplicationDetails: React.FC = () => {
@@ -127,24 +131,26 @@ const ViewApplicationDetails: React.FC = () => {
     setModalFile(null);
   };
 
-  const fetchDocumentUrl = (fileName: string | null): string | null => {
+  const fetchDocumentUrl = (fileName: string | null, folder: 'uploads' | 'permits' | 'receipts'): string | null => {
     if (!fileName) return null;
-    // Assuming the backend is serving files from '/files' route
-    return `http://localhost:3000/uploads/${fileName}`;
+    
+    // Return the file URL based on the folder specified
+    return `http://localhost:3000/${folder}/${fileName}`;
   };
+  
+const renderDocument = (fileName: string | null, folder: 'uploads' | 'permits' | 'receipts') => {
+  const fileUrl = fetchDocumentUrl(fileName, folder);
+  if (!fileUrl) return <span>Not uploaded</span>;
 
-  const renderDocument = (fileName: string | null) => {
-    const fileUrl = fetchDocumentUrl(fileName);
-    if (!fileUrl) return <span>Not uploaded</span>;
+  const fileExtension = fileUrl.split('.').pop()?.toLowerCase();
 
-    const fileExtension = fileUrl.split('.').pop()?.toLowerCase();
+  return (
+    <span style={{ cursor: 'pointer', color: 'blue' }} onClick={() => openModal(fileUrl)}>
+      {fileExtension === 'pdf' ? 'View PDF' : 'View Document'}
+    </span>
+  );
+};
 
-    return (
-      <span style={{ cursor: 'pointer', color: 'blue' }} onClick={() => openModal(fileUrl)}>
-        {fileExtension === 'pdf' ? 'View PDF' : 'View Document'}
-      </span>
-    );
-  };
 
 
 
@@ -185,7 +191,9 @@ const ViewApplicationDetails: React.FC = () => {
         
         <h1>Work Permit Details</h1>
         {workPermit ? (
-          <>
+          <> 
+            <p> Date Issued: {workPermit.createdAt ? new Date(workPermit.createdAt).toLocaleDateString() : 'N/A'}</p>
+            <p> Work Permit Status: {workPermit.workpermitstatus}</p>
             <h1>Personal Information Details</h1>
             <p><strong>Application ID:</strong> {workPermit.id}</p>
             <p><strong>Fullname:</strong>  {workPermit.formData.personalInformation.lastName}, {workPermit.formData.personalInformation.firstName} {workPermit.formData.personalInformation.middleInitial}</p>
@@ -217,10 +225,21 @@ const ViewApplicationDetails: React.FC = () => {
 
             <h3>Documents</h3>
             <div>
-            <p>Document 1: {renderDocument(workPermit.formData.files.document1)}</p>
-            <p>Document 2: {renderDocument(workPermit.formData.files.document2)}</p>
-            <p>Document 3: {renderDocument(workPermit.formData.files.document3)}</p>
-            <p>Document 4: {renderDocument(workPermit.formData.files.document4)}</p>
+            <p>Document 1: {renderDocument(workPermit.formData.files.document1, 'uploads')}</p>
+            <p>Document 2: {renderDocument(workPermit.formData.files.document2, 'uploads')}</p>
+            <p>Document 3: {renderDocument(workPermit.formData.files.document3, 'uploads')}</p>
+            <p>Document 4: {renderDocument(workPermit.formData.files.document4, 'uploads')}</p>
+              
+  {workPermit.receipt?.receiptFile && (
+    <p>Receipt: {renderDocument(workPermit.receipt.receiptFile, 'receipts')}</p>
+  )}
+    {workPermit.permitFile && (
+    <p>Work Permit: {renderDocument(workPermit.permitFile, 'permits')}</p>
+  )}
+   {workPermit.applicationComments && (
+    <p>Comments: {workPermit.applicationComments}</p>
+  )}
+
             </div>
 
 

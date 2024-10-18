@@ -44,13 +44,14 @@ export interface PersonalInformation {
     modeOfPayment?: string; // Optional
     receiptDate?: string; // Optional
     amountPaid?: string; // Optional
+    receiptFile?: string;
   }
   
   export interface FormData {
     personalInformation: PersonalInformation;
     emergencyContact: EmergencyContact;
     files: Files;
-    receipt: Receipt;
+  
   }
   
   export interface WorkPermit {
@@ -61,8 +62,12 @@ export interface PersonalInformation {
     workpermitstatus: string;
     transaction: string;
     transactionstatus: string;
-    dateIssued?: Date; // Optional
+    applicationdateIssued?: Date; // Optional
     formData: FormData;
+    createdAt: string;
+    receipt: Receipt
+    permitFile: string;
+    applicationComments: string;
   }
 
 const DataControllerViewApplicationDetails: React.FC = () => {
@@ -72,6 +77,7 @@ const DataControllerViewApplicationDetails: React.FC = () => {
     const token = localStorage.getItem('token'); // Assuming the token is stored in local storage
     const [modalFile, setModalFile] = useState<string | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [showRejectModal, setShowRejectModal] = useState(false);
 
     const handleLogout = () => {
         localStorage.removeItem('token'); // Remove token from 
@@ -111,35 +117,79 @@ const DataControllerViewApplicationDetails: React.FC = () => {
 
 
 
+
+// REJECT Modal @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+      const openRejectModal = () => {
+        setShowRejectModal(true);
+
+      };
+
+      const [isCommentVisible, setIsCommentVisible] = useState(false); // State to track comment visibility
+      const [comments, setComments] = useState(''); // State for comments
+    
+      const closeModal = () => {
+        setShowRejectModal(false);
+        setIsCommentVisible(false); // Reset comment visibility when closing
+        setComments(''); // Reset comments when closing
+      };
+    
+      const handleConfirm = () => {
+        setIsCommentVisible(true); // Show the comment input area
+      };
+    
+      const handleFinalConfirm = async () => {
+        // Logic to handle submission of comments
+        console.log('Updating permit with ID:', workPermit?._id); // Log ID for debugging
+      
+        try {
+          const response = await axios.put(`http://localhost:3000/work-permitsreject/${workPermit?._id}`, {
+            status: 'Rejected',
+            comments: comments,
+          });
+          console.log('Updated Permit:', response.data);
+      
+          // Update local state with the response data
+          setWorkPermit(response.data);
+          alert('Work Permit Application updated successfully!');
+          navigate(-1);
+        } catch (error) {
+          console.error('Error updating work permit:', error);
+        } console.log('Application rejected with comments:', comments);
+        closeModal(); // Close modal after confirmation
+      };
+
+
+//End REJECT MODAL @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
       const openModal = (filePath: string) => {
         setModalFile(filePath);
         setIsModalOpen(true);
       };
     
-      const closeModal = () => {
+      const closeRejectModal = () => {
         setIsModalOpen(false);
+        setShowRejectModal(false);
         setModalFile(null);
       };
     
-      const fetchDocumentUrl = (fileName: string | null): string | null => {
+      const fetchDocumentUrl = (fileName: string | null, folder: 'uploads' | 'permits' | 'receipts'): string | null => {
         if (!fileName) return null;
-        // Assuming the backend is serving files from '/files' route
-        return `http://localhost:3000/uploads/${fileName}`;
+        
+        // Return the file URL based on the folder specified
+        return `http://localhost:3000/${folder}/${fileName}`;
       };
+      
+    const renderDocument = (fileName: string | null, folder: 'uploads' | 'permits' | 'receipts') => {
+      const fileUrl = fetchDocumentUrl(fileName, folder);
+      if (!fileUrl) return <span>Not uploaded</span>;
     
-      const renderDocument = (fileName: string | null) => {
-        const fileUrl = fetchDocumentUrl(fileName);
-        if (!fileUrl) return <span>Not uploaded</span>;
+      const fileExtension = fileUrl.split('.').pop()?.toLowerCase();
     
-        const fileExtension = fileUrl.split('.').pop()?.toLowerCase();
-    
-        return (
-          <span style={{ cursor: 'pointer', color: 'blue' }} onClick={() => openModal(fileUrl)}>
-            {fileExtension === 'pdf' ? 'View PDF' : 'View Document'}
-          </span>
-        );
-      };
-
+      return (
+        <span style={{ cursor: 'pointer', color: 'blue' }} onClick={() => openModal(fileUrl)}>
+          {fileExtension === 'pdf' ? 'View PDF' : 'View Document'}
+        </span>
+      );
+    };
 
 
 
@@ -156,6 +206,8 @@ const DataControllerViewApplicationDetails: React.FC = () => {
       
           // Update local state with the response data
           setWorkPermit(response.data);
+          alert('Work Permit Application updated successfully!');
+          navigate(-1);
         } catch (error) {
           console.error('Error updating work permit:', error);
         }
@@ -217,7 +269,7 @@ return (
         <h1>Work Permit Details</h1>
         {workPermit ? (
           <>
-            <p> Date Issued: {workPermit.dateIssued ? new Date(workPermit.dateIssued).toLocaleDateString() : 'N/A'}</p>
+            <p> Date Issued: {workPermit.createdAt ? new Date(workPermit.createdAt).toLocaleDateString() : 'N/A'}</p>
             <p> Work Permit Status: {workPermit.workpermitstatus}</p>
             <h1>Personal Information Details</h1>
             <p><strong>Application ID:</strong> {workPermit.id}</p>
@@ -250,10 +302,21 @@ return (
 
             <h3>Documents</h3>
             <div>
-            <p>Document 1: {renderDocument(workPermit.formData.files.document1)}</p>
-            <p>Document 2: {renderDocument(workPermit.formData.files.document2)}</p>
-            <p>Document 3: {renderDocument(workPermit.formData.files.document3)}</p>
-            <p>Document 4: {renderDocument(workPermit.formData.files.document4)}</p>
+            <p>Document 1: {renderDocument(workPermit.formData.files.document1, 'uploads')}</p>
+            <p>Document 2: {renderDocument(workPermit.formData.files.document2, 'uploads')}</p>
+            <p>Document 3: {renderDocument(workPermit.formData.files.document3, 'uploads')}</p>
+            <p>Document 4: {renderDocument(workPermit.formData.files.document4, 'uploads')}</p>
+              
+  {workPermit.receipt?.receiptFile && (
+    <p>Receipt: {renderDocument(workPermit.receipt.receiptFile, 'receipts')}</p>
+  )}
+    {workPermit.permitFile && (
+    <p>Work Permit: {renderDocument(workPermit.permitFile, 'permits')}</p>
+  )}
+ {workPermit.applicationComments && (
+    <p>Comments: {workPermit.applicationComments}</p>
+  )}
+
             </div>
 
 
@@ -261,7 +324,7 @@ return (
             {workPermit.workpermitstatus === 'Pending' && (
               <p>
         <button onClick={handleUpdate}>Accept Application</button>
-        <button>Reject Application</button>
+        <button onClick={openRejectModal}>Reject Application</button>
         </p>
       )}
     
@@ -288,6 +351,39 @@ return (
           </div>
         </div>
       )}
+
+
+      
+
+{showRejectModal && (
+        <div className="modal-overlay">
+          <div className="modalreject">
+            <h2>Reject Application</h2>
+            {!isCommentVisible ? (
+              <>
+                <p>Are you sure you want to reject this application?</p>
+                <button onClick={handleConfirm}>Confirm</button>
+                <button onClick={closeRejectModal}>Cancel</button>
+              </>
+            ) : (
+              <>
+                <h3>Comments</h3>
+                <label htmlFor="comments">Enter your comments:</label>
+                <textarea
+                  id="comments"
+                  value={comments}
+                  onChange={(e) => setComments(e.target.value)}
+                  rows={4}
+                  style={{ width: '100%' }} // Adjust width as needed
+                />
+                <button onClick={handleFinalConfirm}>Submit</button>
+                <button onClick={() => setIsCommentVisible(false)}>Back</button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
         </div>
         
 

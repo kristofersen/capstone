@@ -244,6 +244,7 @@ width: 100%; /* Occupy most of the container's width */
     right: 0;
     bottom: 0;
     background: transparent; /* Remove the black background */
+    z-index: 1000; /* Ensure it's above other content */
     display: flex;
     justify-content: center;
     align-items: center;

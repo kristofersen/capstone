@@ -1,13 +1,25 @@
-import React, {  useState } from 'react';
+import React, {  useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../Styles/workpermitpage.css';
 import axios from 'axios';
+
+export interface WorkPermits {
+  _id: string;
+  id: string;
+  workpermitstatus: string;
+  permitFile: string;
+}
+
 
 const WorkPermit: React.FC = () => {
   const navigate = useNavigate();
   const token = localStorage.getItem('token');
   const [step, setStep] = useState(1);
   const [isFormValid, setIsFormValid] = useState(true); 
+
+  const [workPermits, setWorkPermits] = useState<WorkPermits[]>([]);
+ 
+  
 
   const [lastName, setLastName] = useState('');
   const [firstName, setFirstName] = useState('');
@@ -45,11 +57,16 @@ const WorkPermit: React.FC = () => {
     document4: null,
   });
 
-if (!token) {
-    navigate('/'); // Redirect to login if no token
-    return;
-  }
   
+  useEffect(() => {
+    if (!token) {
+      navigate('/'); // Redirect to login if no token
+      return;
+    }
+    fetchWorkPermits(token);
+  }, [navigate, token]); 
+
+
       const goToNextStep = () => {
           // Perform validation based on the current step
        if (step === 1) {
@@ -139,7 +156,7 @@ if (!token) {
         console.log(response.data);
         if (response.status === 200) {
           alert('Work Permit Application submitted successfully!');
-          navigate('/dashboard'); // Redirect to the dashboard or any other page
+          navigate('/dashboard');
         } else {
           const errorMessage = (response.data as { message: string }).message;
           console.error('Error submitting application:', errorMessage);
@@ -149,7 +166,23 @@ if (!token) {
       }
   };
   
-  
+  const fetchWorkPermits = async (token: string) => {
+    try {
+      const response = await fetch('http://localhost:3000/workpermits', {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      const WorkPermitData = await response.json();
+      setWorkPermits(WorkPermitData);
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+    }
+  };
+
 
   const handleLogout = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -314,6 +347,7 @@ if (!token) {
                   value="Renew" // Set the value directly here
                   checked={workpermitclassification === "Renewal"} // Set checked based on state
                   onChange={() => setWorkPermitClassification("Renewal")} 
+                  disabled={workPermits.length === 0} // Disable if there are no work permits
                />Work Permit Renewal
                  </label>
                  
@@ -349,6 +383,7 @@ if (!token) {
       <button type="submit" className="submitbuttonworkpermit">Submit</button>
   </div>
 )}
+
 
 </form>
       </div>

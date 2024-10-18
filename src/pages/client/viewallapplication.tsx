@@ -9,9 +9,13 @@ export interface WorkPermit {
     _id: string;
     id: string;
     workpermitstatus: string;
+    classification: string;
+    applicationdateIssued: string;
+    permitExpiryDate: string;
     permitFile: string;
     receipt: Receipt;
   }
+
   export interface Receipt {
    receiptFile: string;
   }
@@ -29,6 +33,12 @@ const ViewWorkPermitApplication: React.FC = () => {
     const [latestReceiptFile, setLatestReceiptFile] = useState<string |null>(null);
 
 
+const [latestReleasedPermitID, setLatestReleasedPermitID] = useState<string | null>(null);
+const [latestReleasedPermitIDMain, setLatestReleasedPermitIDMain] = useState<string | null>(null);
+
+
+
+
 // CODE FOR TABLE @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 const [activePermit, setActivePermit] = useState<WorkPermit | null>(null);
 const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -37,7 +47,22 @@ const itemsPerPage = 5;
 const totalPages = Math.ceil(workPermits.length / itemsPerPage)
 const startIndex = currentPage * itemsPerPage;
 const endIndex = startIndex + itemsPerPage;
-const currentItems = workPermits.slice(startIndex, endIndex);
+const sortedWorkPermits = workPermits
+  .slice() // Make a copy of the array to avoid modifying the original
+  .sort((a, b) => {
+    const dateA = new Date(a.applicationdateIssued);
+    const dateB = new Date(b.applicationdateIssued);
+
+    // Check if both dates are valid
+    if (isNaN(dateA.getTime()) || isNaN(dateB.getTime())) {
+      return 0; // If either date is invalid, keep their order (or handle as needed)
+    }
+
+    return dateB.getTime() - dateA.getTime(); // Sort in descending order
+  });
+
+// Now slice the sorted array to get the current items
+const currentItems = sortedWorkPermits.slice(startIndex, endIndex);
 const handleNextPage = () => {
   if (currentPage < totalPages - 1) {
     setCurrentPage(currentPage + 1);
@@ -59,13 +84,19 @@ const closeModal = () => {
   setIsModalOpen(false);
 };
 
-const handleEdit = () => {
+const handleViewApplication = () => {
   if (activePermit) {
     console.log(`Edit permit ID: ${activePermit._id}`);
     navigate(`/viewapplicationdetails/${activePermit._id}`);
-    // Implement your edit logic here
-    closeModal(); // Close the modal after action
+  
   }
+};
+const handleViewLatestReleasedApplication = () => {
+  
+    console.log(`Edit permit ID: ${latestReleasedPermitIDMain}`);
+    navigate(`/viewapplicationdetails/${latestReleasedPermitIDMain}`);
+  
+
 };
 
 const handleDelete = () => {
@@ -154,32 +185,36 @@ const handleLogout = () => {
     navigate('/'); // Redirect to home page
   };
 
-useEffect(() => {
+  useEffect(() => {
     if (!token) {
       navigate('/'); // Redirect to login if no token
       return;
     }
-    const fetchWorkPermits = async (token: string) => {
+  
+    const fetchWorkPermits = async () => {
       try {
-        const response = await fetch('http://localhost:3000/workpermits', {
+        const response = await fetch('http://localhost:3000/fetchuserworkpermits', {
           method: 'GET',
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
         });
-        
+  
         const WorkPermitData = await response.json();
         setWorkPermits(WorkPermitData);
       } catch (error) {
-        console.error('Error fetching profile:', error);
-        setError('Failed to fetch profile, please try again.');
+        console.error('Error fetching work permits:', error);
+        setError('Failed to fetch work permits, please try again.');
       }
     };
-    fetchWorkPermits(token);
-
+  
+    fetchWorkPermits();
+  }, [navigate, token]); // Only run when token changes
+  
+  useEffect(() => {
     if (workPermits.length > 0) {
-      // Function to extract and convert DDMMYYYY to YYYYMMDD for comparison
+      // Logic for processing work permits
       const convertDateForComparison = (permitID: string) => {
         const dateString = permitID.slice(-8); // Extract the last 8 characters (DDMMYYYY)
         const day = dateString.slice(0, 2);
@@ -187,36 +222,46 @@ useEffect(() => {
         const year = dateString.slice(4, 8);
         return `${year}${month}${day}`; // Return YYYYMMDD for proper sorting
       };
-
-      // Function to extract sequenceString for comparison
+    
       const extractSequenceString = (permitID: string) => {
-        return permitID.match(/\d+/)?.[0] || '0'; // Extract the number from the sequence, assuming it's digits
+        return permitID.match(/\d+/)?.[0] || '0'; // Extract the number from the sequence
       };
-
-      // Sort work permits based on date first, then sequenceString
+    
+      // Sort permits by date and sequence number
       const sortedPermits = workPermits.sort((a, b) => {
         const dateA = convertDateForComparison(a.id);
         const dateB = convertDateForComparison(b.id);
-
-        // If dates are the same, compare sequenceString
+    
         if (dateA === dateB) {
           const seqA = parseInt(extractSequenceString(a.id), 10);
           const seqB = parseInt(extractSequenceString(b.id), 10);
-          return seqB - seqA; // Sort by sequence number (higher number means more recent)
+          return seqB - seqA; // Sort by sequence number
         }
-        return dateB.localeCompare(dateA); // Sort by date in descending order
+        return dateB.localeCompare(dateA); // Sort by date
       });
-      // The first item in the sorted array is the latest
+    
+      // Set latest permit data (regardless of status)
       setLatestPermitID(sortedPermits[0].id);
       setLatestPermitmainID(sortedPermits[0]._id);
       setLatestStatus(sortedPermits[0].workpermitstatus);
       setLatestPermitFile(sortedPermits[0].permitFile);
       setLatestReceiptFile(sortedPermits[0].receipt.receiptFile);
+    
+      // Now filter permits to get only those with a status of 'released'
+      const releasedPermits = sortedPermits.filter(
+        (permit) => permit.workpermitstatus === 'Released'
+      );
+    
+      if (releasedPermits.length > 0) {
+        // Set latest released permit data
+        setLatestReleasedPermitID(releasedPermits[0].id);
+        setLatestReleasedPermitIDMain(releasedPermits[0]._id);
 
+      }
     }
-
-  }, [navigate, token, workPermits]);
-
+    
+  }, [workPermits]); // This effect runs when workPermits changes
+  
 
   const handleOpenPermitPDF = () => {
     // Assuming the PDFs are served from the '/permits' route
@@ -306,7 +351,6 @@ useEffect(() => {
 {latestStatus === 'Waiting for Payment' && (
         <p>
           <button onClick={openPaymentMethod}>Payment</button>
-          <button>Reject Application</button>
         </p>
       )}
 
@@ -418,34 +462,48 @@ useEffect(() => {
                     <div className="paymentandviewpermitcontainer">
                         <div className="viewpermit">
                             <h2>Recently Released Permit:</h2>
-                            <button className='viewpermitbutton'>View Permit</button>
+                            <p>Latest Released Permit ID: {latestReleasedPermitID}</p>
+                            <button className='viewpermitbutton' onClick={handleViewLatestReleasedApplication}>View Permit</button>
                         </div>
                     </div>
                 </div>
 
                 <div className='workpermittable'>
-          <p>Released Work Permit Applications</p>
-          <table className="permit-table">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {currentItems.map((permit) => (
-                <tr key={permit._id}>
-                  <td>{permit.id}</td>
-                  <td>{permit.workpermitstatus}</td>
-                  <td>
-                    <button onClick={() => openModal(permit)}>
-                    <h3>Choose an Action for Permit ID: {permit.id}</h3> {/* Display the permit ID */}
-                    </button>
-                  </td>
-                </tr>
-              ))}
+  <p>Work Permit Applications</p>
+  <table className="permit-table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Status</th>
+        <th>Transaction</th>
+        <th>Date Issued</th>
+        <th>Date Expired</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {currentItems.map((permit) => (
+        <tr key={permit._id}>
+          <td>{permit.id}</td>
+          <td>{permit.workpermitstatus}</td>
+          <td>{permit.classification}</td>
+          <td>{new Date(permit.applicationdateIssued).toLocaleDateString()}</td>
+          <td>
+            {permit.permitExpiryDate 
+              ? new Date(permit.permitExpiryDate).toLocaleDateString() 
+              : '---'}
+          </td>
+          <td>
+            <button onClick={() => openModal(permit)} className="action-button">
+              Choose Action
+            </button>
+          </td>
+        </tr>
+      ))}
             </tbody>
           </table>
+
+          
           <div className="pagination-buttons">
             {currentPage > 0 && (
               <button onClick={handlePreviousPage}>Back</button>
@@ -459,12 +517,19 @@ useEffect(() => {
             <div className="modal-overlay">
               <div className="modal">
               <h3>Choose an Action for Permit ID: {activePermit.id}</h3> {/* Display the permit ID */}
-                <button onClick={handleEdit}>View Application</button>
-                <button onClick={handleDelete}>Delete</button>
-                <button onClick={closeModal}>Cancel</button>
+              <button onClick={handleViewApplication}>View Application</button>
+               {/* Conditionally render the Delete button */}
+               {activePermit.workpermitstatus === 'Pending' && (
+              <button onClick={handleDelete}>Delete</button>
+           )}
+
+<button onClick={closeModal}>Cancel</button>
               </div>
             </div>
           )}
+
+
+
         </div>
 
         
