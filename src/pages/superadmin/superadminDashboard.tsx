@@ -77,16 +77,18 @@ const SuperAdminDashboard: React.FC = () => {
 
 useEffect(() => {
   const fetchUserLogs = async () => {
-    try {
-      const response = await axios.get('http://localhost:3000/userlogs');
-      setUserLogs(response.data);
-    } catch (error) {
-      console.error('Error fetching user logs:', error);
-    }
-  };
+      try {
+        const adminResponse = await axios.get('http://localhost:3000/adminusers');
+        const datacontrollerResponse = await axios.get('http://localhost:3000/datacontrollers');
+        setUserLogs([...adminResponse.data, ...datacontrollerResponse.data]);
+      } catch (error) {
+        console.error('Error fetching user logs:', error);
+      }
+    };
 
   fetchUserLogs();
 }, []);
+
 
   
 useEffect(() => {
