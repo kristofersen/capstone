@@ -23,9 +23,9 @@ interface Admin {
 
 interface UserLog {
   userId: string;
-  username: string;
-  timeIn: string;
-  timeOut: string;
+  firstName: string;
+  lastName: string;
+  accountOpenedDate: string;
 }
 
 
@@ -68,22 +68,23 @@ const SuperAdminDashboard: React.FC = () => {
 }, []);
 
 
-// useEffect(() => {
-//   fetch('http://localhost:3000/online-users')
-//     .then(response => response.json())
-//     .then(data => setOnlineUsers(data)) 
-//     .catch(error => console.error('Error fetching online users:', error));
-// }, []);
+useEffect(() => {
+  fetch('http://localhost:3000/online-users')
+    .then(response => response.json())
+    .then(data => setOnlineUsers(data)) 
+    .catch(error => console.error('Error fetching online users:', error));
+}, []);
 
 useEffect(() => {
   const fetchUserLogs = async () => {
-    try {
-      const response = await axios.get('http://localhost:3000/userlogs');
-      setUserLogs(response.data);
-    } catch (error) {
-      console.error('Error fetching user logs:', error);
-    }
-  };
+      try {
+        const adminResponse = await axios.get('http://localhost:3000/adminusers');
+        const datacontrollerResponse = await axios.get('http://localhost:3000/datacontrollers');
+        setUserLogs([...adminResponse.data, ...datacontrollerResponse.data]);
+      } catch (error) {
+        console.error('Error fetching user logs:', error);
+      }
+    };
 
   fetchUserLogs();
 }, []);
@@ -152,7 +153,7 @@ useEffect(() => {
             {
             admins.map(admin => {
               return (
-                <tr>
+                <tr key={admin.userId}>
                    <td>{admin.userId}</td>
                   <td>{admin.firstName} {admin.lastName}</td>
                 </tr>
@@ -185,7 +186,7 @@ useEffect(() => {
               {
             dataControllers.map(dataController => {
               return (
-                <tr>
+                <tr key={dataController.userId}>
                   <td>{dataController.userId}</td>
                   <td>{dataController.firstName} {dataController.lastName}</td>
                 </tr>
@@ -221,9 +222,10 @@ useEffect(() => {
             userLogs.map(log => {
               return (
             <tr key={log.userId}>
+              <td>{log.firstName} {log.lastName}</td>
               <td>{log.userId}</td>
-              <td>{new Date(log.timeIn).toLocaleString()}</td>
-              <td>{new Date(log.timeOut).toLocaleString()}</td>
+              
+              
             </tr>
               );
             }
@@ -236,15 +238,25 @@ useEffect(() => {
       {/* Online Accounts Panel */}
 
       <div className="panel online-accounts-panel">
-        <h3>Online Accounts</h3>
-        <ul>
-        {onlineUsers.map(user => (
-          <li key={user.userId}>
-            {user.firstName} {user.lastName} ({user.userrole})
-          </li>
-        ))}
-        </ul>
-      </div>
+  <h3>Online Accounts</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>First Name</th>
+        <th>Last Name</th>
+        <th>Role</th>
+      </tr>
+    </thead>
+    <tbody>
+      {onlineUsers.map(user => (
+        <tr key={user.userId}>
+          <td>{user.firstName} {user.lastName}</td>
+          <td>{user.userrole}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
     </div>
   </div>
 </div>
