@@ -39,9 +39,9 @@ const SuperAdminDashboard: React.FC = () => {
   const [userLogs, setUserLogs] = useState<UserLog[]>([]);
 
   useEffect(() => {
-    // if (!isAuthenticated || user?.role !== 'superadmin') {
-    //   navigate('/superadmin/login')
-    // }
+    if (!isAuthenticated || user?.role !== 'superadmin') {
+       navigate('/superadmin/login')
+     }
   }, [isAuthenticated, user, navigate]);
 
   useEffect(() => {
@@ -153,7 +153,7 @@ useEffect(() => {
             {
             admins.map(admin => {
               return (
-                <tr>
+                <tr key={admin.userId}>
                    <td>{admin.userId}</td>
                   <td>{admin.firstName} {admin.lastName}</td>
                 </tr>
@@ -186,7 +186,7 @@ useEffect(() => {
               {
             dataControllers.map(dataController => {
               return (
-                <tr>
+                <tr key={log.userId}>
                   <td>{dataController.userId}</td>
                   <td>{dataController.firstName} {dataController.lastName}</td>
                 </tr>
