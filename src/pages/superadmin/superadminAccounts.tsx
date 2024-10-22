@@ -123,9 +123,9 @@ const Accounts: React.FC = () => {
         <table className="account-table">
           <thead>
             <tr>
-              <th>Employee Name</th>
+            <th>Employee Name</th>
               <th>Employee ID</th>
-              <th>Mobile No.</th>
+              <th>Mobile No.</th> 
               <th>Email</th>
               <th>Actions</th>
             </tr>
@@ -157,8 +157,7 @@ const Accounts: React.FC = () => {
             <tr>
               <th>Employee Name</th>
               <th>Employee ID</th>
-              <th>Username</th>
-              <th>Mobile No.</th>
+              <th>Mobile No.</th> 
               <th>Email</th>
               <th>Actions</th>
             </tr>
