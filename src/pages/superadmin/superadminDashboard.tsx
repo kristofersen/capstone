@@ -219,11 +219,11 @@ useEffect(() => {
             </thead>
             <tbody>
               {
-            userLogs.map(log => {
+            userLogs.map(userLog => {
               return (
-            <tr key={log.userId}>
-              <td>{log.firstName} {log.lastName}</td>
-              <td>{log.userId}</td>
+            <tr key={userLog.userId}>
+              <td>{userLog.firstName} {log.lastName}</td>
+              <td>{userLog.userId}</td>
               
               
             </tr>
@@ -248,11 +248,11 @@ useEffect(() => {
       </tr>
     </thead>
     <tbody>
-      {onlineUsers.map(user => (
-        <tr key={user.userId}>
-          <td>{user.firstName} {user.lastName}</td>
-          <td>{user.userrole}</td>
-        </tr>
+  //     {onlineUsers.map(user => (
+  //      <tr key={user.userId}>
+  //        <td>{user.firstName} {user.lastName}</td>
+  //       <td>{user.userrole}</td>
+  //     </tr>
       ))}
     </tbody>
   </table>
