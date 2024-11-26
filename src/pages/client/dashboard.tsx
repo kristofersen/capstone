@@ -78,34 +78,6 @@ const currentItems = sortedWorkPermits.slice(startIndex, endIndex);
     }
   };
 
-  useEffect(() => {
-    const getLocation = async () => {
-      try {
-        const response = await axios.get('http://ip-api.com/json');
-        const region = response.data.regionName;
-
-        // Define a list of specific districts within Dasmariñas
-        const dasmarinasDistricts = [
-          'Barangay Langkaan', 'Burol', 'Datu Esmael', 'Fatima', 'H-2', 'Luzviminda', 'Paliparan', 'Sabang', 'Salawag', 'Salitran', 'Sampaloc', 'San Agustin', 'San Antonio de Padua', 'San Dionisio', 'San Esteban', 'San Jose', 'San Juan', 'San Luis', 'San Manuel', 'San Mateo', 'San Miguel', 'San Nicolas', 'San Roque', 'San Simon', 'Santa Clara', 'Santa Cristina', 'Santa Cruz', 'Santa Fe', 'Santa Lucia', 'Santa Maria', 'Victoria Reyes', 'Zone (Poblacion)', 'Bayan Luma'
-        ];
-
-        // Check if the region is one of the specific districts within Dasmariñas
-        const district = dasmarinasDistricts.includes(region) ? region : 'Others';
-
-        // Store the district in MongoDB
-        await axios.post('http://localhost:3000/store-region', {
-          userId: 'userId', // Replace with actual userId
-          region: district,
-        });
-
-        console.log('District stored successfully:', district);
-      } catch (error) {
-        console.error('Error fetching or storing district:', error);
-      }
-    };
-
-    getLocation();
-  }, []);
 
   const handleDelete = async () => {
     if (activePermit) {

@@ -28,43 +28,69 @@ const userSchema = new mongoose.Schema({
 
 const User = mongoose.model('User', userSchema);
 
-// Define Business Permit schema and model
+// Define schema and model for Business Permit Application
 const businessPermitSchema = new mongoose.Schema({
+  id: { type: String, required: true,},
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  permittype: { type: String, required: true, default: 'BP' },
+  businesspermitstatus: { type: String, required: true, },
+  classification: { type: String },
+  transaction: { type: String },
+  amountToPay: {type: String },
+  permitFile: {type: String},
+  permitDateIssued: {type: String},
+  permitExpiryDate: {type:String},
+  expiryDate: {type: String},
+  applicationdateIssued: { type: Date, default: Date.now },
+  applicationComments: {type: String},
   owner: {
     lastName: String,
     firstName: String,
     middleInitial: String,
-    civilStatus: String,
+    civilstatus: String,
     gender: String,
     citizenship: String,
-    tinNumber: String,
-    isRepresentative: Boolean,
-    representative: {
-      fullName: String,
-      designation: String,
-      mobileNumber: String
+    tinnumber: String,
+    representative: String,
+    representativedetails: {
+      repfullname: String,
+      repdesignation: String,
+      repmobilenumber: String,
     }
   },
   businessReference: {
-    businessName: String,
-    businessScale: String,
-    paymentMethod: String,
-    houseBuildingNo: String,
-    buildingStreetName: String,
-    subdivisionCompoundName: String,
+    businessname: String,
+    businessscale: String,
+    paymentmethod: String,
+    buildingblocklot: String,
+    buildingname: String,
+    subdivisioncompoundName: String,
     region: String,
     province: String,
-    cityMunicipality: String,
+    municipality: String,
     barangay: String,
-    businessStreet: String,
+    businessstreet: String,
     zone: String,
     zip: String,
-    contactNumber: String
+    contactnumber: String,
   },
-  bui: { type: String, required: true, default: 'Pending' },
-  transaction: { type: String, required: true, default: 'Processing' },
-  dateIssued: { type: Date, default: Date.now },
-  expiryDate: { type: Date, default: () => Date.now() + 31536000000 }
+  files: {
+    document1: String,
+    document2: String,
+    document3: String,
+    document4: String,
+  },
+  receipt: {
+    receiptId: String, //Generated
+    modeOfPayment: String, //online, onsite
+    paymentType: String, // gcash, bank payment, onsite
+    paymentNumber: String, // gcashnumber, card number
+    receiptName: String, //user's name
+    receiptAddress: String, // user's address
+    receiptDate: String, //date
+    amountPaid: String, // amount
+    receiptFile: String,
+  },
 }, { timestamps: true });
 
 const BusinessPermit = mongoose.model('BusinessPermit', businessPermitSchema);
@@ -135,8 +161,35 @@ const workPermitSchema = new mongoose.Schema({
 
 const WorkPermit = mongoose.model('WorkPermit', workPermitSchema);
 
+const PersonSchema = new mongoose.Schema({
+  name: String,
+  email: String,
+  applicationForm: {
+    age: Number,
+    address: String,
+    phoneNumber: String,
+    isActive: Boolean,
+  },
+  files: {
+    document1: String,
+    document2: String,
+    document3: String,
+  },
+  businesses: [
+    {
+      businessNature: { type: String,},
+      businessType: { type: String,},
+      capitalInvestment: { type: Number,},
+    },
+  ],
+});
+
+
+const Person = mongoose.model('Person', PersonSchema);
+
 module.exports = {
   User,
   BusinessPermit,
-  WorkPermit
+  WorkPermit,
+  Person
 };
