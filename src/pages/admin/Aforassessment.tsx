@@ -75,33 +75,32 @@ const AdminForAssessment: React.FC = () => {
                     <a href="/AforassessmentBP" className="Abusinesspermitbutton">
                         For Assessment New Business Permit
                     </a>
-                    
-                    <a href="/AforassessmentWP" className="Aworkpermitbutton">
-                        For Assessment New Working Permit
+
+                    <a href="/AforassessmentBP" className="Abusinesspermitbutton">
+                        For Assessment Renew Business Permit
+                    </a>
+
+                    <a href="/AforassessmentBP" className="Abusinesspermitbutton">
+                        View All For Assessment Business Permit
                     </a>
           
             </div>
             <div className="button-container"> {/* Centering container */}
-                    <a href="/AforassessmentBP" className="Abusinesspermitbutton">
-                        For Assessment Renew Business Permit
-                    </a>
+
                     
                     <a href="/AforassessmentWP" className="Aworkpermitbutton">
                         For Assessment Renew Working Permit
                     </a>
-          
-            </div>
 
-            <div className="button-container"> {/* Centering container */}
-                    <a href="/AforassessmentBP" className="Abusinesspermitbutton">
-                        View All For Assessment Business Permit
+                    <a href="/AforassessmentWP" className="Aworkpermitbutton">
+                        For Assessment New Working Permit
                     </a>
-                    
+
                     <a href="/AforassessmentWP" className="Aworkpermitbutton">
                         View All For Assessment Working Permit
-                    </a>
-          
+                    </a>         
             </div>
+
             </div>
         </section>
     );

@@ -71,6 +71,16 @@
     overflow-y: auto; /* Enable vertical scrolling for content if necessary */
 }
 
+.Aworkpermitbutton, .Abusinesspermitbutton {
+    display: inline-block; /* Ensure buttons are inline */
+    background-color: #ffffff; /* Button background color */
+    color: rgb(0, 0, 0); /* black text color */
+    padding: 3rem; /* Padding for the button */
+    border-radius: 5px; /* Rounded corners */
+    text-decoration: none; /* Remove underline */
+    transition: background-color 0.3s; /* Smooth hover effect */
+}
+
 /* SEARCH BAR CONTAINER */
 .search-bar-container {
     display: flex; /* Use flexbox for layout */
@@ -223,6 +233,16 @@
     align-items: center;
     z-index: 1000;
 }
+
+.modal-contentapproval{
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    max-width: 450px;
+    width: 100%;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
 
 .Amodal {
     background-color: #ffffff;

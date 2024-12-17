@@ -1916,8 +1916,8 @@ return (
         </tr>
       </tbody>
     </table>
-  <button onClick={handlesaveassessment}>Assess</button>
-  <button onClick={() => { window.location.href = `/DAEditBusinessNature/${businessPermit?._id}`;}}>Edit Business Nature</button>
+  <button className="assessbutton"onClick={handlesaveassessment}>Assess</button>
+  <button  className="editbutton" onClick={() => { window.location.href = `/DAEditBusinessNature/${businessPermit?._id}`;}}>Edit Business Nature</button>
   {businessPermit && businessPermit.statementofaccount && businessPermit.businesspermitstatus === 'Assessed' ? (
   // If the business permit is available and its status is "Assessed", render the PDF component
   <GenerateStatementofAccountPDF permitData={businessPermit.statementofaccount} />

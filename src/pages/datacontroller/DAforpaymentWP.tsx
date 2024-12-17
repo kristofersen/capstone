@@ -462,7 +462,7 @@ const DataControllerForPaymentWP: React.FC = () => {
         <header className='DAheader'>
           <h1>Online Business and Work Permit Licensing System</h1>
         </header>
-        <div className='workpermittable'>
+        <div className='workpermitcontainer'>
           <p>Work Permit Applications (For Payment)</p>
           {/* Search Bar */}
           <div className="search-bar-container">

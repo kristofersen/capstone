@@ -555,7 +555,7 @@ const handleAction = (action: string, permit: WorkPermit) => {
 
 
         
-        <div className='workpermittable'>
+        <div className='workpermitcontainer'>
   <p>Work Permit Applications</p>
   <table className="permit-table">
   <thead>
@@ -627,7 +627,7 @@ const handleAction = (action: string, permit: WorkPermit) => {
           </div>
 
 </div>
-          <div className='workpermittable'>
+          <div className='businesspermitcontainer'>
   <p>Business Permit Applications</p>
   <table className="permit-table">
   <thead>

@@ -268,7 +268,7 @@ const handleLogout = async () => {
                     <h1>View Work Permit Applications</h1>
                 </header>
 
-                <div className='workpermittable'>
+                <div className='workpermitcontainer'>
                 <p>Work Permit Applications</p>
   <table className="permit-table">
   <thead>

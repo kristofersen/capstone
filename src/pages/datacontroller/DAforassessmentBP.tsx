@@ -916,7 +916,7 @@ const handleCancelEdit = () => {
         <header className='DAheader'>
           <h1>Online Business and Work Permit Licensing System</h1>
         </header>
-        <div className='workpermittable'>
+        <div className='workpermitcontainer'>
           <p>Business Permit Applications New Business(For Assessments)</p>
           {/* Search Bar */}
           Search:
@@ -952,21 +952,20 @@ const handleCancelEdit = () => {
             />
             <button onClick={handleDateSearch} className="search-button">Search by Date</button>
           </div>
-
           <table className="permit-table">
             <thead>
               <tr>
                 <th>
-                 Business Information 
+                Business Information 
                 </th>
                 <th>
                   ID
                 </th>
                 <th>
-                 Application Status
+                Application Status
                 </th>
                 <th>
-                 Business Status 
+                Business Status 
                 </th>
                 <th>
                   Date Issued 
@@ -2117,16 +2116,16 @@ const handleCancelEdit = () => {
 
 
   <div>
-  <button onClick={editbusiness ? handlesavebusinessedit : () => setEditBusiness(true)}>
+  <button className="editbutton"onClick={editbusiness ? handlesavebusinessedit : () => setEditBusiness(true)}>
     {editbusiness ? 'Save' : 'Edit'}
   </button>
   {editbusiness && (
-    <button onClick={handlecancelbusinessedit} style={{ marginLeft: '10px' }}>
+    <button className="cancel-button" onClick={handlecancelbusinessedit} style={{ marginLeft: '10px' }}>
       Cancel
     </button>
   )}
           {/* Close Modal Button */}
-          <button className="close-modal" onClick={closeViewBusinessDetails}>
+          <button className="cancel-button" onClick={closeViewBusinessDetails}>
           Close
         </button>
     </div>

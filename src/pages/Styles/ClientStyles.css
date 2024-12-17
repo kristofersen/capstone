@@ -500,17 +500,7 @@ width: 100%; /* Occupy most of the container's width */
 /* ---------------------------------------- TABLE STYLES -------------------------------------------- */
 
 /* BUSINESS PERMIT TABLE STYLE */
-.businesspermittable {
-  margin: 20px 0; /* Space above and below the table */
-  padding: 20px; /* Padding around the table */
-  border-radius: 8px; /* Rounded corners */
-  background-color: #ffffff; /* White background for contrast */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
-  overflow-x: auto; /* Horizontal scrolling for smaller screens */
-}
-
-/* WORK PERMIT TABLE STYLE */
-.workpermittable {
+.businesspermitcontainer, .workpermitcontainer {
   margin: 20px 0; /* Space above and below the table */
   padding: 20px; /* Padding around the table */
   border-radius: 8px; /* Rounded corners */
@@ -527,12 +517,7 @@ width: 100%; /* Occupy most of the container's width */
 }
 
 /* TABLE HEADER STYLE */
-.businesspermittable p{
-  font-weight: bold;
-  font-size: 22px;
-}
-
-.workpermittable p{
+.businesspermitcontainer p, .workpermitcontainer p {
   font-weight: bold;
   font-size: 22px;
 }
@@ -543,14 +528,23 @@ width: 100%; /* Occupy most of the container's width */
   padding: 12px; /* Padding for header cells */
   font-weight: bold; /* Bold header text */
   border-bottom: 2px solid #ffffff; /* Bottom border for separation */
+  border-radius: 8px;
+  border: none;
 }
 
 /* TABLE BODY STYLE */
 .permit-table tbody td {
   padding: 10px; /* Padding for table cells */
-  border-bottom: 1px solid #ddd; /* Light border for rows */
+border: none;
 }
 
+.permit-table tr:nth-child(odd) {
+  background-color: #ffffff; /* White for odd rows */
+}
+
+.permit-table tr:nth-child(even) {
+  background-color: #e7e5e5; /* Light grey for even rows */
+}
 /* BUTTON STYLE INSIDE TABLE */
 .table-button {
   background-color: #00712D; /* Consistent green background */

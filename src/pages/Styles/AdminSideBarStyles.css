@@ -2,7 +2,7 @@
  .Asidebar {
     width: 100%; /* Full width within its container */
     height: 100vh; /* Full height */
-    background-color: #ca294c; /* Dark background color */
+    background-color: #0047AB; /* Dark background color */
     padding-top: 20px;
     position: relative; /* Relative positioning within its container */
     overflow-y: auto; /* Add vertical scrolling if necessary */

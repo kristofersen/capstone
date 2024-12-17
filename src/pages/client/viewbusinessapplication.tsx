@@ -356,7 +356,7 @@ const ViewBusinessApplication: React.FC = () => {
                 </header>
                 
 
-                <div className='businesspermittable'>
+                <div className='businesspermitcontainer'>
                 <p>Business Permits</p>
       <table className="permit-table">
         <thead>

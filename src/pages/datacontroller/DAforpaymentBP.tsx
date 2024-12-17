@@ -419,7 +419,7 @@ useEffect(() => {
         <header className='DAheader'>
           <h1>Online Business and Work Permit Licensing System</h1>
         </header>
-  <div className='workpermittable'>
+  <div className='workpermitcontainer'>
           <p>Business Permit Applications New Business(For Assessments)</p>
           {/* Search Bar */}
           Search:
@@ -516,7 +516,7 @@ useEffect(() => {
       {selectedUserIdDep === permit._id && (
   <tr>
     <td colSpan={6}>
-      <table>
+      <table className="permit-table">
         <thead>
           <tr>
             <th>Departments</th>

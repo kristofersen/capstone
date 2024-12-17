@@ -1625,14 +1625,14 @@ const updatebusinesspermitstatus = async (action: string, remarks: string) => {
       )}
 
 {checkpermit && activePermitId && (
-        <div className="modal-overlay" onClick={closePermitChecker}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+        <div className="Amodal-overlay" onClick={closePermitChecker}>
+          <div className="modal-contentapproval" onClick={(e) => e.stopPropagation()}>
             <h2>Approve Permit {activePermitId.id}?</h2>
             <p>Are you sure you want to approve or reject this permit? Please confirm your decision.</p>
 
             <div className="button-group">
-              <button onClick={() => updatebusinesspermitstatus('approved', 'N/A')}>Approve</button>
-              <button onClick={() => {
+              <button className="Amodal-button" onClick={() => updatebusinesspermitstatus('approved', 'N/A')}>Approve</button>
+              <button className="Acancel-button" onClick={() => {
                 setIsRejecting(true); // Show remarks input when rejecting
               }}>
                 Reject
@@ -1648,12 +1648,9 @@ const updatebusinesspermitstatus = async (action: string, remarks: string) => {
                   onChange={(e) => setRemarks(e.target.value)}
                   placeholder="Enter remarks for rejection"
                 />
-              <button onClick={() => updatebusinesspermitstatus('rejected', remarks)}>Save</button>
+              <button className="Acancel-button"onClick={() => updatebusinesspermitstatus('rejected', remarks)}>Save</button>
               </div>
             )}
-            <button className="close-modal" onClick={closePermitChecker}>
-              Close
-            </button>
           </div>
         </div>
       )}
