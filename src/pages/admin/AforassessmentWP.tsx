@@ -2,7 +2,7 @@ import '../styles/AdminStyles.css';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Modal from 'react-modal';
-import AdminSideBar from '../components/AdminSideBar';
+import AdminSideBar from '../components/NavigationBars/AdminSideBar';
 
 Modal.setAppElement('#root'); // Set the root element for accessibility
 
@@ -81,7 +81,7 @@ const AdminForAssessmentWP: React.FC = () => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await fetch('http://localhost:3000/client/check-auth-admin', {
+        const response = await fetch('http://localhost:3000/auth/check-auth-admin', {
           method: 'GET',
           credentials: 'include', // This ensures cookies are sent with the request
         });
@@ -108,29 +108,7 @@ const AdminForAssessmentWP: React.FC = () => {
     checkAuth();
   }, [navigate]); // Only depend on navigate, which is necessary for the redirection
 
-  const handleLogout = async () => {
-    try {
-      const response = await fetch('http://localhost:3000/client/logout', {
-        method: 'POST',
-        credentials: 'include', // Include cookies in the request
-      });
 
-      if (response.ok) {
-        // Clear any local storage data (if applicable)
-        localStorage.removeItem('profile');
-        localStorage.removeItem('userId');
-
-        // Redirect to the login page
-        navigate('/');
-      } else {
-        // Handle any errors from the server
-        const errorData = await response.json();
-        console.error('Logout error:', errorData.message);
-      }
-    } catch (error) {
-      console.error('Error logging out:', error);
-    }
-  };
 
   // CODE FOR TABLE @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
   const [currentPage, setCurrentPage] = useState(0);
@@ -233,7 +211,7 @@ const AdminForAssessmentWP: React.FC = () => {
 
   const fetchWorkPermits = async () => {
     try {
-      const response = await fetch('http://localhost:3000/datacontroller/getworkpermitsforassessment', {
+      const response = await fetch('http://localhost:3000/datacontroller/getworkpermitforassessment', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -325,7 +303,7 @@ const AdminForAssessmentWP: React.FC = () => {
     e.preventDefault();
     if (selectedPermit) {
       try {
-        const response = await fetch(`http://localhost:3000/datacontroller/updateworkingPermit/${selectedPermit._id}`, {
+        const response = await fetch(`http://localhost:3000/datacontroller/updateworkpermit/${selectedPermit._id}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -382,7 +360,7 @@ const AdminForAssessmentWP: React.FC = () => {
 
 const fetchDocumentUrl = (fileName: string | null, folder: 'uploads' | 'permits' | 'receipts'): string | null => {
   if (!fileName) return null;
-  return `http://localhost:3000/datacontroller/${folder}/${fileName}`;
+  return `http://localhost:3000/${folder}/${fileName}`;
 };
 
 const renderFile = (fileUrl: string | null) => {
@@ -468,7 +446,7 @@ const updateAttachments = async (e: React.FormEvent) => {
       console.error('No permit selected');
       return;
     }
-    const response = await fetch(`http://localhost:3000/datacontroller/updateworkpermitattachments/${selectedPermit._id}`, {
+    const response = await fetch(`http://localhost:3000/datacontroller/updateworkpermitattachment/${selectedPermit._id}`, {
       method: 'POST',
       body: formData,
     });
@@ -528,7 +506,7 @@ useEffect(() => {
   return (
     <section className="Abody">
       <div className="Asidebar-container">
-        <AdminSideBar handleLogout={handleLogout} /> 
+        <AdminSideBar />
       </div>
 
       <div className="Acontent">

@@ -1,5 +1,5 @@
 import '../styles/DataControllerStyles.css'; 
-import DASidebar from '../components/DAsidebar';
+import DASidebar from '../components/NavigationBars/DAsidebar';
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Modal from 'react-modal';
@@ -82,7 +82,7 @@ const DataControllerForAssessmentWP: React.FC = () => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await fetch('http://localhost:3000/client/check-auth-datacontroller', {
+        const response = await fetch('http://localhost:3000/auth/check-auth-datacontroller', {
           method: 'GET',
           credentials: 'include', // This ensures cookies are sent with the request
         });
@@ -109,29 +109,7 @@ const DataControllerForAssessmentWP: React.FC = () => {
     checkAuth();
   }, [navigate]); // Only depend on navigate, which is necessary for the redirection
 
-  const handleLogout = async () => {
-    try {
-      const response = await fetch('http://localhost:3000/client/logout', {
-        method: 'POST',
-        credentials: 'include', // Include cookies in the request
-      });
 
-      if (response.ok) {
-        // Clear any local storage data (if applicable)
-        localStorage.removeItem('profile');
-        localStorage.removeItem('userId');
-
-        // Redirect to the login page
-        navigate('/');
-      } else {
-        // Handle any errors from the server
-        const errorData = await response.json();
-        console.error('Logout error:', errorData.message);
-      }
-    } catch (error) {
-      console.error('Error logging out:', error);
-    }
-  };
 
   // CODE FOR TABLE @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
   const [currentPage, setCurrentPage] = useState(0);
@@ -234,7 +212,7 @@ const DataControllerForAssessmentWP: React.FC = () => {
           try {
             console.log(type);
             const response = await fetch(
-              `http://localhost:3000/datacontroller/getworkpermitsforassessment/${type}`,
+              `http://localhost:3000/datacontroller/getworkpermitforassessment/${type}`,
               {
                 method: 'GET',
                 credentials: 'include',
@@ -321,13 +299,14 @@ const DataControllerForAssessmentWP: React.FC = () => {
   const closeAttachmentsModal = () => {
     setIsAttachmentsModalOpen(false);
     setSelectedPermit(null);
+    handleCancelEditAttach();
   };
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (selectedPermit) {
       try {
-        const response = await fetch(`http://localhost:3000/datacontroller/updateworkingPermit/${selectedPermit._id}`, {
+        const response = await fetch(`http://localhost:3000/datacontroller/updateworkpermit/${selectedPermit._id}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -384,7 +363,7 @@ const DataControllerForAssessmentWP: React.FC = () => {
 
 const fetchDocumentUrl = (fileName: string | null, folder: 'uploads' | 'permits' | 'receipts'): string | null => {
   if (!fileName) return null;
-  return `http://localhost:3000/datacontroller/${folder}/${fileName}`;
+  return `http://localhost:3000/${folder}/${fileName}`;
 };
 
 const renderFile = (fileUrl: string | null) => {
@@ -398,7 +377,18 @@ const renderFile = (fileUrl: string | null) => {
         title="PDF Viewer"
       />
     );
-  } else {
+  } 
+  else if (fileUrl.endsWith('.docx')) {
+    return (
+      <div style={{ marginTop: '10px' }}>
+        <p>Word file detected. Download File</p>
+        <a href={fileUrl} download>
+          <button>Download</button>
+        </a>
+      </div>
+    );
+  }
+  else {
     return (
       <img
         src={fileUrl}
@@ -425,6 +415,14 @@ const [files, setFiles] = useState<{
   document3: null,
   document4: null,
 });
+
+  //Actionupdate
+  const [updatesuccess, setUpdateSuccess] = useState(false);
+
+  const closeupdateSuccess = () => {
+    setUpdateSuccess(false);
+    window.location.reload();
+  };
 
 const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>, doc: 'document1' | 'document2' | 'document3' | 'document4') => {
   const selectedFiles = event.target.files;
@@ -470,7 +468,7 @@ const updateAttachments = async (e: React.FormEvent) => {
       console.error('No permit selected');
       return;
     }
-    const response = await fetch(`http://localhost:3000/datacontroller/updateworkpermitattachments/${selectedPermit._id}`, {
+    const response = await fetch(`http://localhost:3000/datacontroller/updateworkpermitattachment/${selectedPermit._id}`, {
       method: 'POST',
       body: formData,
     });
@@ -483,8 +481,11 @@ const updateAttachments = async (e: React.FormEvent) => {
         )
       );
       console.log('Attachments updated successfully');
+      alert('Attachments updated successfully');
+      window.location.reload();
       setIsEditingAttach(false); 
       closeAttachmentsModal();
+      handleCancelEditAttach();
     } else {
       console.error('Failed to upload files');
     }
@@ -541,7 +542,7 @@ if (type === 'new') {
   return (
     <section className="DAbody">
       <div className="DAsidebar-container">
-        <DASidebar handleLogout={handleLogout} /> {/* Pass handleLogout to DASidebar */}
+        <DASidebar /> {/* Pass handleLogout to DASidebar */}
       </div>
 
       <div className="DAcontent">
@@ -1049,12 +1050,21 @@ if (type === 'new') {
         <p>
           Document 1: {selectedPermit.formData.files.document1 || 'Not uploaded'}
           {selectedPermit.formData.files.document1 && (
-            <button
-              type="button"
-              onClick={() => handleViewDocument('document1')}
-            >
-              {selectedFiles.document1 ? 'Close' : 'View'}
-            </button>
+               <button
+               type="button"
+               onClick={() => {
+                 const newFileUrl = fetchDocumentUrl(selectedPermit.formData.files.document1, 'uploads');
+                 setSelectedFiles((prev) => {
+                   const isFileSelected = prev.document1 === newFileUrl;
+                   return {
+                     ...prev,
+                     document1: isFileSelected ? null : newFileUrl, // Toggle visibility based on the URL
+                   };
+                 });
+               }}
+             >
+               {selectedFiles.document1 ? 'Back' : 'View'}
+             </button>
           )}
           {isEditingAttach && (
             <input type="file" onChange={(e) => handleFileChange(e, 'document1')} />
@@ -1065,6 +1075,8 @@ if (type === 'new') {
             value={isEditingAttach ? (remarksdoc1 || '') : (selectedPermit.formData.files.remarksdoc1 || '')} 
             onChange={(e) => setRemarksdoc1(e.target.value)} 
             disabled={!isEditingAttach} 
+
+            
           />
         </p>
         {renderFile(selectedFiles.document1)}
@@ -1076,7 +1088,7 @@ if (type === 'new') {
               type="button"
               onClick={() => handleViewDocument('document2')}
             >
-              {selectedFiles.document2 ? 'Close' : 'View'}
+              {selectedFiles.document2 ? 'Back' : 'View'}
             </button>
           )}
           {isEditingAttach && (
@@ -1099,7 +1111,7 @@ if (type === 'new') {
               type="button"
               onClick={() => handleViewDocument('document3')}
             >
-              {selectedFiles.document3 ? 'Close' : 'View'}
+              {selectedFiles.document3 ? 'Back' : 'View'}
             </button>
           )}
           {isEditingAttach && (
@@ -1122,7 +1134,7 @@ if (type === 'new') {
               type="button"
               onClick={() => handleViewDocument('document4')}
             >
-              {selectedFiles.document4 ? 'Close' : 'View'}
+              {selectedFiles.document4 ? 'Back' : 'View'}
             </button>
           )}
           {isEditingAttach && (
@@ -1160,6 +1172,17 @@ if (type === 'new') {
     )}
   </form>
 </Modal>
+{updatesuccess && selectedPermit && (
+  <div className="modal-overlay" onClick={closeupdateSuccess}>
+  <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+    <p>Updated Business Permit ID:{selectedPermit.id}</p>
+    <button className="btn btn-danger" onClick={closeupdateSuccess}>
+          Close
+        </button>
+  </div>
+  </div>
+      )}
+
     </section>
   );
 };

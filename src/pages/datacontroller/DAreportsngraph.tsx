@@ -1,5 +1,5 @@
 import '../Styles/DataControllerStyles.css'; 
-import DASidebar from '../components/DAsidebar';
+import DASidebar from '../components/NavigationBars/DAsidebar';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import {  Bar, Doughnut } from 'react-chartjs-2';
@@ -41,7 +41,7 @@ const DataControllerReportandGraph: React.FC = () => {
     useEffect(() => {
         const checkAuth = async () => {
           try {
-            const response = await fetch('http://localhost:3000/client/check-auth-datacontroller', {
+            const response = await fetch('http://localhost:3000/auth/check-auth-datacontroller', {
               method: 'GET',
               credentials: 'include', // This ensures cookies are sent with the request
             });
@@ -68,29 +68,7 @@ const DataControllerReportandGraph: React.FC = () => {
         checkAuth();
       }, [navigate]);
 
-      const handleLogout = async () => {
-        try {
-          const response = await fetch('http://localhost:3000/client/logout', {
-            method: 'POST',
-            credentials: 'include', // Include cookies in the request
-          });
-    
-          if (response.ok) {
-            // Clear any local storage data (if applicable)
-            localStorage.removeItem('profile');
-            localStorage.removeItem('userId');
-    
-            // Redirect to the login page
-            navigate('/');
-          } else {
-            // Handle any errors from the server
-            const errorData = await response.json();
-            console.error('Logout error:', errorData.message);
-          }
-        } catch (error) {
-          console.error('Error logging out:', error);
-        }
-      };
+
 
     useEffect(() => {
         const barangays = [
@@ -126,7 +104,7 @@ const DataControllerReportandGraph: React.FC = () => {
     // };
     // setMonthlyData(mockMonthlyData);
 
-        fetch('http://localhost:3000/datacontroller/businessPermitLocations')
+        fetch('http://localhost:3000/datacontroller/graphbusinesspermitlocation')
             .then(response => response.json())
             .then(data => {
                 const filteredData = data.filter((item: BusinessPermitLocation) => barangays.includes(item._id));
@@ -136,7 +114,7 @@ const DataControllerReportandGraph: React.FC = () => {
             })
             .catch(error => console.error('Error fetching location data:', error));
             
-        fetch('http://localhost:3000/datacontroller/monthlyPaymentStatus')
+        fetch('http://localhost:3000/datacontroller/graphmonthlypaymentstatus')
             .then(response => response.json())
             .then(data => {
                 const labels = data.map((item: MonthlyPaymentStatus) => item.month);
@@ -146,7 +124,7 @@ const DataControllerReportandGraph: React.FC = () => {
             })
             .catch(error => console.error('Error fetching monthly payment data:', error));
 
-        fetch('http://localhost:3000/datacontroller/permitApplicationsByCategory')
+        fetch('http://localhost:3000/datacontroller/graphpermitapplicationcategory')
             .then(response => response.json())
             .then(data => {
                 const workPermitLabels = data.workPermitCategories.map((item: CategoryData) => item._id);
@@ -248,7 +226,7 @@ const DataControllerReportandGraph: React.FC = () => {
     return (
         <section className="DAbody">
             <div className="DAsidebar-container">
-                <DASidebar handleLogout={handleLogout} /> {/* Pass handleLogout to DASidebar */}
+                <DASidebar /> {/* Pass handleLogout to DASidebar */}
             </div>
 
             <div className="DAcontent">

@@ -2,75 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../Styles/ClientStyles.css';
-import ClientNavbar from '../components/clientnavbar';
+import { WorkPermit } from "../components/Interface(Front-end)/Types";
+import ClientNavbar from '../components/NavigationBars/clientnavbar';
 
-export interface PersonalInformation {
-    lastName: string;
-    firstName: string;
-    middleInitial?: string; // Optional
-    permanentAddress?: string; // Optional
-    currentlyResiding: boolean;
-    temporaryAddress?: string; // Optional
-    dateOfBirth?: Date; // Optional
-    age?: number; // Optional
-    placeOfBirth?: string; // Optional
-    citizenship?: string; // Optional
-    civilStatus?: string; // Optional
-    gender?: string; // Optional
-    height?: string; // Optional
-    weight?: string; // Optional
-    mobileTel?: string; // Optional
-    email?: string; // Optional
-    educationalAttainment?: string; // Optional
-    natureOfWork?: string; // Optional
-    placeOfWork?: string; // Optional
-    companyName?: string; // Optional
-    workpermitclassification?: string;
-  }
-  
-  export interface EmergencyContact {
-    name2?: string; // Optional
-    mobileTel2?: string; // Optional
-    address?: string; // Optional
-  }
-  
-  export interface Files {
-    document1: string | null; // Optional
-    document2: string | null; // Optional
-    document3: string | null; // Optional
-    document4: string | null; // Optional
-  }
-  
-  export interface Receipt {
-    receiptId?: string; // Optional
-    modeOfPayment?: string; // Optional
-    receiptDate?: string; // Optional
-    amountPaid?: string; // Optional
-    receiptFile?: string;
-  }
-  
-  export interface FormData {
-    personalInformation: PersonalInformation;
-    emergencyContact: EmergencyContact;
-    files: Files;
-  
-  }
-  
-  export interface WorkPermit {
-    _id: string; // Mongoose generated ID
-    id: string;
-    userId?: string; // Can be a string for front end
-    permittype?: string; // Default value can be handled in logic
-    classification: string;
-    workpermitstatus: string;
-    transaction: string;
-    transactionstatus: string;
-    formData: FormData;
-    createdAt?: string;
-    receipt: Receipt;
-    permitFile?: string;
-    applicationComments: string;
-  }
 
 const ViewApplicationDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>(); // Extract work permit ID from URL
@@ -91,7 +25,7 @@ const ViewApplicationDetails: React.FC = () => {
           } 
       try {
         console.log(id);
-        const response = await axios.get(`http://localhost:3000/client/workpermitdetails/${id}`, {
+        const response = await axios.get(`http://localhost:3000/client/fetchworkpermitdetails/${id}`, {
           headers: { },
           withCredentials: true, 
 
@@ -106,29 +40,6 @@ const ViewApplicationDetails: React.FC = () => {
 
   }, [id, token, navigate]);
 
-  const handleLogout = async () => {
-    try {
-      const response = await fetch('http://localhost:3000/client/logout', {
-        method: 'POST',
-        credentials: 'include', // Include cookies in the request
-      });
-  
-      if (response.ok) {
-        // Clear any local storage data (if applicable)
-        localStorage.removeItem('profile');
-        localStorage.removeItem('userId');
-  
-        // Redirect to the login page
-        navigate('/');
-      } else {
-        // Handle any errors from the server
-        const errorData = await response.json();
-        console.error('Logout error:', errorData.message);
-      }
-    } catch (error) {
-      console.error('Error logging out:', error);
-    }
-  };
 
   useEffect(() => {
     console.log(workPermit); // This will log the updated workPermit when it changes
@@ -150,7 +61,7 @@ const ViewApplicationDetails: React.FC = () => {
     if (!fileName) return null;
     
     // Return the file URL based on the folder specified
-    return `http://localhost:3000/client/${folder}/${fileName}`;
+    return `http://localhost:3000/${folder}/${fileName}`;
   };
   
 const renderDocument = (fileName: string | null, folder: 'uploads' | 'permits' | 'receipts') => {
@@ -169,7 +80,7 @@ const renderDocument = (fileName: string | null, folder: 'uploads' | 'permits' |
 useEffect(() => {
   const checkAuth = async () => {
     try {
-      const response = await fetch('http://localhost:3000/client/check-auth-client', {
+      const response = await fetch('http://localhost:3000/auth/check-auth-client', {
         method: 'GET',
         credentials: 'include', // This ensures cookies are sent with the request
       });
@@ -199,7 +110,7 @@ useEffect(() => {
   return (
     <section className="dashboard-container">
           {/* Navbar */}
-          <ClientNavbar handleLogout={handleLogout}/>
+          <ClientNavbar/>
   
       <div className="content">
         <header>

@@ -19,8 +19,8 @@ const Accounts: React.FC = () => {
   useEffect(() => {
     const fetchAccounts = async () => {
       try {
-        const adminResponse = await fetch('http://localhost:3000/superadmin/adminusers');
-        const dataControllerResponse = await fetch('http://localhost:3000/superadmin/datacontrollers');
+        const adminResponse = await fetch('http://localhost:3000/superadmin/getadminuser');
+        const dataControllerResponse = await fetch('http://localhost:3000/superadmin/getdatacontrolleruser');
 
         if (!adminResponse.ok) {
           const errorText = await adminResponse.text();
@@ -52,7 +52,7 @@ const Accounts: React.FC = () => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await fetch('http://localhost:3000/superadmin/superadmin/authentication', {
+        const response = await fetch('http://localhost:3000/auth/check-auth-superadmin', {
           method: 'GET',
           credentials: 'include',
         });
@@ -75,28 +75,32 @@ const Accounts: React.FC = () => {
     checkAuth();
   }, [navigate]);
 
+
+
   const handleLogout = async () => {
     try {
-      const response = await fetch('http://localhost:3000/client/logout', {
+      const response = await fetch('http://localhost:3000/auth/logout', {
         method: 'POST',
-        credentials: 'include',
+        credentials: 'include', // Include cookies in the request
       });
   
       if (response.ok) {
-        localStorage.removeItem('token');
-        navigate('/superadmin/login');
+        // Clear any local storage data (if applicable)
+        localStorage.removeItem('profile');
+        localStorage.removeItem('userId');
+  
+        // Redirect to the login page
+        navigate('/');
       } else {
-        const errorText = await response.text();
-        throw new Error(`Failed to logout: ${errorText}`);
-      } 
-    } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError('An unknown error occurred');
+        // Handle any errors from the server
+        const errorData = await response.json();
+        console.error('Logout error:', errorData.message);
       }
+    } catch (error) {
+      console.error('Error logging out:', error);
     }
   };
+
 
   if (error) {
     return <div>Error: {error}</div>; // Error message
@@ -108,7 +112,7 @@ const Accounts: React.FC = () => {
 
   const handleRemove = async (account: Account) => {
     try {
-      const response = await fetch(`http://localhost:3000/api/accounts/${account.userId}`, {
+      const response = await fetch(`http://localhost:3000/superadmin/handleremoveuser/${account.userId}`, {
         method: 'DELETE',
       });
   

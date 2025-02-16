@@ -1,76 +1,9 @@
 import React, {  useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../Styles/ClientStyles.css';
-import ClientNavbar from '../components/clientnavbar';
+import ClientNavbar from '../components/NavigationBars/clientnavbar';
 import axios from 'axios';
-
-export interface PersonalInformation {
-  lastName: string;
-  firstName: string;
-  middleInitial?: string; // Optional
-  permanentAddress?: string; // Optional
-  currentlyResiding: boolean;
-  temporaryAddress?: string; // Optional
-  dateOfBirth?: string; // Optional
-  age?: number; // Optional
-  placeOfBirth?: string; // Optional
-  citizenship?: string; // Optional
-  civilStatus?: string; // Optional
-  gender?: string; // Optional
-  height?: string; // Optional
-  weight?: string; // Optional
-  mobileTel?: string; // Optional
-  email?: string; // Optional
-  educationalAttainment?: string; // Optional
-  natureOfWork?: string; // Optional
-  placeOfWork?: string; // Optional
-  companyName?: string; // Optional
-  workpermitclassification?: string;
-}
-
-export interface EmergencyContact {
-  name2?: string; // Optional
-  mobileTel2?: string; // Optional
-  address?: string; // Optional
-}
-
-export interface Files {
-  document1: string | null; // Optional
-  document2: string | null; // Optional
-  document3: string | null; // Optional
-  document4: string | null; // Optional
-}
-
-export interface Receipt {
-  receiptId?: string; // Optional
-  modeOfPayment?: string; // Optional
-  receiptDate?: string; // Optional
-  amountPaid?: string; // Optional
-  receiptFile?: string;
-}
-
-export interface FormContent {
-  personalInformation: PersonalInformation;
-  emergencyContact: EmergencyContact;
-  files: Files;
-
-}
-
-export interface WorkPermits {
-  _id: string; // Mongoose generated ID
-  id: string;
-  userId?: string; // Can be a string for front end
-  permittype?: string; // Default value can be handled in logic
-  workpermitstatus: string;
-  transaction: string;
-  transactionstatus: string;
-  formData: FormContent;
-  createdAt?: string;
-  receipt: Receipt;
-  permitFile?: string;
-  applicationComments: string;
-}
-
+import { WorkPermits} from "../components/Interface(Front-end)/Types";
 
 const WorkPermit: React.FC = () => {
   const navigate = useNavigate();
@@ -113,6 +46,7 @@ const WorkPermit: React.FC = () => {
     document4: null,
   });
   const [latestWorkPermit, setLatestWorkPermit] = useState<WorkPermits | null>(null);
+  
   const fetchWorkPermits = async () => {
       try {
         const response = await fetch('http://localhost:3000/client/fetchuserworkpermits', {
@@ -134,8 +68,6 @@ const WorkPermit: React.FC = () => {
   return dateB - dateA; // Sort in descending order
 });
 
-
-
 // Set the latest work permit if there are any permits
 if (WorkPermitData.length > 0) {
   setLatestWorkPermit(WorkPermitData[0]);
@@ -144,9 +76,6 @@ if (WorkPermitData.length > 0) {
         console.error('Error fetching profile:', error);
       }
     };
-    
-
-
     
   useEffect(() => {
 
@@ -279,7 +208,7 @@ if (WorkPermitData.length > 0) {
 
   
     try {
-      const response = await axios.post('http://localhost:3000/client/workpermitpage', formData, {
+      const response = await axios.post('http://localhost:3000/client/workpermitapplication', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -301,7 +230,7 @@ if (WorkPermitData.length > 0) {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await fetch('http://localhost:3000/client/check-auth-client', {
+        const response = await fetch('http://localhost:3000/auth/check-auth-client', {
           method: 'GET',
           credentials: 'include', // This ensures cookies are sent with the request
         });
@@ -328,37 +257,12 @@ if (WorkPermitData.length > 0) {
   
     checkAuth();
   }, [navigate]);
-  
 
-
-  const handleLogout = async () => {
-    try {
-      const response = await fetch('http://localhost:3000/client/logout', {
-        method: 'POST',
-        credentials: 'include', // Include cookies in the request
-      });
-  
-      if (response.ok) {
-        // Clear any local storage data (if applicable)
-        localStorage.removeItem('profile');
-        localStorage.removeItem('userId');
-  
-        // Redirect to the login page
-        navigate('/');
-      } else {
-        // Handle any errors from the server
-        const errorData = await response.json();
-        console.error('Logout error:', errorData.message);
-      }
-    } catch (error) {
-      console.error('Error logging out:', error);
-    }
-  };
 
   return (
     <section className="dashboard-container">
           {/* Navbar */}
-          <ClientNavbar handleLogout={handleLogout}/>
+          <ClientNavbar/>
 
       <div className="content">
         <header>
@@ -371,20 +275,20 @@ if (WorkPermitData.length > 0) {
           <div className="form-row">
             <div className="form-group">
               <label>LAST NAME:</label>
-              <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} placeholder="Enter Last Name"  required/>
+              <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} required/>
             </div>
             <div className="form-group">
               <label>FIRST NAME:</label>
-              <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="Enter First Name" required />
+              <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)}  required />
             </div>
             <div className="form-group">
               <label>MIDDLE INITIAL:</label>
-              <input type="text" value={middleInitial} onChange={(e) => setMiddleInitial(e.target.value)} placeholder="Enter Middle Initial"  />
+              <input type="text" value={middleInitial} onChange={(e) => setMiddleInitial(e.target.value)}   />
             </div>
           </div>
           <div className="form-group">
             <label>PERMANENT ADDRESS:</label>
-            <input type="text" value={permanentAddress} onChange={(e) => setPermanentAddress(e.target.value)} placeholder="Enter Permanent Address"  />
+            <input type="text" value={permanentAddress} onChange={(e) => setPermanentAddress(e.target.value)}  />
           </div>
           <div className="form-group">
           <label className="checkbox-label">
@@ -398,30 +302,30 @@ if (WorkPermitData.length > 0) {
           </div>
           <div className="form-group">
             <label>TEMPORARY ADDRESS (IF ANY):</label>
-            <input type="text" value={temporaryAddress} onChange={(e) => setTemporaryAddress(e.target.value)} placeholder="Enter Permanent Address "  />
+            <input type="text" value={temporaryAddress} onChange={(e) => setTemporaryAddress(e.target.value)}   />
           </div>
           <div className="form-row">
             <div className="form-group">
               <label>DATE OF BIRTH:</label>
-              <input type="date" value={dateOfBirth} onChange={(e) => setDateOfBirth(e.target.value)} placeholder="Enter Date of Birth"  />
+              <input type="date" value={dateOfBirth} onChange={(e) => setDateOfBirth(e.target.value)}  />
             </div>
             <div className="form-group">
               <label>AGE:</label>
-              <input type="number" value={age}  onChange={(e) => setAge(Number(e.target.value))} placeholder="Enter Age"  />
+              <input type="number" value={age}  onChange={(e) => setAge(Number(e.target.value))}  />
             </div>
             <div className="form-group">
               <label>PLACE OF BIRTH:</label>
-              <input type="text" value={placeOfBirth} onChange={(e) => setPlaceOfBirth(e.target.value)} placeholder="Enter Place of Birth"  />
+              <input type="text" value={placeOfBirth} onChange={(e) => setPlaceOfBirth(e.target.value)}  />
             </div>
           </div>
           <div className="form-row">
             <div className="form-group">
               <label>CITIZENSHIP:</label>
-              <input type="text" value={citizenship} onChange={(e) => setCitizenship(e.target.value)} placeholder="Enter Citizenship"  />
+              <input type="text" value={citizenship} onChange={(e) => setCitizenship(e.target.value)}  />
             </div>
             <div className="form-group">
               <label>CIVIL STATUS:</label>
-              <input type="text" value={civilStatus} onChange={(e) => setCivilStatus(e.target.value)} placeholder="Enter Civil Status"  />
+              <input type="text" value={civilStatus} onChange={(e) => setCivilStatus(e.target.value)}  />
               </div>
               <div className="form-group">
               <label htmlFor="gender">GENDER:</label>
@@ -441,39 +345,39 @@ if (WorkPermitData.length > 0) {
               <div className="form-row">
               <div className="form-group">
               <label>HEIGHT:</label>
-              <input type="text" value={height} onChange={(e) => setHeight(e.target.value)} placeholder="Enter Height in cm"  />
+              <input type="text" value={height} onChange={(e) => setHeight(e.target.value)}  />
               </div>
               <div className="form-group">
               <label>WEIGHT:</label>
-              <input type="text" value={weight} onChange={(e) => setWeight(e.target.value)} placeholder="Enter Weight in kg "  />
+              <input type="text" value={weight} onChange={(e) => setWeight(e.target.value)} />
             </div>
           </div>
           <div className="form-row">
           <div className="form-group">
             <label>MOBILE/TEL. NO:</label>
-            <input type="text" value={mobileTel} onChange={(e) => setMobileTel(e.target.value)} placeholder="Enter Phone Number"  />
+            <input type="text" value={mobileTel} onChange={(e) => setMobileTel(e.target.value)}  />
             </div>
             <div className="form-group">
             <label>EMAIL ADDRESS:</label>
-            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Enter Email"  />
+            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)}   />
             </div>
             <div className="form-group">
             <label>EDUCATIONAL ATTAINMENT:</label>
-            <input type="text" value={educationalAttainment} onChange={(e) => setEducationalAttainment(e.target.value)} placeholder="Enter Educational Attainment"  />
+            <input type="text" value={educationalAttainment} onChange={(e) => setEducationalAttainment(e.target.value)}  />
           </div>
           </div>
           <div className="form-row">
           <div className="form-group">
             <label>NATURE OF WORK:</label>
-            <input type="text" value={natureOfWork} onChange={(e) => setNatureOfWork(e.target.value)} placeholder="Enter Nature of Work"  />
+            <input type="text" value={natureOfWork} onChange={(e) => setNatureOfWork(e.target.value)}  />
           </div>
           <div className="form-group">
             <label>PLACE OF WORK:</label>
-            <input type="text" value={placeOfWork} onChange={(e) => setPlaceOfWork(e.target.value)} placeholder="Enter Place of Work"  />
+            <input type="text" value={placeOfWork} onChange={(e) => setPlaceOfWork(e.target.value)}  />
           </div>
           <div className="form-group">
             <label>COMPANY NAME:</label>
-            <input type="text" value={companyName} onChange={(e) => setCompanyName(e.target.value)} placeholder="Enter Company Name"  />
+            <input type="text" value={companyName} onChange={(e) => setCompanyName(e.target.value)} />
           </div>
           </div>
 
@@ -495,16 +399,16 @@ if (WorkPermitData.length > 0) {
           <div className="form-row">
           <div className="form-group">
             <label>NAME:</label>
-            <input type="text" value={name2} onChange={(e) => setName2(e.target.value)} placeholder="Enter Emegency Contact Person"  />
+            <input type="text" value={name2} onChange={(e) => setName2(e.target.value)}  />
           </div>
           <div className="form-group">
             <label>MOBILE/TEL. NO:</label>
-            <input type="text" value={mobileTel2} onChange={(e) => setMobileTel2(e.target.value)} placeholder="Enter Emegency Contact Person Phone Number"  />
+            <input type="text" value={mobileTel2} onChange={(e) => setMobileTel2(e.target.value)} />
           </div>
           </div>
           <div className="form-group">
             <label>ADDRESS:</label>
-            <input type="text" value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Enter Emegency Contact Person Address"  />
+            <input type="text" value={address} onChange={(e) => setAddress(e.target.value)}   />
           </div>
           {!isFormValid && <p style={{ color: 'red' }}>Please fill in all required fields.</p>}
           <button type="button" className="nextbutton"onClick={goToNextStep}>Next</button>

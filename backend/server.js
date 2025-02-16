@@ -7,26 +7,74 @@ const cookieParser = require('cookie-parser');
 const http = require('http');
 const cron = require('node-cron');
 const bcrypt = require('bcrypt');
+const {Person } = require('./Modals');
+const { User } = require('./models/user');
+const { BusinessPermit } = require('./models/businesspermit');
+const { WorkPermit } = require('./models/workpermit');
+const session = require('express-session');
 const path = require('path');
+const fs = require('fs');
 
-const { User, BusinessPermit, WorkPermit } = require('./Modals');
-const superadminRoutes = require('./superadmin');
-const clientRoutes = require('./client');
-const datacontollerRoute = require('./datacontroller');
-const adminRoutes = require('./admin');
+const socketIo = require('socket.io');
+
+
+
+
+// Define the new receipts directory
+const receiptsDir = path.join(__dirname, 'documents/receipts');
+
+// Ensure the receipts directory exists
+if (!fs.existsSync(receiptsDir)) {
+    fs.mkdirSync(receiptsDir, { recursive: true });
+}
+
+// Define the new receipts directory
+const permitsDir = path.join(__dirname, 'documents/permits');
+
+// Ensure the receipts directory exists
+if (!fs.existsSync(permitsDir)) {
+    fs.mkdirSync(permitsDir, { recursive: true });
+}
+
+// Define the new receipts directory
+const uploadsDir = path.join(__dirname, 'documents/uploads');
+
+// Ensure the receipts directory exists
+if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
+
+
+const authRoutes = require('./routes/authRoutes');
+const clientRoutes = require('./routes/client');
+const datacontrollerRoutes = require('./routes/datacontroller');
+const adminRoutes = require('./routes/admin');
+const superadminRoutes = require('./routes/superadmin');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = 'your_jwt_secret'; // Use a strong secret key in production
 const server = http.createServer(app);
+const io = socketIo(server);
 
 app.use(cors({
   origin: 'http://localhost:5173', // Update to your frontend URL
   credentials: true // Allow credentials (cookies, authorization headers)
 }));
+
 app.use(bodyParser.json());
 app.use(express.json());
 app.use(cookieParser());
+
+// Session middleware
+app.use(session({
+  secret: 'your_session_secret', // Replace with a strong secret in production
+  resave: false,
+  saveUninitialized: false,
+  cookie: { secure: false } // Set to true in production with HTTPS
+}))
+
 
 mongoose.connect('mongodb://localhost:27017/obpwlsdatabase', {
   useNewUrlParser: true,
@@ -39,10 +87,17 @@ mongoose.connect('mongodb://localhost:27017/obpwlsdatabase', {
   checkBusinessPermitExpiryAndUpdateStatus();
 }).catch(err => console.log(err));
 
-app.use('/client', clientRoutes);
-app.use('/superadmin', superadminRoutes);
-app.use('/datacontroller', datacontollerRoute);
-app.use("/admin", adminRoutes);
+// Serve static files from the receipts directory
+app.use('/receipts', express.static(receiptsDir));
+app.use('/permits', express.static(permitsDir));
+app.use('/uploads', express.static(uploadsDir));
+
+
+app.use('/auth', authRoutes); // Base route
+app.use('/client', clientRoutes); //Sample Moving
+app.use('/datacontroller', datacontrollerRoutes); //Sample Moving
+app.use('/admin', adminRoutes); //Sample Moving
+app.use('/superadmin', superadminRoutes); //Sample Moving
 
 const seedSuperadmin = async () => {
   const SuperAdmin_Email = process.env.SUPERADMIN_EMAIL;
@@ -110,7 +165,6 @@ const checkExpired = async () => {
   }
 };
  
-
 const checkExpiredAndMigrateBusinessPermit = async () => {
   const currentDate = new Date(Date.now()).toISOString();
   console.log(`Current Date (UTC): ${currentDate}`);
@@ -196,13 +250,29 @@ const checkBusinessPermitExpiryAndUpdateStatus = async () => {
 };
 
 
-
-
 cron.schedule('0 0 * * *', async () => {
   console.log('Running scheduled job to check for expired Business permits.');
   await checkExpired();
   await checkExpiredAndMigrateBusinessPermit();
   await checkBusinessPermitExpiryAndUpdateStatus();
+});
+
+io.on('connection', (socket) => {
+  console.log('A user connected:', socket.id);
+
+  socket.on('userOnline', async (userId) => {
+    await User.findByIdAndUpdate(userId, { isOnline: true });
+    io.emit('statusUpdate', { userId, isOnline: true });
+  });
+
+  socket.on('userOffline', async (userId) => {
+    await User.findByIdAndUpdate(userId, { isOnline: false });
+    io.emit('statusUpdate', { userId, isOnline: false });
+  });
+
+  socket.on('disconnect', () => {
+    console.log('A user disconnected:', socket.id);
+  });
 });
 
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));

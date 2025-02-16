@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../Styles/DataControllerStyles.css';
-import ASidebar from '../components/AdminSideBar';
+import AdminSidebar from '../components/NavigationBars/AdminSideBar';
 
 interface User {
   _id: string;
@@ -36,7 +36,7 @@ const AdminAccount: React.FC = () => {
       }
       const fetchUserDetails = async () => {
         try {
-          const response = await fetch('http://localhost:3000/datacontroller/profile', {
+          const response = await fetch('http://localhost:3000/client/profile', {
             method: 'GET',
             credentials: 'include',
             headers: {
@@ -67,7 +67,7 @@ const AdminAccount: React.FC = () => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await fetch('http://localhost:3000/client/check-auth-admin', {
+        const response = await fetch('http://localhost:3000/auth/check-auth-admin', {
           method: 'GET',
           credentials: 'include',
         });
@@ -102,7 +102,7 @@ const AdminAccount: React.FC = () => {
     }
 
     try {
-      const response = await fetch('http://localhost:3000/admin/updatePassword', {
+      const response = await fetch('http://localhost:3000/datacontroller/changepassword', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -123,10 +123,6 @@ const AdminAccount: React.FC = () => {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('token'); // Remove token from localStorage
-    navigate('/'); // Redirect to home page
-  };
 
   const handleButtonClick = () => {
     setIsFormVisible(!isFormVisible);
@@ -135,7 +131,7 @@ const AdminAccount: React.FC = () => {
   return (
     <section className="DAbody">
       <div className="DAsidebar-container">
-        <ASidebar handleLogout={handleLogout} /> {/* Pass handleLogout to DASidebar */}
+        <AdminSidebar /> {/* Pass handleLogout to DASidebar */}
       </div>
 
       <div className="DAcontent">

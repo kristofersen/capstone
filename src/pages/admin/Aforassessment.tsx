@@ -1,5 +1,5 @@
 import '../Styles/AdminStyles.css'; 
-import AdminSideBar from '../components/AdminSideBar';
+import AdminSideBar from '../components/NavigationBars/AdminSideBar';
 import React, {  useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';// Import your CSS file
 
@@ -9,7 +9,7 @@ const AdminForAssessment: React.FC = () => {
     useEffect(() => {
         const checkAuth = async () => {
           try {
-            const response = await fetch('http://localhost:3000/client/check-auth-admin', {
+            const response = await fetch('http://localhost:3000/auth/check-auth-admin', {
               method: 'GET',
               credentials: 'include', // This ensures cookies are sent with the request
             });
@@ -36,34 +36,11 @@ const AdminForAssessment: React.FC = () => {
         checkAuth();
       }, [navigate]); // Only depend on navigate, which is necessary for the redirection
 
-      const handleLogout = async () => {
-        try {
-          const response = await fetch('http://localhost:3000/client/logout', {
-            method: 'POST',
-            credentials: 'include', // Include cookies in the request
-          });
-      
-          if (response.ok) {
-            // Clear any local storage Ata (if applicable)
-            localStorage.removeItem('profile');
-            localStorage.removeItem('userId');
-      
-            // Redirect to the login page
-            navigate('/');
-          } else {
-            // Handle any errors from the server
-            const errorAta = await response.json();
-            console.error('Logout error:', errorAta.message);
-          }
-        } catch (error) {
-          console.error('Error logging out:', error);
-        }
-      };
 
       return (
         <section className="Abody">
             <div className="Asidebar-container">
-                <AdminSideBar handleLogout={handleLogout} />
+                <AdminSideBar />
             </div>
 
             <div className="Acontent">

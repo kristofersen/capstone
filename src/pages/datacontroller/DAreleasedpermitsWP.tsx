@@ -1,5 +1,5 @@
 import '../Styles/DataControllerStyles.css'; 
-import DASidebar from '../components/DAsidebar';
+import DASidebar from '../components/NavigationBars/DAsidebar';
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Modal from 'react-modal';
@@ -71,7 +71,6 @@ const DAreleasedpermitsWP: React.FC = () => {
   const navigate = useNavigate();
   const [selectedPermit, setSelectedPermit] = useState<WorkPermit | null>(null);
   const [isAttachmentsModalOpen, setIsAttachmentsModalOpen] = useState(false);
-  const [isEditingAttach, setIsEditingAttach] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<{ [key: string]: string | null }>({});
   const [remarksdoc1, setRemarksdoc1] = useState('');
   const [remarksdoc2, setRemarksdoc2] = useState('');
@@ -126,29 +125,7 @@ const DAreleasedpermitsWP: React.FC = () => {
     checkAuth();
   }, [navigate]); // Only depend on navigate, which is necessary for the redirection
 
-  const handleLogout = async () => {
-    try {
-      const response = await fetch('http://localhost:3000/client/logout', {
-        method: 'POST',
-        credentials: 'include', // Include cookies in the request
-      });
 
-      if (response.ok) {
-        // Clear any local storage data (if applicable)
-        localStorage.removeItem('profile');
-        localStorage.removeItem('userId');
-
-        // Redirect to the login page
-        navigate('/');
-      } else {
-        // Handle any errors from the server
-        const errorData = await response.json();
-        console.error('Logout error:', errorData.message);
-      }
-    } catch (error) {
-      console.error('Error logging out:', error);
-    }
-  };
 
   // CODE FOR TABLE @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
   const [currentPage, setCurrentPage] = useState(0);
@@ -242,7 +219,7 @@ const DAreleasedpermitsWP: React.FC = () => {
     const fetchWorkPermits = async () => {
       try {
         console.log(type);
-        const response = await fetch(`http://localhost:3000/datacontroller/getworkpermitsrelease/${type}`, {
+        const response = await fetch(`http://localhost:3000/datacontroller/getworkpermitrelease/${type}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -366,59 +343,9 @@ const DAreleasedpermitsWP: React.FC = () => {
     }
   };
 
-  const logFormData = (formData: FormData) => {
-    for (const [key, value] of formData.entries()) {
-      console.log(`${key}:`, value);
-    }
-  };
 
-  const updateAttachments = async (e: React.FormEvent) => {
-    e.preventDefault();
-    // if (!selectedPermit) return;
 
-    const formData = new FormData();
-    
-    formData.append('remarksdoc1', remarksdoc1);
-    formData.append('remarksdoc2', remarksdoc2);
-    formData.append('remarksdoc3', remarksdoc3);
-    formData.append('remarksdoc4', remarksdoc4);
 
-    if (files.document1) formData.append('document1', files.document1);
-    if (files.document2) formData.append('document2', files.document2);
-    if (files.document3) formData.append('document3', files.document3);
-    if (files.document4) formData.append('document4', files.document4);
-
-    logFormData(formData);
-
-    try {
-      if (!selectedPermit) {
-        console.error('No permit selected');
-        return;
-      }
-      const response = await fetch(`http://localhost:3000/datacontroller/updateworkpermitattachments/${selectedPermit._id}`, {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (response.ok) {
-        const updatedPermit = await response.json();
-        setWorkPermits((prevPermits) =>
-          prevPermits.map((permit) =>
-            permit._id === updatedPermit._id ? updatedPermit : permit
-          )
-        );
-        console.log('Attachments updated successfully');
-        setIsEditingAttach(false); 
-        closeAttachmentsModal();
-      } else {
-        console.error('Failed to upload files');
-      }
-    } catch (error) {
-      console.error('Error uploading files:', error);
-    }
-  };
-
- 
 
   useEffect(() => {
     const urls: Record<string, string> = {}; // Define a typed object for URLs
@@ -440,7 +367,7 @@ const DAreleasedpermitsWP: React.FC = () => {
 
   const fetchDocumentUrl = (fileName: string | null, folder: 'uploads' | 'permits' | 'receipts'): string | null => {
     if (!fileName) return null;
-    return `http://localhost:3000/datacontroller/${folder}/${fileName}`;
+    return `http://localhost:3000/${folder}/${fileName}`;
   };
 
   const renderFile = (fileUrl: string | null) => {
@@ -454,7 +381,18 @@ const DAreleasedpermitsWP: React.FC = () => {
           title="PDF Viewer"
         />
       );
-    } else {
+    } 
+    else if (fileUrl.endsWith('.docx')) {
+      return (
+        <div style={{ marginTop: '10px' }}>
+          <p>Word file detected. Download File</p>
+          <a href={fileUrl} download>
+            <button>Download</button>
+          </a>
+        </div>
+      );
+    }
+    else {
       return (
         <img
           src={fileUrl}
@@ -468,7 +406,7 @@ const DAreleasedpermitsWP: React.FC = () => {
   return (
     <section className="DAbody">
       <div className="DAsidebar-container">
-        <DASidebar handleLogout={handleLogout} /> {/* Pass handleLogout to DASidebar */}
+        <DASidebar /> {/* Pass handleLogout to DASidebar */}
       </div>
 
       <div className="DAcontent">
@@ -578,7 +516,7 @@ const DAreleasedpermitsWP: React.FC = () => {
         contentLabel="View Attachments"
         style={customModalStyles} // Apply custom styles
       >
-        <form onSubmit={updateAttachments}>
+        <form>
           <h2>View Attachments</h2>
           {selectedPermit && (
             <div>
@@ -592,18 +530,18 @@ const DAreleasedpermitsWP: React.FC = () => {
                     type="button"
                     onClick={() => handleViewDocument('document1')}
                   >
-                    {selectedFiles.document1 ? 'Close' : 'View'}
+                    {selectedFiles.document1 ? 'Back' : 'View'}
                   </button>
                 )}
-                {isEditingAttach && (
+                {  (
                   <input type="file" onChange={(e) => handleFileChange(e, 'document1')} />
                 )}
                 <label>Remarks:</label>
                 <input 
                   type="text" 
-                  value={isEditingAttach ? (remarksdoc1 || '') : (selectedPermit.formData.files.remarksdoc1 || '')} 
+                  value={remarksdoc1 !== undefined && remarksdoc1 !== null ? remarksdoc1 : (selectedPermit.formData.files.remarksdoc1 || '')}
                   onChange={(e) => setRemarksdoc1(e.target.value)} 
-                  disabled={!isEditingAttach} 
+                  disabled
                 />
               </p>
               {renderFile(selectedFiles.document1)}
@@ -615,18 +553,18 @@ const DAreleasedpermitsWP: React.FC = () => {
                     type="button"
                     onClick={() => handleViewDocument('document2')}
                   >
-                    {selectedFiles.document2 ? 'Close' : 'View'}
+                    {selectedFiles.document2 ? 'Back' : 'View'}
                   </button>
                 )}
-                {isEditingAttach && (
+                { (
                   <input type="file" onChange={(e) => handleFileChange(e, 'document2')} />
                 )}
                 <label>Remarks:</label>
                 <input 
                   type="text" 
-                  value={isEditingAttach ? (remarksdoc2 || '') : (selectedPermit.formData.files.remarksdoc2 || '')} 
+                  value={remarksdoc2 !== undefined && remarksdoc2 !== null ? remarksdoc2 : (selectedPermit.formData.files.remarksdoc2 || '')}
                   onChange={(e) => setRemarksdoc2(e.target.value)} 
-                  disabled={!isEditingAttach} 
+                  disabled
                 />
               </p>
               {renderFile(selectedFiles.document2)}
@@ -638,18 +576,18 @@ const DAreleasedpermitsWP: React.FC = () => {
                     type="button"
                     onClick={() => handleViewDocument('document3')}
                   >
-                    {selectedFiles.document3 ? 'Close' : 'View'}
+                    {selectedFiles.document3 ? 'Back' : 'View'}
                   </button>
                 )}
-                {isEditingAttach && (
+                {(
                   <input type="file" onChange={(e) => handleFileChange(e, 'document3')} />
                 )}
                 <label>Remarks:</label>
                 <input 
                   type="text" 
-                  value={isEditingAttach ? (remarksdoc3 || '') : (selectedPermit.formData.files.remarksdoc3 || '')} 
+                  value={remarksdoc3 !== undefined && remarksdoc3 !== null ? remarksdoc3 : (selectedPermit.formData.files.remarksdoc3 || '')}
                   onChange={(e) => setRemarksdoc3(e.target.value)} 
-                  disabled={!isEditingAttach} 
+                  disabled 
                 />
               </p>
               {renderFile(selectedFiles.document3)}
@@ -661,18 +599,18 @@ const DAreleasedpermitsWP: React.FC = () => {
                     type="button"
                     onClick={() => handleViewDocument('document4')}
                   >
-                    {selectedFiles.document4 ? 'Close' : 'View'}
+                    {selectedFiles.document4 ? 'Back' : 'View'}
                   </button>
                 )}
-                {isEditingAttach && (
+                { (
                   <input type="file" onChange={(e) => handleFileChange(e, 'document4')} />
                 )}
                 <label>Remarks:</label>
                 <input 
                   type="text" 
-                  value={isEditingAttach ? (remarksdoc4 || '') : (selectedPermit.formData.files.remarksdoc4 || '')} 
+                  value={remarksdoc4 !== undefined && remarksdoc4 !== null ? remarksdoc4 : (selectedPermit.formData.files.remarksdoc4 || '')}
                   onChange={(e) => setRemarksdoc4(e.target.value)} 
-                  disabled={!isEditingAttach} 
+                  disabled
                 />
               </p>
               {renderFile(selectedFiles.document4)}

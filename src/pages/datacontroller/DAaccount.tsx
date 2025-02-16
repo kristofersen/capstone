@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../Styles/DataControllerStyles.css';
-import DASidebar from '../components/DAsidebar';
+import DASidebar from '../components/NavigationBars/DAsidebar';
 
 interface User {
   _id: string;
@@ -36,7 +36,7 @@ const DataControllerAccount: React.FC = () => {
       }
       const fetchUserDetails = async () => {
         try {
-          const response = await fetch('http://localhost:3000/datacontroller/profile', {
+          const response = await fetch('http://localhost:3000/client/profile', {
             method: 'GET',
             credentials: 'include',
             headers: {
@@ -66,7 +66,7 @@ const DataControllerAccount: React.FC = () => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await fetch('http://localhost:3000/client/check-auth-datacontroller', {
+        const response = await fetch('http://localhost:3000/auth/check-auth-datacontroller', {
           method: 'GET',
           credentials: 'include',
         });
@@ -101,7 +101,7 @@ const DataControllerAccount: React.FC = () => {
     }
 
     try {
-      const response = await fetch('http://localhost:3000/datacontroller/updatePassword', {
+      const response = await fetch('http://localhost:3000/datacontroller/changepassword', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -112,12 +112,13 @@ const DataControllerAccount: React.FC = () => {
       let data;
       try {
         data = await response.json();
-      } catch (jsonError) {
+      } catch {
         throw new Error('Invalid JSON response');
       }
 
       if (response.ok) {
         setSuccess('Password changed successfully.');
+        alert('Please Log In Again.');
         navigate('/login');
         setError(null);
       } else {
@@ -128,12 +129,7 @@ const DataControllerAccount: React.FC = () => {
       setError('Error changing password, please try again.');
     }
   };
-
-  const handleLogout = () => {
-    localStorage.removeItem('token'); // Remove token from localStorage
-    navigate('/'); // Redirect to home page
-  };
-
+  
   const handleButtonClick = () => {
     setIsFormVisible(!isFormVisible);
   };
@@ -141,7 +137,7 @@ const DataControllerAccount: React.FC = () => {
   return (
     <section className="DAbody">
       <div className="DAsidebar-container">
-        <DASidebar handleLogout={handleLogout} /> {/* Pass handleLogout to DASidebar */}
+        <DASidebar/> {/* Pass handleLogout to DASidebar */}
       </div>
 
       <div className="DAcontent">

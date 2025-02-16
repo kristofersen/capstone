@@ -49,7 +49,7 @@ const Logbook: React.FC = () => {
   useEffect(() => {
     const fetchAdmins = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/superadmin/adminusers');
+        const response = await axios.get('http://localhost:3000/superadmin/getadminuser');
         setAdmins(response.data);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -58,7 +58,7 @@ const Logbook: React.FC = () => {
 
     const fetchDataControllers = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/superadmin/datacontrollers');
+        const response = await axios.get('http://localhost:3000/superadmin/getdatacontrolleruser');
         setDataControllers(response.data);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -73,8 +73,8 @@ const Logbook: React.FC = () => {
     const fetchData = async () => {
       try {
         // Fetching data from the API
-        const adminLogsResponse = await fetch('http://localhost:3000/superadmin/adminusers');
-        const dataControllerLogsResponse = await fetch('http://localhost:3000/superadmin/datacontrollers');
+        const adminLogsResponse = await fetch('http://localhost:3000/superadmin/getadminuser');
+        const dataControllerLogsResponse = await fetch('http://localhost:3000/superadmin/getdatacontrolleruser');
       
         // Check if any of the responses were not OK
         if (!adminLogsResponse.ok || !dataControllerLogsResponse.ok) {
@@ -119,33 +119,36 @@ const Logbook: React.FC = () => {
     };
   }, []);
 
+
   const handleLogout = async () => {
     try {
-      const response = await fetch('http://localhost:3000/superadmin/logout', {
+      const response = await fetch('http://localhost:3000/auth/logout', {
         method: 'POST',
-        credentials: 'include',
+        credentials: 'include', // Include cookies in the request
       });
-
+  
       if (response.ok) {
-        localStorage.removeItem('token');
-        navigate('/superadmin/login');
+        // Clear any local storage data (if applicable)
+        localStorage.removeItem('profile');
+        localStorage.removeItem('userId');
+  
+        // Redirect to the login page
+        navigate('/');
       } else {
-        const errorText = await response.text();
-        throw new Error(`Failed to logout: ${errorText}`);
+        // Handle any errors from the server
+        const errorData = await response.json();
+        console.error('Logout error:', errorData.message);
       }
-    } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError('An unknown error occurred');
-      }
+    } catch (error) {
+      console.error('Error logging out:', error);
     }
   };
+
 
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await fetch('http://localhost:3000/superadmin/superadmin/authentication', {
+        const response = await fetch('http://localhost:3000/auth/check-auth-superadmin', {
           method: 'GET',
           credentials: 'include',
         });

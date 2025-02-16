@@ -1,6 +1,6 @@
 
 import '../Styles/AdminStyles.css'; 
-import AdminSideBar from '../components/AdminSideBar';
+import AdminSideBar from '../components/NavigationBars/AdminSideBar';
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -186,7 +186,7 @@ const AdminForAssessmentBusinessPermit: React.FC = () => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await fetch('http://localhost:3000/client/check-auth-admin', {
+        const response = await fetch('http://localhost:3000/auth/check-auth-admin', {
           method: 'GET',
           credentials: 'include', // This ensures cookies are sent with the request
         });
@@ -214,29 +214,7 @@ const AdminForAssessmentBusinessPermit: React.FC = () => {
     checkAuth();
   }, [navigate, type]); // Only depend on navigate, which is necessary for the redirection
 
-  const handleLogout = async () => {
-    try {
-      const response = await fetch('http://localhost:3000/client/logout', {
-        method: 'POST',
-        credentials: 'include', // Include cookies in the request
-      });
 
-      if (response.ok) {
-        // Clear any local storage data (if applicable)
-        localStorage.removeItem('profile');
-        localStorage.removeItem('userId');
-
-        // Redirect to the login page
-        navigate('/');
-      } else {
-        // Handle any errors from the server
-        const errorData = await response.json();
-        console.error('Logout error:', errorData.message);
-      }
-    } catch (error) {
-      console.error('Error logging out:', error);
-    }
-  };
 
   //Table Code
   const [currentPage, setCurrentPage] = useState(0);
@@ -294,7 +272,7 @@ const [selectedFiles, setSelectedFiles] = useState<{ [key: string]: string | nul
         if (!fileName) return null;
         
         // Return the file URL based on the folder specified
-        return `http://localhost:3000/datacontroller/${folder}/${fileName}`;
+        return `http://localhost:3000/${folder}/${fileName}`;
       };
   const renderFile = (fileUrl: string | null) => {
     if (!fileUrl) return <p>No file selected.</p>;
@@ -427,7 +405,7 @@ const [selectedFiles, setSelectedFiles] = useState<{ [key: string]: string | nul
   const fetchBusinessPermits = async () => {
     try {
       const response = await fetch(
-        `http://localhost:3000/datacontroller/getbusinesspermitsforassessment/${type}`,
+        `http://localhost:3000/datacontroller/getbusinesspermitforassessment/${type}`,
         {
           method: 'GET',
           credentials: 'include',
@@ -453,7 +431,7 @@ const [selectedFiles, setSelectedFiles] = useState<{ [key: string]: string | nul
       try {
         console.log(type);
         const response = await fetch(
-          `http://localhost:3000/datacontroller/getbusinesspermitsforassessment/${type}`,
+          `http://localhost:3000/datacontroller/getbusinesspermitforassessment/${type}`,
           {
             method: 'GET',
             credentials: 'include',
@@ -557,7 +535,7 @@ const updatebusinesspermitstatus = async (action: string, remarks: string) => {
   return (
     <section className="Abody">
       <div className="Asidebar-container">
-        <AdminSideBar handleLogout={handleLogout} /> {/* Pass handleLogout to ASidebar */}
+        <AdminSideBar />{/* Pass handleLogout to ASidebar */}
       </div>
 
       <div className="Acontent">

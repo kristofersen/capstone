@@ -1,5 +1,5 @@
 import '../Styles/DataControllerStyles.css'; 
-import DASidebar from '../components/DAsidebar';
+import DASidebar from '../components/NavigationBars/DAsidebar';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Line } from 'react-chartjs-2';
@@ -104,7 +104,7 @@ const DAdashboard: React.FC = () => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await fetch('http://localhost:3000/client/check-auth-datacontroller', {
+        const response = await fetch('http://localhost:3000/auth/check-auth-datacontroller', {
           method: 'GET',
           credentials: 'include',
         });
@@ -273,32 +273,13 @@ const DAdashboard: React.FC = () => {
     }; 
 
     fetchData();
-  }, []);
+  }, [month]);
 
-  const handleLogout = async () => {
-    try {
-      const response = await fetch('http://localhost:3000/client/logout', {
-        method: 'POST',
-        credentials: 'include',
-      });
-
-      if (response.ok) {
-        localStorage.removeItem('profile');
-        localStorage.removeItem('userId');
-        navigate('/');
-      } else {
-        const errorData = await response.json();
-        console.error('Logout error:', errorData.message);
-      }
-    } catch (error) {
-      console.error('Error logging out:', error);
-    }
-  };
 
   return (
     <section className="DAbody">
       <div className="DAsidebar-container">
-        <DASidebar handleLogout={handleLogout} />
+        <DASidebar />
       </div>
 
       <div className="DAcontent">

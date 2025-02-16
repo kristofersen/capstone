@@ -1,5 +1,5 @@
 import '../Styles/AdminStyles.css'; 
-import ASidebar from '../components/AdminSideBar';
+import ASidebar from '../components/NavigationBars/AdminSideBar';
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -84,7 +84,7 @@ const AdminViewApplicationDetails: React.FC = () => {
     useEffect(() => {
       const checkAuth = async () => {
         try {
-          const response = await fetch('http://localhost:3000/client/check-auth-admin', {
+          const response = await fetch('http://localhost:3000/auth/check-auth-admin', {
             method: 'GET',
             credentials: 'include', // This ensures cookies are sent with the request
           });
@@ -111,29 +111,7 @@ const AdminViewApplicationDetails: React.FC = () => {
       checkAuth();
     }, [navigate]); // Only depend on navigate, which is necessary for the redirection
 
-    const handleLogout = async () => {
-      try {
-        const response = await fetch('http://localhost:3000/client/logout', {
-          method: 'POST',
-          credentials: 'include', // Include cookies in the request
-        });
-    
-        if (response.ok) {
-          // Clear any local storage data (if applicable)
-          localStorage.removeItem('profile');
-          localStorage.removeItem('userId');
-    
-          // Redirect to the login page
-          navigate('/');
-        } else {
-          // Handle any errors from the server
-          const errorData = await response.json();
-          console.error('Logout error:', errorData.message);
-        }
-      } catch (error) {
-        console.error('Error logging out:', error);
-      }
-    };
+
 
     useEffect(() => {
         const fetchWorkPermitDetails = async () => {
@@ -143,7 +121,7 @@ const AdminViewApplicationDetails: React.FC = () => {
               } 
           try {
             console.log(id);
-            const response = await axios.get(`http://localhost:3000/admin/Aworkpermitdetails/${id}`, {
+            const response = await axios.get(`http://localhost:3000/datacontroller/workpermitdetails/${id}`, {
 
             });
             setWorkPermit(response.data as WorkPermit); // Set the work permit details to state
@@ -180,7 +158,7 @@ const AdminViewApplicationDetails: React.FC = () => {
         console.log('Updating permit with ID:', workPermit?._id); // Log ID for debugging
       
         try {
-          const response = await axios.put(`http://localhost:3000/admin/work-permitsreject/${workPermit?._id}`, {
+          const response = await axios.put(`http://localhost:3000/datacontroller/workpermitreject/${workPermit?._id}`, {
             status: 'Rejected',
             comments: comments,
           });
@@ -213,7 +191,7 @@ const AdminViewApplicationDetails: React.FC = () => {
         if (!fileName) return null;
         
         // Return the file URL based on the folder specified
-        return `http://localhost:3000/admin/${folder}/${fileName}`;
+        return `http://localhost:3000/${folder}/${fileName}`;
       };
       
     const renderDocument = (fileName: string | null, folder: 'uploads' | 'permits' | 'receipts') => {
@@ -244,7 +222,7 @@ const AdminViewApplicationDetails: React.FC = () => {
   
           // If newStatus is set, proceed with the update
           if (newStatus) {
-              const response = await axios.put(`http://localhost:3000/admin/work-permits/${workPermit?._id}`, {
+              const response = await axios.put(`http://localhost:3000/datacontroller/workpermithandleupdate/${workPermit?._id}`, {
                   status: newStatus,
               });
   
@@ -266,7 +244,7 @@ const AdminViewApplicationDetails: React.FC = () => {
 return (
     <section className="Abody">
         <div className="Asidebar-container">
-        <ASidebar handleLogout={handleLogout} />
+        <ASidebar />
       </div>
     <div className="Acontent">
         <header className='Aheader'>

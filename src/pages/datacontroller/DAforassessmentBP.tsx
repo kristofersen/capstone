@@ -1,6 +1,6 @@
 
 import '../Styles/DataControllerStyles.css'; 
-import DASidebar from '../components/DAsidebar';
+import DASidebar from '../components/NavigationBars/DAsidebar';
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -267,7 +267,7 @@ const DataControllerForAssessmentBP: React.FC = () => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await fetch('http://localhost:3000/client/check-auth-datacontroller', {
+        const response = await fetch('http://localhost:3000/auth/check-auth-datacontroller', {
           method: 'GET',
           credentials: 'include', // This ensures cookies are sent with the request
         });
@@ -294,29 +294,7 @@ const DataControllerForAssessmentBP: React.FC = () => {
     checkAuth();
   }, [navigate]); // Only depend on navigate, which is necessary for the redirection
 
-  const handleLogout = async () => {
-    try {
-      const response = await fetch('http://localhost:3000/client/logout', {
-        method: 'POST',
-        credentials: 'include', // Include cookies in the request
-      });
 
-      if (response.ok) {
-        // Clear any local storage data (if applicable)
-        localStorage.removeItem('profile');
-        localStorage.removeItem('userId');
-
-        // Redirect to the login page
-        navigate('/');
-      } else {
-        // Handle any errors from the server
-        const errorData = await response.json();
-        console.error('Logout error:', errorData.message);
-      }
-    } catch (error) {
-      console.error('Error logging out:', error);
-    }
-  };
 
   //Table Code
   const [currentPage, setCurrentPage] = useState(0);
@@ -374,7 +352,7 @@ const [selectedFiles, setSelectedFiles] = useState<{ [key: string]: string | nul
         if (!fileName) return null;
         
         // Return the file URL based on the folder specified
-        return `http://localhost:3000/datacontroller/${folder}/${fileName}`;
+        return `http://localhost:3000/${folder}/${fileName}`;
       };
       
   const renderFile = (fileUrl: string | null) => {
@@ -649,7 +627,7 @@ const logFormData = (formData: FormData) => {
     };
   
     try {
-      const response = await axios.put(`http://localhost:3000/datacontroller/updatebusinessinfoPermit/${activePermitId._id}`, updatedData);
+      const response = await axios.put(`http://localhost:3000/datacontroller/updatebusinessinfopermit/${activePermitId._id}`, updatedData);
   
       fetchBusinessPermits(); // Fetch work permits if token is present
       console.log('Update successful:', response.data);
@@ -694,6 +672,10 @@ const logFormData = (formData: FormData) => {
             setActivePermitId(permit);
         break;
 
+        case 'rejectpermit':
+          setActivePermitId(permit);
+          setRejectPermit(true);
+        break;
 
       default:
         console.warn('Unknown action');
@@ -784,7 +766,7 @@ const logFormData = (formData: FormData) => {
   const fetchBusinessPermits = async () => {
     try {
       const response = await fetch(
-        `http://localhost:3000/datacontroller/getbusinesspermitsforassessment/${type}`,
+        `http://localhost:3000/datacontroller/getbusinesspermitforassessment/${type}`,
         {
           method: 'GET',
           credentials: 'include',
@@ -810,7 +792,7 @@ const logFormData = (formData: FormData) => {
       try {
         console.log(type);
         const response = await fetch(
-          `http://localhost:3000/datacontroller/getbusinesspermitsforassessment/${type}`,
+          `http://localhost:3000/datacontroller/getbusinesspermitforassessment/${type}`,
           {
             method: 'GET',
             credentials: 'include',
@@ -894,7 +876,7 @@ const handleeditsave = async () => {
   };
 
   try {
-    const response = await axios.put(`http://localhost:3000/datacontroller/updatebusinessownerPermit/${activePermitId._id}`, updatedData);
+    const response = await axios.put(`http://localhost:3000/datacontroller/updatebusinessownerpermit/${activePermitId._id}`, updatedData);
 
     fetchBusinessPermits(); // Fetch work permits if token is present
     editcloseModal();
@@ -994,7 +976,7 @@ const updatebusinesspermitstatus = async (action: string, remarks: string) => {
   try {
     // Send the action as part of the request payload
     const response = await axios.put(
-      `http://localhost:3000/admin/updatebusinesspermitstatus/${activePermitId._id}`,
+      `http://localhost:3000/datacontroller/rejectbusinesspermit/${activePermitId._id}`,
       { status: action, remarks }
     );
 
@@ -1033,7 +1015,7 @@ const updatebusinesspermitstatus = async (action: string, remarks: string) => {
   return (
     <section className="DAbody">
       <div className="DAsidebar-container">
-        <DASidebar handleLogout={handleLogout} /> {/* Pass handleLogout to DASidebar */}
+        <DASidebar /> {/* Pass handleLogout to DASidebar */}
       </div>
 
       <div className="DAcontent">
@@ -1135,7 +1117,7 @@ const updatebusinesspermitstatus = async (action: string, remarks: string) => {
                 <option value="viewattatchments">View Attatchments</option>
                 {permit.businesspermitstatus === 'Pending' && (
               <>
-                <option value="viewApplication">Reject Application</option>
+                <option value="rejectpermit">Reject Application</option>
               </>
             )}
               </>
@@ -2458,15 +2440,17 @@ const updatebusinesspermitstatus = async (action: string, remarks: string) => {
 {rejectpermit && activePermitId && (
         <div className="modal-overlay" onClick={closeRejectpermit}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <h2>Approve Permit {activePermitId.id}?</h2>
+            <h2>Reject Permit {activePermitId.id}?</h2>
             <p>Are you sure you want to approve or reject this permit? Please confirm your decision.</p>
 
             <div className="button-group">
-              <button className="btn btn-success">Approve</button>
+              <button className="btn btn-success" onClick={() => {
+                closeRejectpermit(); // Show remarks input when rejecting
+              }}>No</button>
               <button className="btn btn-danger" onClick={() => {
                 setIsRejecting(true); // Show remarks input when rejecting
               }}>
-                Reject
+                Yes
               </button>
             </div>
 

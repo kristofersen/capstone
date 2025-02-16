@@ -1,425 +1,67 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../Styles/ClientStyles.css'; //  CSS file
-import ClientNavbar from '../components/clientnavbar';
-import axios from 'axios';
+import ClientNavbar from '../components/NavigationBars/clientnavbar';
+
+import { WorkPermit, GroupedBusinessPermit } from "../components/Interface(Front-end)/Types";
+import WorkPermitTable from "../components/Tables/WorkPermitTable-Client";
+import BusinessPermitTable from "../components/Tables/BusinessPermitTable-Client";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
-// Define the WorkPermit interface
-interface WorkPermit {
-  _id: string;
-  id: string;
-  workpermitstatus: string;
-  classification: string;
-  createdAt: string;
-  permitExpiryDate: string;
-  applicationdateIssued: string;
-  permitFile: string;
-  receipt: Receipt;
-}
-
-
-export interface Receipt {
-    receiptId?: string; // Optional
-    modeOfPayment?: string; // Optional
-    receiptDate?: string; // Optional
-    amountPaid?: string; // Optional
-    receiptFile?: string;
-  }
-  export interface BusinessPermit {
-    _id: string;
-    id: string;
-    userId: string;
-    permittype?: string;
-    businesspermitstatus?: string;
-    businessstatus?: string;
-    forretirement?: string;
-    classification?: string;
-    transaction?: string;
-    amountToPay?: string;
-    permitFile: string;
-    permitDateIssued?: string;
-    permitExpiryDate?: string;
-    expiryDate?: string;
-    applicationdateIssued: Date;
-    applicationComments?: string;
-  
-    owner: Owner;
-    business: Business;
-    otherbusinessinfo: OtherBusiness;
-    mapview: MapView;
-    businesses: Businesses[];
-    files: Files;
-    department: Department; // Change to object with key-value pairs
-    statementofaccount: Statement;
-    receipt: ReceiptBP;
-    createdAt?: string;
-  }
-  
-  export interface Owner {
-  corporation?: boolean;
-  lastname?: string;
-  firstname?: string;
-  middleinitial?: string;
-  civilstatus?: string;
-  companyname?: string;
-  gender?: string;
-  citizenship?: string;
-  tinnumber?: string;
-  representative?: boolean;
-  houseandlot?: string;
-  buildingstreetname?: string;
-  subdivision?: string;
-  region?: string;
-  province?: string;
-  municipality?: string;
-  barangay?: string;
-  telephonenumber?: string;
-  mobilenumber?: string;
-  email?: string;
-  representativedetails?: RepDetails;
-  }
-  
-  export interface RepDetails {
-  repfullname: string,
-  repdesignation: string,
-  repmobilenumber: string,
-  }
-
-  export interface Business {
-  businessname?: string,
-  businessscale?: string,
-  paymentmethod?: string,
-  businessbuildingblocklot?: string,
-  businessbuildingname?: string,
-  businesssubcompname?: string,
-  businessregion?: string,
-  businessprovince?: string,
-  businessmunicipality?: string,
-  businessbarangay?: string,
-  businesszip?: string,
-  businesscontactnumber?: string,
-  ownershiptype?: string,
-  agencyregistered?: string,
-  dtiregistrationnum?: string,
-  dtiregistrationdate?: string,
-  dtiregistrationexpdate?: string,
-  secregistrationnum?: string,
-  birregistrationnum?: string,
-  industrysector?: string,
-  businessoperation?: string,
-  typeofbusiness?: string,
-  
-  }
-
-  export interface ReceiptBP {
-    receiptId: string,
-    receiptDate: string,
-    receiptFile: string,
-    }
-  
-  export interface OtherBusiness {
-  dateestablished?: string,
-  startdate?: string,
-  occupancy?: string,
-  otherbusinesstype?: string,
-  businessemail?: string,
-  businessarea?: string,
-  businesslotarea?: string,
-  numofworkermale?: string,
-  numofworkerfemale?: string,
-  numofworkertotal?: string,
-  numofworkerlgu?: string,
-  lessorfullname?: string,
-  lessormobilenumber?: string,
-  monthlyrent?: string,
-  lessorfulladdress?: string,
-  lessoremailaddress?: string,
-  }
-  
-  export interface MapView{
-  lat: string,
-  lng: string,
-  }
-  
-  export interface Businesses {
-  _id: string;
-  businessNature: string;
-  businessType: string;
-  capitalInvestment: string;
-  }
-  
-  
-  export interface Department{
-   
-    Zoning: string;
-    OffBldOfcl: string;
-    CtyHlthOff: string;
-    BreuFrPrt: string;
-  
-  }
-  
-  export interface Files {
-  document1: string | null; // Optional
-  document2: string | null; // Optional
-  document3: string | null; // Optional
-  document4: string | null; // Optional
-  document5: string | null; // Optional
-  document6: string | null; // Optional
-  remarksdoc1: string;
-  remarksdoc2: string;
-  remarksdoc3: string;
-  remarksdoc4: string;
-  remarksdoc5: string;
-  remarksdoc6: string;
-  }
-
-  export interface Statement{
-    permitassessed: string;
-    dateassessed: string;
-    mayorspermit: string;
-    sanitary:  string;
-    health:  string;
-    businessplate:  string;
-    zoningclearance:  string;
-    annualInspection:  string;
-    environmental:  string;
-    miscfee:  string;
-    liquortobaco:  string;
-    liquorplate:  string;
-    statementofaccountfile: string;
-}
-  
-
- 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const [userDetails, setUserDetails] = useState<{ email: string; firstName: string; lastName: string; id: string} | null>(null);;
   const [workPermits, setWorkPermits] = useState<WorkPermit[]>([]);
-  
+  const [businessPermits, setBusinessPermits] = useState<GroupedBusinessPermit[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [latestStatus, setLatestStatus] = useState<string | null>(null);
 
-//Update Table code
-  const [activePermitId, setActivePermitId] = useState<string | null>(null);
-  const [modalFile, setModalFile] = useState<string | null>(null);
-  const [isModalOpenFile, setIsModalOpenFile] = useState(false);
-  // CODE FOR TABLE @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-  const [currentPage, setCurrentPage] = useState(0);
-  const itemsPerPage = 5;
-  const totalPages = Math.ceil(workPermits.length / itemsPerPage)
-  const startIndex = currentPage * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const sortedWorkPermits = workPermits.slice() // Make a copy of the array to avoid modifying the original
- .sort((a, b) => {
-    const dateA = new Date(a.createdAt);
-    const dateB = new Date(b.createdAt);
-
-    // Check if both dates are valid
-    if (isNaN(dateA.getTime()) || isNaN(dateB.getTime())) {
-      return 0; // If either date is invalid, keep their order (or handle as needed)
-    }
-
-    return dateB.getTime() - dateA.getTime(); // Sort in descending order
-  });
-
-// Now slice the sorted array to get the current items
-const currentItems = sortedWorkPermits.slice(startIndex, endIndex);
-  const handleNextPage = () => {
-    if (currentPage < totalPages - 1) {
-      setCurrentPage(currentPage + 1);
-    }
-  };
-  const handlePreviousPage = () => {
-    if (currentPage > 0) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
-  
-//File
-  const [files, setFiles] = useState<{
-    document1: File | null;
-    document2: File | null;
-    document3: File | null;
-  }>({
-    document1: null,
-    document2: null,
-    document3: null,
-  });
-  
-  const handleDelete = async (permitId: string) => {
-    console.log(`Delete permit ID: ${permitId}`);
-    try {
-      const response = await fetch(`http://localhost:3000/datacontroller/deletePermit/${permitId}`, {
-        method: 'DELETE',
-      });
-  
-      if (response.ok) {
-        alert("Permit deleted successfully");
-        window.location.reload(); // Reload the page to refresh the data
-      } else {
-        alert("Failed to delete permit");
-      }
-    } catch (error) {
-      console.error("Error deleting permit:", error);
-    }
-  };
-  
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>, doc: 'document1' | 'document2' | 'document3' ) => {
-        const selectedFiles = event.target.files;
-      if (selectedFiles && selectedFiles.length > 0) {
-        setFiles((prev) => ({
-          ...prev,
-          [doc]: selectedFiles[0],
-        }));
-      } else {
-        setFiles((prev) => ({
-          ...prev,
-          [doc]: null, 
-        }));
-      }
-    };
-
-  const fetchDocumentUrl = (fileName: string | null, folder: 'uploads' | 'permits' | 'receipts'): string | null => {
-      if (!fileName) return null;
-      
-      // Return the file URL based on the folder specified
-      return `http://localhost:3000/datacontroller/${folder}/${fileName}`;
-    };
-    
-  const renderDocument = (fileName: string | null, folder: 'uploads' | 'permits' | 'receipts') => {
-      const fileUrl = fetchDocumentUrl(fileName, folder);
-    
-      if (!fileUrl) return <span>Not uploaded</span>;
-    
-      const fileExtension = fileUrl.split('.').pop()?.toLowerCase();
-    
-      // Automatically open the modal if a valid file is found
-     
-          openModal(fileUrl); // Open the modal automatically
-    
-    
-      return (
-        <span>
-          {fileExtension === 'pdf' ? 'View PDF' : 'View Document'}
-        </span>
-      );
-    };
-//File Viewing
-  const openModal = (filePath: string) => {
-      setModalFile(filePath);
-      setIsModalOpenFile(true);
-    };
-  
-  const closeModal = () => {
-      setIsModalOpenFile(false);
-      setModalFile(null);
-    };
-  
   
 
- //MODAL TESTING FOR PAYMENT  WORK PERMIT
-const [showPaymentMethod, setShowPaymentMethod] = useState(false);
-const [modalStep, setModalStep] = useState(0);
-const closePaymentMethod = () => {
-    setShowPaymentMethod(false);
-    setModalStep(0); // Reset when closing
-  };
- // Close modal on overlay click
-//  const handleOverlayClick = () => {
-//    closePaymentMethod();
-//  };
-
-const [confirmpayment, setConfirmPayment] = useState(false);
-  const confirmpaymentclose = () => {
-    setConfirmPayment(false);
-    setActivePermitId(null);
-    setShowPaymentMethod(false);
-    window.location.reload();
-  };
-
-  const closeviewpayment = () => {
-    setShowPaymentMethod(false);
-    setActivePermitId(null);
-    setConfirmPayment(false);
-    window.location.reload();
-
-  };
-
-  const logFormData = (formData: FormData) => {
-    for (const [key, value] of formData.entries()) {
-      console.log(`${key}:`, value);
-    }
-  };
-
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  if (!files.document1) {
-    alert('Please Upload a Receipt');
-    return; // Prevent further execution
-  }
-else{
-  const formData = new FormData();
-  formData.append('document1', files.document1); // Append validated file
 
 
-  logFormData(formData);
-
-
-  try {
-    const response = await axios.post(`http://localhost:3000/datacontroller/updateworkpermitpayments/${activePermitId}`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-      withCredentials: true, 
-    });
-      console.log(response.data);
-      if (response.status === 200) {
-        setConfirmPayment(true);
-        setFiles({ document1: null, document2: null, document3: null,
-
-         }); // Clear uploaded file (if applicable)
-
-        // Optionally update state/UI instead of reloading
-      } else {
-        const errorMessage = (response.data as { message: string }).message;
-        console.error('Error submitting application:', errorMessage);
-      }
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        console.error('Axios error:', error.response?.data || error.message);
-        alert('Failed to submit work permit payment. Please try again.');
-      } else {
-        console.error('Unexpected error:', error);
-        alert('An unexpected error occurred. Please contact support.');
-      }
-    }
-  }
-};
+ 
 
 //Content Codes
-const handleLogout = async () => {
+
+const checkForPending = async () => {
   try {
-    const response = await fetch('http://localhost:3000/client/logout', {
-      method: 'POST',
+    const response = await fetch('http://localhost:3000/client/checkpermitlatest', {
+      method: 'GET',
       credentials: 'include', // Include cookies in the request
     });
 
-    if (response.ok) {
-      // Clear any local storage data (if applicable)
-      localStorage.removeItem('profile');
-      localStorage.removeItem('userId');
-
-      // Redirect to the login page
-      navigate('/');
-    } else {
-      // Handle any errors from the server
-      const errorData = await response.json();
-      console.error('Logout error:', errorData.message);
+    if (!response.ok) {
+      console.error('Error fetching permit status');
+      return;
     }
+
+    const data = await response.json();
+
+    if (data.status === 'Pending') {
+      alert('Your permit application is pending approval. Please wait for further updates.');
+      return; //Stop execution here
+    } 
+
+    if (data.status === 'Waiting for Payment') {
+      alert('Your permit is awaiting payment. Please complete the payment.');
+      return; //Stop execution here
+    } 
+
+    if (data.status === 'Released') {
+      alert('You have an ongoing permit. Please wait for expiry.');
+      return; //Stop execution here
+    }
+    if (data.status === 'Expired' || data.status === 'No Permit') {
+      navigate('/workpermitpage');
+      return; //Stop execution here
+    }
+
+    //Only proceed if none of the above conditions were met
+    navigate('/workpermitpage');
   } catch (error) {
-    console.error('Error logging out:', error);
+    console.error('Error checking permit status:', error);
   }
 };
 
@@ -469,7 +111,7 @@ useEffect(() => {
 useEffect(() => {
   const checkAuth = async () => {
     try {
-      const response = await fetch('http://localhost:3000/client/check-auth-client', {
+      const response = await fetch('http://localhost:3000/auth/check-auth-client', {
         method: 'GET',
         credentials: 'include', // This ensures cookies are sent with the request
       });
@@ -532,48 +174,37 @@ useEffect(() => {
   }
 }, [workPermits]); // This effect now depends only on workPermits
 
-//Handle Action Work Permit
-const handleAction = (action: string, permit: WorkPermit) => {
-    switch (action) {
-      case 'viewApplication':
-    console.log(`Edit permit ID: ${permit._id}`);
-      navigate(`/viewapplicationdetails/${permit._id}`);
-        break;
-      case 'delete':
-        handleDelete(permit._id);
-        console.log(`Delete permit: ${permit._id}`);
-        break;
-      case 'pay':
-        setActivePermitId(permit._id);  // Save the permit ID
-        setShowPaymentMethod(true);
-        setModalStep(0);                 // Reset modal to the first step
-        console.log(`Pay for permit: ${permit._id}`);
-        console.log(`Pay for permit: ${permit.id}`);
-        break;
-      case 'viewReceipt':
-        if (permit.receipt?.receiptFile) { // Check if the receipt file exists
-            renderDocument(permit.receipt.receiptFile, 'receipts'); // Automatically open modal
-            console.log(`View receipt for permit: ${permit.id}`);
-          } else {
-            console.log(`No receipt file found for permit: ${permit.id}`);
-          }
-        break;
-      case 'viewPermit':
-        renderDocument(permit.permitFile, 'permits');
+useEffect(() => {
+  const fetchBusinessPermits = async () => {
+    try {
+      const response = await fetch('http://localhost:3000/client/fetchuserbusinesspermits', {
+        method: 'GET',
+        credentials: 'include', // Ensure cookies (containing the token) are sent
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
 
-        console.log(`View permit: ${permit.permitFile}`);
-        console.log(`View permit: ${permit.id}`);
-        break;
+      if (!response.ok) {
+        throw new Error(`Error: ${response.statusText}`);
+      }
 
-      default:
-        console.warn('Unknown action');
+      const businessPermitData = await response.json();
+      setBusinessPermits(businessPermitData);
+    } catch (error) {
+      console.error('Error fetching business permits:', error);
     }
   };
+
+  fetchBusinessPermits();
+}, []); // Business Permit
+
+
 
   return (
     <section className="dashboard-container">
         {/* Navbar */}
-      <ClientNavbar handleLogout={handleLogout}/>
+      <ClientNavbar/>
 
       <div className="content">
       <div id="carouselExampleFade" className="carousel slide carousel-fade" style={{ width: '60%', margin: 'auto' }} >
@@ -629,11 +260,7 @@ const handleAction = (action: string, permit: WorkPermit) => {
           <a 
           href={!(latestStatus === 'Pending' || latestStatus === 'Waiting for Payment' || latestStatus === 'Released') ? "/workpermitpage" : "#"} 
           className='workpermitbutton'
-          onClick={(e) => {
-          if (latestStatus === 'Pending' || latestStatus === 'Waiting for Payment' || latestStatus === 'Released') {
-           e.preventDefault(); // Disable click if status is 'For Assessment', 'Waiting for Payment', or 'Released'
-          }
-          }}
+          onClick={checkForPending}
             >
               <img 
                 src="applicationslogo.svg" 
@@ -645,233 +272,12 @@ const handleAction = (action: string, permit: WorkPermit) => {
           </div>
         </div>
 
-        <div className="workpermittable">
-          <p> Work Permit Applications</p>
-        <table className="table table-striped table-hover ">
-          <thead style={{ backgroundColor: '#ffd23' }}>
-
-            <tr>
-    <th style={{ backgroundColor: "#ffff00", color: "black" }}>ID</th>
-    <th style={{ backgroundColor: "#ffff00", color: "black" }}>Status</th>
-    <th style={{ backgroundColor: "#ffff00", color: "black" }}>Transaction</th>
-    <th style={{ backgroundColor: "#ffff00", color: "black" }}>Date Issued</th>
-    <th style={{ backgroundColor: "#ffff00", color: "black" }}>Date Expired</th>
-    <th style={{ backgroundColor: "#ffff00", color: "black" }}>Action</th>
-  </tr>
-        
-  </thead>
-  <tbody>
-    {currentItems.map((permit) => (
-      <tr key={permit._id}>
-        <td>{permit.id}</td>
-        <td>{permit.workpermitstatus}</td>
-        <td>{permit.classification}</td>
-        <td>{new Date(permit.applicationdateIssued).toLocaleDateString()}</td>
-        <td>
-          {permit.permitExpiryDate
-            ? new Date(permit.permitExpiryDate).toLocaleDateString()
-            : '---'}
-        </td>
-        <td>
-          <select
-            defaultValue=""
-            onChange={(e) => {
-              handleAction(e.target.value, permit);
-              e.target.value = ""; // Reset dropdown to default
-            }}
-            className="dropdown-button"
-          >
-            <option value="" disabled>
-              Select Action
-            </option>
-            {permit.workpermitstatus === 'Pending' && (
-              <>
-                <option value="viewApplication">View Application</option>
-                <option value="delete">Delete</option>
-              </>
-            )}
-            {permit.workpermitstatus === 'Waiting for Payment' && (
-              <>
-                <option value="viewApplication">View Application</option>
-                <option value="pay">Pay</option>
-              </>
-            )}
-            {permit.workpermitstatus === 'Released' && (
-              <>
-                <option value="viewApplication">View Application</option>
-                {permit.classification === 'Renew' && (
-                      <option value="viewReceipt">View Receipt</option>
-                )}
-                <option value="viewPermit">View Permit</option>
-              </>
-            )}
-                        {permit.workpermitstatus === 'Expired' && (
-              <>
-                <option value="viewApplication">View Application</option>
-                {permit.classification === 'Renew' && (
-                      <option value="viewReceipt">View Receipt</option>
-                )}
-                <option value="viewPermit">View Permit</option>
-              </>
-            )}
-          </select>
-        </td>
-      </tr>
-    ))}
-  </tbody>
-      </table>
-      <div className="pagination-buttons">
-            {currentPage > 0 && (
-              <button className="btn btn-success" onClick={handlePreviousPage}>Back</button>
-            )}
-            {currentPage < totalPages - 1 && (
-              <button className="btn btn-success" onClick={handleNextPage}>Next</button>
-            )}
-          </div>
-      </div>
 
 
-{/* Modal Dump */}
+      <WorkPermitTable workPermits={workPermits}/>
 
+      <BusinessPermitTable businessPermits={businessPermits}/>
 
-
-{showPaymentMethod && (
-  <div
-    className="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
-    style={{ backgroundColor: "rgba(0, 0, 0, 0.45)", zIndex: 1050 }}
-  >
-    <div
-      className="modal-content p-4"
-      style={{
-        maxWidth: "400px",
-        width: "100%",
-        backgroundColor: "rgba(255, 255, 255, 0.8)", // Transparent effect
-        borderRadius: "10px",
-        backdropFilter: "blur(5px)",
-      }}
-    >
-      <div className="modal-header">
-        <h5 className="modal-title">
-          Choose an Action for Permit ID: {activePermitId}
-        </h5>
-        <button
-          type="button"
-          className="btn-close"
-          aria-label="Close"
-          onClick={closePaymentMethod}
-        ></button>
-      </div>
-
-      <div className="modal-body">
-        {modalStep === 0 && (
-          <div>
-            <h6>Upload Receipt</h6>
-            <div className="mb-3">
-              <label className="form-label">Select File</label>
-              <input
-                type="file"
-                className="form-control"
-                onChange={(e) => handleFileChange(e, "document1")}
-              />
-            </div>
-          </div>
-        )}
-      </div>
-      <div className="modal-footer">
-        <button
-          type="button"
-          className="btn btn-success"
-          onClick={handleSubmit}
-          disabled={!files}
-        >
-          Upload
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-
-{/* Confirm Payment for Working Permit */}
-{confirmpayment && activePermitId && (
-  <div
-    className="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
-    style={{ backgroundColor: "rgba(0, 0, 0, 0.45)", zIndex: 1050 }}
-    onClick={closeviewpayment}
-  >
-    <div
-      className="modal-content p-4"
-      style={{
-        maxWidth: "400px",
-        width: "100%",
-        backgroundColor: "rgba(255, 255, 255, 0.8)",
-        borderRadius: "10px",
-        backdropFilter: "blur(5px)",
-      }}
-      onClick={(e) => e.stopPropagation()}
-    >
-      <div className="modal-header">
-        <h5 className="modal-title">
-          Payment Completed for Working Permit Application {activePermitId}
-        </h5>
-        <button
-          type="button"
-          className="btn-close"
-          aria-label="Close"
-          onClick={confirmpaymentclose}
-        ></button>
-      </div>
-      <div className="modal-footer">
-        <button type="button" className="btn btn-success" onClick={confirmpaymentclose}>
-          Okay
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-
-
-{isModalOpenFile && (
-  <div
-    className="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
-    style={{ backgroundColor: "rgba(0, 0, 0, 0.45)", zIndex: 1050 }}
-    onClick={closeModal}
-  >
-    <div
-      className="modal-content p-4"
-      style={{
-        maxWidth: "900px",
-        width: "100%",
-        backgroundColor: "rgba(255, 255, 255, 0.8)",
-        borderRadius: "10px",
-        backdropFilter: "blur(5px)",
-      }}
-      onClick={(e) => e.stopPropagation()}
-    >
-      {modalFile && (
-        <div>
-          {modalFile.endsWith('.pdf') ? (
-            <iframe
-              src={modalFile}
-              style={{ width: '800px', height: '400px' }}
-              title="PDF Viewer"
-            />
-          ) : (
-            <img
-              src={modalFile}
-              alt="Document"
-              style={{ maxWidth: '100%', height: 'auto' }}
-            />
-          )}
-        </div>
-      )}
-      <div className="modal-footer mt-3">
-        <button className="btn btn-success" onClick={closeModal}>Close</button>
-      </div>
-    </div>
-  </div>
-)}
-
-{/* End Modal Dump */}
       </div>
     </section>
   );

@@ -1,5 +1,5 @@
 import '../Styles/DataControllerStyles.css'; 
-import DASidebar from '../components/DAsidebar';
+import DASidebar from '../components/NavigationBars/DAsidebar';
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -179,10 +179,7 @@ const DataControllerBusinessAssessment: React.FC = () => {
     const [businessPermit, setBusinessPermit] = useState<BusinessPermit | null>(null);
     const token = localStorage.getItem('token'); // Assuming the token is stored in local storage
 
-    const handleLogout = () => {
-        localStorage.removeItem('token'); // Remove token from 
-        navigate('/'); // Redirect to home page
-    };
+
 
     useEffect(() => {
         const fetchBusinessPermitDetails = async () => {
@@ -192,7 +189,7 @@ const DataControllerBusinessAssessment: React.FC = () => {
               } 
           try {
             console.log(id);
-            const response = await axios.get(`http://localhost:3000/datacontroller/DCbusinesspermitdetails/${id}`, {
+            const response = await axios.get(`http://localhost:3000/datacontroller/businesspermitdetails/${id}`, {
   
             });
             setBusinessPermit(response.data as BusinessPermit); // Set the work permit details to state
@@ -211,7 +208,7 @@ const [selectedFiles, setSelectedFiles] = useState<{ [key: string]: string | nul
         if (!fileName) return null;
         
         // Return the file URL based on the folder specified
-        return `http://localhost:3000/datacontroller/${folder}/${fileName}`;
+        return `http://localhost:3000/${folder}/${fileName}`;
       };
   const renderFile = (fileUrl: string | null) => {
     if (!fileUrl) return <p>No file selected.</p>;
@@ -1607,6 +1604,25 @@ useEffect(() => {
 
 
 const [total, setTotal] = useState(0); // State for the total computation
+useEffect(() => {
+  // Set the date to today in YYYY-MM-DD format
+  const today = new Date();
+  const formattedDate = today.toISOString().split('T')[0]; // Formats to 'YYYY-MM-DD'
+  setDateAssessed(formattedDate); // Set the state with today's date
+  
+}, [businessPermit?.business?.paymentmethod]);
+
+useEffect(() => {
+  // Set the date to today in YYYY-MM-DD format
+ 
+  if (businessPermit?.business?.paymentmethod) {
+    setPaymentMethod(businessPermit.business.paymentmethod);
+  } else {
+    setPaymentMethod(undefined); // Default payment method
+  }
+}, [businessPermit?.business?.paymentmethod]);
+
+
 
 useEffect(() => {
   if (!paymentmethod) {
@@ -1662,22 +1678,51 @@ useEffect(() => {
   paymentmethod, // Include payment method in dependencies
 ]);
 
+//Auth Checker
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const response = await fetch('http://localhost:3000/auth/check-auth-datacontroller', {
+          method: 'GET',
+          credentials: 'include',
+        });
 
-useEffect(() => {
-  // Set the date to today in YYYY-MM-DD format
-  const today = new Date();
-  const formattedDate = today.toISOString().split('T')[0]; // Formats to 'YYYY-MM-DD'
-  setDateAssessed(formattedDate); // Set the state with today's date
-  if (businessPermit?.business?.paymentmethod) {
-    setPaymentMethod(businessPermit.business.paymentmethod);
-  } else {
-    setPaymentMethod(undefined); // Or set a default value if needed
-  }
-}, [businessPermit?.business.paymentmethod]);
+        if (response.status === 401) {
+          console.error('Access denied: No token');
+          navigate('/login');
+          return;
+        }
+
+        if (response.status === 204) {
+          console.log('Access Success');
+          return;
+        }
+
+        console.error('Unexpected response status:', response.status);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    checkAuth();
+  }, [navigate]);
+
 
 
 
 const handlesaveassessment = async () => {
+
+  if (
+    businessPermit?.businesspermitstatus === 'Waiting for Payment' || 
+    businessPermit?.businesspermitstatus === 'Released' ||  
+    businessPermit?.businesspermitstatus === 'Expired'
+  ) {
+    setCheckPermit(false);
+    alert('Cannot assess already assessed permits');
+    return;
+  
+  }
+  
   const updatedData = {
     dateassessed,
     mayorspermit,
@@ -1698,7 +1743,7 @@ const handlesaveassessment = async () => {
   try {
     // Make the PUT request with credentials included
     const response = await axios.put(
-      `http://localhost:3000/datacontroller/SavingAssessment/${id}`,
+      `http://localhost:3000/datacontroller/savingassessment/${id}`,
       updatedData,
       {
         withCredentials: true, // Ensures cookies are sent along with the request
@@ -1720,7 +1765,7 @@ const [userNameDisplay, setUserNameDisplay] = useState<string>('');
 useEffect(() => {
   const fetchPermitData = async () => {
     try {
-      const response = await axios.get(`http://localhost:3000/datacontroller/getAssessedPerson/${id}`);
+      const response = await axios.get(`http://localhost:3000/datacontroller/getassessedperson/${id}`);
 
       // Access the populated user in permitassessed
       const user = response.data;
@@ -1754,7 +1799,7 @@ useEffect(() => {
 return (
     <section className="DAbody">
         <div className="DAsidebar-container">
-        <DASidebar handleLogout={handleLogout} /> {/* Pass handleLogout to DASidebar */}
+        <DASidebar /> {/* Pass handleLogout to DASidebar */}
     </div>
 
     <div className="DAcontent">
@@ -1859,19 +1904,24 @@ return (
         </tr>
       </thead>
       <tbody>
-        {businessPermit?.businesses?.map((business) => (
-          <tr key={business._id}>
-            <td style={{ padding: '8px', borderBottom: '1px solid #ddd' }}>
-            {businessNatureMap[business.businessNature as keyof typeof businessNatureMap] || business.businessNature}
-            </td>
-            <td style={{ padding: '8px', borderBottom: '1px solid #ddd' }}>
-              ₱{business.capitalInvestment.toLocaleString()}
-            </td>
-            <td style={{ padding: '8px', borderBottom: '1px solid #ddd' }}>
-              ₱{business.tax.toLocaleString()}
-            </td>
-          </tr>
-        ))}
+      {businessPermit?.businesses?.map((business) => {
+  if (!business) return null; // Ensure business exists
+
+  return (
+    <tr key={business._id || Math.random()}>
+      <td style={{ padding: '8px', borderBottom: '1px solid #ddd' }}>
+        {businessNatureMap[business.businessNature as keyof typeof businessNatureMap] || business.businessNature || 'N/A'}
+      </td>
+      <td style={{ padding: '8px', borderBottom: '1px solid #ddd' }}>
+        ₱{business.capitalInvestment ? business.capitalInvestment.toLocaleString() : '0.00'}
+      </td>
+      <td style={{ padding: '8px', borderBottom: '1px solid #ddd' }}>
+        ₱{business.tax ? business.tax.toLocaleString() : '0.00'}
+      </td>
+    </tr>
+  );
+})}
+
 
         {/* Total Capital Investment and Total Tax Calculation */}
         <tr>

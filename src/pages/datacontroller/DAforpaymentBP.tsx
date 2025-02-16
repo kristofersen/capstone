@@ -1,6 +1,6 @@
 
 import '../Styles/DataControllerStyles.css'; 
-import DASidebar from '../components/DAsidebar';
+import DASidebar from '../components/NavigationBars/DAsidebar';
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -180,7 +180,7 @@ const DataControllerForPaymentBP: React.FC = () => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await fetch('http://localhost:3000/client/check-auth-datacontroller', {
+        const response = await fetch('http://localhost:3000/auth/check-auth-datacontroller', {
           method: 'GET',
           credentials: 'include', // This ensures cookies are sent with the request
         });
@@ -207,29 +207,6 @@ const DataControllerForPaymentBP: React.FC = () => {
     checkAuth();
   }, [navigate]); // Only depend on navigate, which is necessary for the redirection
 
-  const handleLogout = async () => {
-    try {
-      const response = await fetch('http://localhost:3000/client/logout', {
-        method: 'POST',
-        credentials: 'include', // Include cookies in the request
-      });
-
-      if (response.ok) {
-        // Clear any local storage data (if applicable)
-        localStorage.removeItem('profile');
-        localStorage.removeItem('userId');
-
-        // Redirect to the login page
-        navigate('/');
-      } else {
-        // Handle any errors from the server
-        const errorData = await response.json();
-        console.error('Logout error:', errorData.message);
-      }
-    } catch (error) {
-      console.error('Error logging out:', error);
-    }
-  };
 
   const [businessPermits, setBusinessPermits] = useState<BusinessPermit[]>([]);
   const [filteredItems, setFilteredItems] = useState<BusinessPermit[]>([]);
@@ -247,7 +224,7 @@ const fetchDocumentUrl = (fileName: string | null, folder: 'uploads' | 'permits'
   if (!fileName) return null;
   
   // Return the file URL based on the folder specified
-  return `http://localhost:3000/datacontroller/${folder}/${fileName}`;
+  return `http://localhost:3000/${folder}/${fileName}`;
 };
 const renderFile = (fileUrl: string | null) => {
 if (!fileUrl) return <p>No file selected.</p>;
@@ -335,7 +312,7 @@ const handlePrint = () => {
 const handlePayment = async () => {
   try {
     // Call the API to update the payment status
-    const response = await axios.put(`http://localhost:3000/client/updatepayments/${activePermitId?._id}`, {
+    const response = await axios.put(`http://localhost:3000/client/businesspermithandlepayment/${activePermitId?._id}`, {
       paymentStatus: 'Paid',
       businesspermitstatus: 'Released'
     });
@@ -369,7 +346,7 @@ const closeviewpayment = () => {
   useEffect(() => {
     const fetchBusinessPermits = async () => {
       try {
-        const response = await fetch(`http://localhost:3000/datacontroller/getbusinesspermitsforpayments/${type}`, {
+        const response = await fetch(`http://localhost:3000/datacontroller/getbusinesspermitforpayment/${type}`, {
           method: 'GET',
           credentials: 'include', // Ensure cookies (containing the token) are sent
           headers: {
@@ -1828,7 +1805,7 @@ if (type === 'new') {
   return (
     <section className="DAbody">
       <div className="DAsidebar-container">
-        <DASidebar handleLogout={handleLogout} /> {/* Pass handleLogout to DASidebar */}
+        <DASidebar /> {/* Pass handleLogout to DASidebar */}
       </div>
 
       <div className="DAcontent">

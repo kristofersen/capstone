@@ -4,36 +4,32 @@ import '../Styles/SuperAdminStyles.css';
 
 const SuperadminAccountAdd = () => {
   const navigate = useNavigate(); // Define navigate
-  const [firstName, setFirstName] = useState('');
-  const [middleName, setMiddleInitial] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [contactNumber, setContactNumber] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [address, setAddress] = useState('');
-  const [userrole, setRole] = useState('');
 
+const [formData, setFormData] = useState({
+  firstName: '',
+  middleName: '',
+  lastName: '',
+  contactNumber: '',
+  email: '',
+  password: '',
+  address: '',
+  userrole: ''
+});
 
+const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  setFormData({ ...formData, [e.target.name]: e.target.value });
+};
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
   
     try {
-      const response = await fetch('http://localhost:3000/superadmin/addinguser', {
+      const response = await fetch('http://localhost:3000/superadmin/adduser', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          firstName,
-          middleName,
-          lastName,
-          contactNumber,
-          email,
-          address,
-          password,
-          userrole,
-        }),
+        body: JSON.stringify(formData),
       });
   
       if (!response.ok) {
@@ -56,7 +52,7 @@ const SuperadminAccountAdd = () => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await fetch('http://localhost:3000/superadmin/superadmin/authentication', {
+        const response = await fetch('http://localhost:3000/auth/check-auth-superadmin', {
           method: 'GET',
           credentials: 'include',
         });
@@ -79,7 +75,6 @@ const SuperadminAccountAdd = () => {
     checkAuth();
   }, [navigate]);
   
-  
 
   return (
     <div>
@@ -88,43 +83,43 @@ const SuperadminAccountAdd = () => {
         <div className="flex-row">
           <label>
             First Name:
-            <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} required />
+            <input type="text" value={formData.firstName} onChange={handleChange} required />
           </label>
           <label>
             Middle Initial:
-            <input type="text" value={middleName} onChange={(e) => setMiddleInitial(e.target.value)} />
+            <input type="text" value={formData.middleName} onChange={handleChange} />
           </label>
           <label>
             Last Name:
-            <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} required />
+            <input type="text" value={formData.lastName} onChange={handleChange} required />
           </label>
         </div>
 
         <div className="flex-row">
           <label>
             Contact Number:
-            <input type="text" value={contactNumber} onChange={(e) => setContactNumber(e.target.value)} required />
+            <input type="text" value={formData.contactNumber} onChange={handleChange} required />
           </label>
           <label>
             Email:
-            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+            <input type="email" value={formData.email} onChange={handleChange} required />
           </label>
         </div>
 
         <div className="flex-row">
           <label>
             Address:
-            <input type="text" value={address} onChange={(e) => setAddress(e.target.value)} required />
+            <input type="text" value={formData.address} onChange={handleChange} required />
           </label>
           <label>
             Password:
-            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+            <input type="password" value={formData.password} onChange={handleChange} required />
           </label>
         </div>
 
         <label>
           Role:
-          <select value={userrole} onChange={(e) => setRole(e.target.value)} required>
+          <select value={formData.userrole} onChange={handleChange} required>
             <option value="" disabled>Select a role</option>
             <option value="CL">Client</option>
             <option value="ADM">Admin</option>

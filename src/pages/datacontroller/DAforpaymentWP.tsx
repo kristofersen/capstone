@@ -1,5 +1,5 @@
 import '../Styles/DataControllerStyles.css'; 
-import DASidebar from '../components/DAsidebar';
+import DASidebar from '../components/NavigationBars/DAsidebar';
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Modal from 'react-modal';
@@ -84,7 +84,7 @@ const DataControllerForPaymentWP: React.FC = () => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await fetch('http://localhost:3000/client/check-auth-datacontroller', {
+        const response = await fetch('http://localhost:3000/auth/check-auth-datacontroller', {
           method: 'GET',
           credentials: 'include', // This ensures cookies are sent with the request
         });
@@ -111,29 +111,7 @@ const DataControllerForPaymentWP: React.FC = () => {
     checkAuth();
   }, [navigate]); // Only depend on navigate, which is necessary for the redirection
 
-  const handleLogout = async () => {
-    try {
-      const response = await fetch('http://localhost:3000/client/logout', {
-        method: 'POST',
-        credentials: 'include', // Include cookies in the request
-      });
 
-      if (response.ok) {
-        // Clear any local storage data (if applicable)
-        localStorage.removeItem('profile');
-        localStorage.removeItem('userId');
-
-        // Redirect to the login page
-        navigate('/');
-      } else {
-        // Handle any errors from the server
-        const errorData = await response.json();
-        console.error('Logout error:', errorData.message);
-      }
-    } catch (error) {
-      console.error('Error logging out:', error);
-    }
-  };
 
   // CODE FOR TABLE @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
   const [currentPage, setCurrentPage] = useState(0);
@@ -197,7 +175,7 @@ const DataControllerForPaymentWP: React.FC = () => {
     const fetchWorkPermits = async () => {
       try {
         console.log(type);
-        const response = await fetch(`http://localhost:3000/datacontroller/getworkpermitsforpayments/${type}`, {
+        const response = await fetch(`http://localhost:3000/datacontroller/getworkpermitforpayment/${type}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -316,7 +294,7 @@ const logFormData = (formData: FormData) => {
   
     try {
       const response = await axios.post(
-        `http://localhost:3000/datacontroller/updateworkpermitpayments/${activePermitId}`,
+        `http://localhost:3000/client/workpermithandlepayment/${activePermitId}`,
         formData,
         {
           headers: {
@@ -372,7 +350,7 @@ const logFormData = (formData: FormData) => {
 
   const fetchDocumentUrl = (fileName: string | null, folder: 'uploads' | 'permits' | 'receipts'): string | null => {
     if (!fileName) return null;
-    return `http://localhost:3000/datacontroller/${folder}/${fileName}`;
+    return `http://localhost:3000/${folder}/${fileName}`;
   };
 
   const renderFile = (fileUrl: string | null) => {
@@ -386,7 +364,18 @@ const logFormData = (formData: FormData) => {
           title="PDF Viewer"
         />
       );
-    } else {
+    } 
+    else if (fileUrl.endsWith('.docx')) {
+      return (
+        <div style={{ marginTop: '10px' }}>
+          <p>Word file detected. Download File</p>
+          <a href={fileUrl} download>
+            <button>Download</button>
+          </a>
+        </div>
+      );
+    }
+    else {
       return (
         <img
           src={fileUrl}
@@ -412,7 +401,7 @@ if (type === 'new') {
   return (
     <section className="DAbody">
       <div className="DAsidebar-container">
-        <DASidebar handleLogout={handleLogout} /> {/* Pass handleLogout to DASidebar */}
+        <DASidebar /> {/* Pass handleLogout to DASidebar */}
       </div>
 
       <div className="DAcontent">
@@ -545,7 +534,7 @@ if (type === 'new') {
                     type="button"
                     onClick={() => handleViewDocument('document1')}
                   >
-                    {selectedFiles.document1 ? 'Close' : 'View'}
+                    {selectedFiles.document1 ? 'Back' : 'View'}
                   </button>
                 )}
                 <label>Remarks:</label>
@@ -564,7 +553,7 @@ if (type === 'new') {
                     type="button"
                     onClick={() => handleViewDocument('document2')}
                   >
-                    {selectedFiles.document2 ? 'Close' : 'View'}
+                    {selectedFiles.document2 ? 'Back' : 'View'}
                   </button>
                 )}
 
@@ -585,7 +574,7 @@ if (type === 'new') {
                     type="button"
                     onClick={() => handleViewDocument('document3')}
                   >
-                    {selectedFiles.document3 ? 'Close' : 'View'}
+                    {selectedFiles.document3 ? 'Back' : 'View'}
                   </button>
                 )}
                 
@@ -605,7 +594,7 @@ if (type === 'new') {
                     type="button"
                     onClick={() => handleViewDocument('document4')}
                   >
-                    {selectedFiles.document4 ? 'Close' : 'View'}
+                    {selectedFiles.document4 ? 'Back' : 'View'}
                   </button>
                 )}
 

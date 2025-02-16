@@ -21,7 +21,7 @@ const ForgotPassword: React.FC = () => {
 
 
         try {
-            const response = await fetch('http://localhost:3000/client/send-otp', {
+            const response = await fetch('http://localhost:3000/auth/sendOTP', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -76,7 +76,7 @@ const ForgotPassword: React.FC = () => {
         }
 
         try {
-            const response = await fetch('http://localhost:3000/client/update-password', {
+            const response = await fetch('http://localhost:3000/auth/updatepassword', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

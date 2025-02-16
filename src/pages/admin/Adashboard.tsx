@@ -1,5 +1,5 @@
 import '../Styles/AdminStyles.css'; 
-import AdminSideBar from '../components/AdminSideBar';
+import AdminSideBar from '../components/NavigationBars/AdminSideBar';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Line } from 'react-chartjs-2';
@@ -104,7 +104,7 @@ const Adashboard: React.FC = () => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await fetch('http://localhost:3000/client/check-auth-admin', {
+        const response = await fetch('http://localhost:3000/auth/check-auth-admin', {
           method: 'GET',
           credentials: 'include', // This ensures cookies are sent with the request
         });
@@ -275,32 +275,13 @@ const Adashboard: React.FC = () => {
     }; 
 
     fetchData();
-  }, []);
+  }, [month]);
 
-  const handleLogout = async () => {
-    try {
-      const response = await fetch('http://localhost:3000/client/logout', {
-        method: 'POST',
-        credentials: 'include',
-      });
-
-      if (response.ok) {
-        localStorage.removeItem('profile');
-        localStorage.removeItem('userId');
-        navigate('/');
-      } else {
-        const errorData = await response.json();
-        console.error('Logout error:', errorData.message);
-      }
-    } catch (error) {
-      console.error('Error logging out:', error);
-    }
-  };
 
   return (
     <section className="Abody">
       <div className="Asidebar-container">
-        <AdminSideBar handleLogout={handleLogout} />
+        <AdminSideBar />
       </div>
 
       <div className="Acontent">

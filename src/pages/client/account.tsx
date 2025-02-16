@@ -1,21 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../Styles/ClientStyles.css'; // Import CSS file
-import ClientNavbar from '../components/clientnavbar';
-
-
-interface User {
-  _id: string;
-  userId: string;
-  firstName: string;
-  middleName: string;
-  lastName: string;
-  email: string,
-  contactNumber: string,
-  address: string,
-  password: string,
-}
-
+import ClientNavbar from '../components/NavigationBars/clientnavbar';
+import { User } from "../components/Interface(Front-end)/Types";
 
 const Account: React.FC = () => {
   const [userDetails, setUserDetails] = useState<User | null>(null);
@@ -92,7 +79,7 @@ const [password, setPassword] = useState(userDetails?.password || '');  // Set i
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await fetch('http://localhost:3000/client/check-auth-client', {
+        const response = await fetch('http://localhost:3000/auth/check-auth-client', {
           method: 'GET',
           credentials: 'include', // This ensures cookies are sent with the request
         });
@@ -138,7 +125,7 @@ const handleSendOtp = async () => {
 
 
   try {
-      const response = await fetch('http://localhost:3000/client/send-otp', {
+      const response = await fetch('http://localhost:3000/auth/sendOTP', {
           method: 'POST',
           headers: {
               'Content-Type': 'application/json',
@@ -176,7 +163,7 @@ const handleVerifyOtp = async () => {
   }
 
   try {
-      const response = await fetch('http://localhost:3000/client/update-password', {
+      const response = await fetch('http://localhost:3000/auth/updatepassword', {
           method: 'POST',
           headers: {
               'Content-Type': 'application/json',
@@ -201,17 +188,14 @@ const handleVerifyOtp = async () => {
 
 
 
-  const handleLogout = () => {
-    localStorage.removeItem('token'); // Remove token from localStorage
-    navigate('/'); // Redirect to home page
-  };
+
   const handleButtonClick = () => {
     setIsFormVisible(!isFormVisible);
   };
 
   return (
     <section className="dashboard-container">
-  <ClientNavbar handleLogout={handleLogout}/>
+  <ClientNavbar/>
 
 
   <div className="content">

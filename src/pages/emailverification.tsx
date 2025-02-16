@@ -17,7 +17,7 @@ const EmailVerification: React.FC = () => {
         if (!email) return;
 
         try {
-            const response = await fetch('http://localhost:3000/client/send-otp', {
+            const response = await fetch('http://localhost:3000/auth/sendOTP', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -66,7 +66,7 @@ const EmailVerification: React.FC = () => {
     const handleVerifyOtp = async () => {
         if (!email || !otp) return;
         try {
-            const response = await fetch('http://localhost:3000/client/verify-emailotp', {
+            const response = await fetch('http://localhost:3000/auth/verifyemailotp', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
