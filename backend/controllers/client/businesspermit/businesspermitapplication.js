@@ -10,8 +10,13 @@ const businesspermitapplication = async (req, res) => {
      if (!token) {
        return res.status(401).json({ error: 'Unauthorized' });
      }
-   
      const files = req.files;
+     console.log("Processed files:", files);
+     console.log(files.document1?.[0]?.path);
+     console.log(files.document2?.[0]?.path);
+     console.log(files.document3?.[0]?.path);
+     console.log(files.document4?.[0]?.path);
+
      const {
       //Step 1
        corporation,
@@ -91,7 +96,7 @@ const businesspermitapplication = async (req, res) => {
   
      } = req.body;
      console.log('Incoming data:', req.body);
-     console.log(req.files)
+     console.log(req.files);
   
   
      try {
@@ -209,16 +214,16 @@ const businesspermitapplication = async (req, res) => {
         },
         businesses: updatedBusinesses, // Save businesses as an array
         files: {
-          document1: files.document1 ? files.document1[0].filename : null,
-          document2: files.document2 ? files.document2[0].filename : null,
-          document3: files.document3 ? files.document3[0].filename : null,
-          document4: files.document4 ? files.document4[0].filename : null,
-          document5: files.document5 ? files.document5[0].filename : null,
-          document6: files.document6 ? files.document6[0].filename : null,
-          document7: files.document7 ? files.document7[0].filename : null,
-          document8: files.document8 ? files.document8[0].filename : null,
-          document9: files.document9 ? files.document9[0].filename : null,
-          document10: files.document10 ? files.document10[0].filename : null,
+          document1: files.document1 ? files.document1[0].path : null,
+          document2: files.document2 ? files.document2[0].path : null,
+          document3: files.document3 ? files.document3[0].path : null,
+          document4: files.document4 ? files.document4[0].path : null,
+          document5: files.document5 ? files.document5[0].path : null,
+          document6: files.document6 ? files.document6[0].path : null,
+          document7: files.document7 ? files.document7[0].path : null,
+          document8: files.document8 ? files.document8[0].path : null,
+          document9: files.document9 ? files.document9[0].path : null,
+          document10: files.document10 ? files.document10[0].path : null,
           remarksdoc1: null,
           remarksdoc2: null,
           remarksdoc3: null,

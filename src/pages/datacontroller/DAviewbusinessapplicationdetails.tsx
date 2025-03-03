@@ -4,130 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';// Import your CSS file
 import MapLocationView from '../components/MapContents/MapLocationView';
-
-export interface BusinessPermit {
-  id: string;
-  userId: string;
-  permittype?: string;
-  businesspermitstatus?: string;
-  businessstatus?: string;
-  classification?: string;
-  transaction?: string;
-  amountToPay?: string;
-  permitFile?: string;
-  permitDateIssued?: string;
-  permitExpiryDate?: string;
-  expiryDate?: string;
-  applicationdateIssued?: string;
-  applicationComments?: string;
-
-  owner: Owner;
-  business: Business;
-  otherbusinessinfo: OtherBusiness;
-  mapview: MapView;
-  businesses: Businesses[];
-  files: Files;
-  department: Department; // Change to object with key-value pairs
-
-  createdAt?: string;
-}
-
-export interface Owner {
-corporation?: boolean;
-lastname?: string;
-firstname?: string;
-middleinitial?: string;
-civilstatus?: string;
-companyname?: string;
-gender?: string;
-citizenship?: string;
-tinnumber?: string;
-representative?: boolean;
-houseandlot?: string;
-buildingstreetname?: string;
-subdivision?: string;
-region?: string;
-province?: string;
-municipality?: string;
-barangay?: string;
-telephonenumber?: string;
-mobilenumber?: string;
-email?: string;
-representativedetails?: RepDetails;
-}
-
-export interface RepDetails {
-repfullname: string,
-repdesignation: string,
-repmobilenumber: string,
-}
-
-export interface Business {
-businessname?: string,
-businessscale?: string,
-paymentmethod?: string,
-businessbuildingblocklot?: string,
-businessbuildingname?: string,
-businesssubcompname?: string,
-businessregion?: string,
-businessprovince?: string,
-businessmunicipality?: string,
-businessbarangay?: string,
-businesszip?: string,
-businesscontactnumber?: string,
-ownershiptype?: string,
-agencyregistered?: string,
-dtiregistrationnum?: string,
-dtiregistrationdate?: string,
-dtiregistrationexpdate?: string,
-secregistrationnum?: string,
-birregistrationnum?: string,
-industrysector?: string,
-businessoperation?: string,
-typeofbusiness?: string,
-
-}
-
-export interface OtherBusiness {
-dateestablished?: string,
-startdate?: string,
-occupancy?: string,
-otherbusinesstype?: string,
-businessemail?: string,
-businessarea?: string,
-businesslotarea?: string,
-numofworkermale?: string,
-numofworkerfemale?: string,
-numofworkertotal?: string,
-numofworkerlgu?: string,
-lessorfullname?: string,
-lessormobilenumber?: string,
-monthlyrent?: string,
-lessorfulladdress?: string,
-lessoremailaddress?: string,
-}
-
-export interface MapView{
-lat: string,
-lng: string,
-}
-
-export interface Businesses {
-_id: string;
-businessNature: string;
-businessType: string;
-capitalInvestment: string;
-}
-
-
-export interface Department{
- 
-  Zoning: string;
-  OffBldOfcl: string;
-  CtyHlthOff: string;
-  BreuFrPrt: string;
-
-}
+import {BusinessPermit} from "../components/Interface(Front-end)/Types";
 
 export interface Files {
 document1: string | null; // Optional
@@ -144,8 +21,7 @@ const DataControllerViewApplicationDetails: React.FC = () => {
     const { id } = useParams<{ id: string }>(); // Extract work permit ID from URL
     const [businessPermit, setBusinessPermit] = useState<BusinessPermit | null>(null);
     const token = localStorage.getItem('token'); // Assuming the token is stored in local storage
-    const [modalFile, setModalFile] = useState<string | null>(null);
-    const [isModalOpen, setIsModalOpen] = useState(false);
+
 
     useEffect(() => {
       const checkAuth = async () => {
@@ -200,37 +76,93 @@ const DataControllerViewApplicationDetails: React.FC = () => {
 
 
 //End REJECT MODAL @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-      const openModal = (filePath: string) => {
-        setModalFile(filePath);
-        setIsModalOpen(true);
-      };
-    
-      const closeModal = () => {
-        setIsModalOpen(false);
-        setModalFile(null);
-      };
-    
-      const fetchDocumentUrl = (fileName: string | null, folder: 'uploads' | 'permits' | 'receipts' ): string | null => {
-        if (!fileName) return null;
-        
-        // Return the file URL based on the folder specified
-        return `http://localhost:3000/${folder}/${fileName}`;
-      };
-      
-    const renderDocument = (fileName: string | null, folder: 'uploads' | 'permits' | 'receipts') => {
-      const fileUrl = fetchDocumentUrl(fileName, folder);
-      console.log(fileUrl);
-      if (!fileUrl) return <span>Not uploaded</span>;
-    
-      const fileExtension = fileUrl.split('.').pop()?.toLowerCase();
-      console.log(fileExtension);
-      return (
-        <span style={{ cursor: 'pointer', color: 'blue' }} onClick={() => openModal(fileUrl)}>
-          {fileExtension === 'pdf' ? 'View PDF' : 'View Document'}
-        </span>
-      );
-    };
+  
 
+    
+  const DocumentViewer = ({ fileUrl, onClose }: { fileUrl: string; onClose: () => void }) => {
+    const isPdf = fileUrl.toLowerCase().endsWith(".pdf");
+    const isDocx = fileUrl.toLowerCase().endsWith(".docx") || fileUrl.toLowerCase().endsWith(".doc");
+  
+    return (
+      <div
+        className="modal-overlay fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+        onClick={onClose}
+      >
+        <div
+          className="modal-content bg-white rounded-2xl p-4 shadow-xl relative w-[90vw] max-w-[700px] max-h-[90vh] flex flex-col"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* File Viewer */}
+          {isPdf ? (
+            <>
+              <iframe
+                src={`https://docs.google.com/gview?url=${encodeURIComponent(fileUrl)}&embedded=true`}
+                className="w-full h-[80vh] rounded-md border mb-4"
+                title="PDF Viewer"
+              />
+              <DownloadButton fileUrl={fileUrl} />
+            </>
+          ) : isDocx ? (
+            <>
+              <iframe
+                src={`https://docs.google.com/gview?url=${encodeURIComponent(fileUrl)}&embedded=true`}
+                className="w-full h-[80vh] rounded-md border mb-4"
+                title="Word Document Viewer"
+              />
+              <DownloadButton fileUrl={fileUrl} />
+            </>
+          ) : (
+            <img src={fileUrl} alt="Uploaded Document" className="w-full max-h-[80vh] rounded-md mb-4" />
+          )}
+  
+          {/* Close Button */}
+          <button
+            className="btn btn-danger self-end bg-[#0056b3] hover:bg-[#003c80] text-white font-semibold py-2 px-6 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all"
+            onClick={onClose}
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    );
+  };
+  
+  // Reusable Download Button Component
+  const DownloadButton = ({ fileUrl }: { fileUrl: string }) => {
+    return (
+      <button
+        className="bg-blue-600 hover:bg-blue-800 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition-all text-center block"
+        onClick={(e) => {
+          e.preventDefault(); // Prevent default behavior
+          const link = document.createElement("a");
+          link.href = fileUrl;
+          link.download = fileUrl.split("/").pop() || "download"; // Extract filename
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        }}
+      >
+       Download File
+      </button>
+    );
+  };
+  
+  // File Renderer Component
+  const FileRenderer = ({ fileName }: { fileName: string | null }) => {
+    const [modalOpen, setModalOpen] = useState(false);
+    const fileUrl = fileName || "";
+  
+    if (!fileUrl) return <span>Not uploaded</span>;
+  
+    return (
+      <>
+        <span style={{ cursor: "pointer", color: "blue" }} onClick={() => setModalOpen(true)}>
+          {fileUrl.endsWith(".pdf") ? "View PDF" : "View Document"}
+        </span>
+        {modalOpen && <DocumentViewer fileUrl={fileUrl} onClose={() => setModalOpen(false)} />}
+      </>
+    );
+  };
    
   
 
@@ -384,53 +316,168 @@ return (
 
             
 
-  <div style={{display: 'flex',justifyContent: 'center', gap: '16px',flexWrap: 'wrap' }}>
-    <p>Document 1: {renderDocument(businessPermit.files?.document1, 'uploads')}</p>
-    <p>Document 2: {renderDocument(businessPermit.files?.document2, 'uploads')}</p>
-    <p>Document 3: {renderDocument(businessPermit.files?.document3, 'uploads')}</p>
-    <p>Document 4: {renderDocument(businessPermit.files?.document4, 'uploads')}</p>
-    <p>Document 5: {renderDocument(businessPermit.files?.document5, 'uploads')}</p>
-    <p>Document 6: {renderDocument(businessPermit.files?.document6, 'uploads')}</p>
-    
+
+    <div style={{display: 'flex',justifyContent: 'center', gap: '16px',flexWrap: 'wrap' }}>
+    <p> Upload DTI / SEC / CDA: </p>
+    <span>
+      {businessPermit.files?.document1 ? (
+        <FileRenderer fileName={businessPermit.files?.document1} />
+      ) : (
+        "No file uploaded"
+      )}
+    </span>
+    {businessPermit.files.remarksdoc1 && (
+    <p>Remarks: {businessPermit.files.remarksdoc1}</p>
+  )}
+    <p> Occupancy Permit (Optional): </p>
+    <span>
+      {businessPermit.files?.document2 ? (
+        <FileRenderer fileName={businessPermit.files?.document2} />
+      ) : (
+        "No file uploaded"
+      )}
+    </span>
+    {businessPermit.files.remarksdoc2 && (
+    <p>Remarks: {businessPermit.files.remarksdoc2}</p>
+  )}
+    <p>Lease Contract (if rented) / Tax Declaration (If Owned): </p>
+    <span>
+      {businessPermit.files?.document3 ? (
+        <FileRenderer fileName={businessPermit.files?.document3} />
+      ) : (
+        "No file uploaded"
+      )}
+    </span>
+    {businessPermit.files.remarksdoc3 && (
+    <p>Remarks: {businessPermit.files.remarksdoc3}</p>
+  )}
+    <p>Authorization Letter / S.P.A. / Board Resolution / Secretary's Certificate (if thru representative): </p>
+    <span>
+      {businessPermit.files?.document4 ? (
+        <FileRenderer fileName={businessPermit.files?.document4} />
+      ) : (
+        "No file uploaded"
+      )}
+    </span>
+    {businessPermit.files.remarksdoc4 && (
+    <p>Remarks: {businessPermit.files.remarksdoc4}</p>
+  )}
+    <p>Owner's ID: </p>
+    <span>
+      {businessPermit.files?.document5 ? (
+        <FileRenderer fileName={businessPermit.files?.document5} />
+      ) : (
+        "No file uploaded"
+      )}
+    </span>
+    {businessPermit.files.remarksdoc5 && (
+    <p>Remarks: {businessPermit.files.remarksdoc5}</p>
+  )}
+    <p>Picture of Establishment (Perspective View): </p>
+    <span>
+      {businessPermit.files?.document6 ? (
+        <FileRenderer fileName={businessPermit.files?.document6} />
+      ) : (
+        "No file uploaded"
+      )}
+    </span>
+    {businessPermit.files.remarksdoc6 && (
+    <p>Remarks: {businessPermit.files.remarksdoc6}</p>
+  )}
+    <p> Zoning: </p>    
+    <span>
+      {businessPermit.files?.document7 ? (
+        <FileRenderer fileName={businessPermit.files?.document7} />
+      ) : (
+        "No file uploaded"
+      )}
+    </span>
+    {businessPermit.files.remarksdoc7 && (
+    <p>Remarks: {businessPermit.files.remarksdoc7}</p>
+  )}
+    <p>Office of the Building Official: </p>
+    <span>
+      {businessPermit.files?.document8 ? (
+        <FileRenderer fileName={businessPermit.files?.document8} />
+      ) : (
+        "No file uploaded"
+      )}
+    </span>
+    {businessPermit.files.remarksdoc8 && (
+    <p>Remarks: {businessPermit.files.remarksdoc8}</p>
+  )}
+    <p>City Health Office: </p>
+    <span>
+      {businessPermit.files?.document9 ? (
+        <FileRenderer fileName={businessPermit.files?.document9} />
+      ) : (
+        "No file uploaded"
+      )}
+    </span>
+    {businessPermit.files.remarksdoc9 && (
+    <p>Remarks: {businessPermit.files.remarksdoc9}</p>
+  )}
+    <p>Bureau of Fire Protection: </p>
+    <span>
+      {businessPermit.files?.document10 ? (
+        <FileRenderer fileName={businessPermit.files?.document10} />
+      ) : (
+        "No file uploaded"
+      )}
+    </span>
+    {businessPermit.files.remarksdoc10 && (
+    <p>Remarks: {businessPermit.files.remarksdoc10}</p>
+  )}
+  </div>            
+  {businessPermit.receipt?.receiptFile && (
+      <div>
+    <p>Receipt: </p>
+    <span>
+    {businessPermit.receipt?.receiptFile ? (
+      <FileRenderer fileName={businessPermit.receipt?.receiptFile} />
+    ) : (
+      "No file uploaded"
+    )}
+  </span>
   </div>
-              
+  )}
+  {businessPermit.statementofaccount.statementofaccountfile && (
+  <div>
+  <p>
+    Statement of Account (Assessment): </p>
+  <span>
+    {businessPermit.statementofaccount?.statementofaccountfile ? (
+      <FileRenderer fileName={businessPermit.statementofaccount?.statementofaccountfile} />
+    ) : (
+      "No file uploaded"
+    )}
+  </span>
+  </div>
+  )}
+  {businessPermit.permitFile && (
+      <div>
+    <p>Business Permit: </p>
+    <span>
+    {businessPermit.permitFile ? (
+      <FileRenderer fileName={businessPermit.permitFile} />
+    ) : (
+      "No file uploaded"
+    )}
+  </span>
+    </div>
+  )}
+  {businessPermit.applicationComments && (
+    <p>Comments: {businessPermit.applicationComments}</p>
+  )} 
 
 
-            {/* Render additional fields as necessary 
-              
-              {workPermit.receipt?.receiptFile && (
-    <p>Receipt: {renderDocument(workPermit.receipt.receiptFile, 'receipts')}</p>
-  )}
-    {workPermit.permitFile && (
-    <p>Work Permit: {renderDocument(workPermit.permitFile, 'permits')}</p>
-  )}
-  {workPermit.applicationComments && (
-    <p>Comments: {workPermit.applicationComments}</p>
-  )}
-    
-  */}
             
           </>
         ) : (
-          <p>No work permit details available.</p>
+          <p>No business permit details available.</p>
         )}
 
-{isModalOpen && (
-        <div className="modal-overlay" onClick={closeModal}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            {modalFile && (
-              <div>
-                {modalFile.endsWith('.pdf') ? (
-                  <iframe src={modalFile} style={{ width: '500px', height: '600px' }} title="PDF Viewer" />
-                ) : (
-                  <img src={modalFile} alt="Document" style={{ maxWidth: '100%', height: 'auto' }} />
-                )}
-              </div>
-            )}
-            <button className="cancel-button" onClick={closeModal}>Close</button>
-          </div>
-        </div>
-      )}
+
         </div>
       </div>
     </div>

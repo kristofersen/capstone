@@ -155,7 +155,7 @@ const ForgotPassword: React.FC = () => {
                         />
                     </div>
                 </div>
-                <div className="button-group">
+                                    <div className="button-group">
                 <button type="button" className="cancelForgotPassword" onClick={handleCancel}>
                     Cancel
                 </button>

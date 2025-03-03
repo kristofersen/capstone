@@ -158,6 +158,8 @@
   .form-group {
     flex: 1;
     margin-bottom: 15px;
+    display: 'flex';
+    gap: 8px;
   }
   
   .form-group label {
@@ -188,7 +190,7 @@
     display: flex;
     align-items: center;
     font-family: 'Arial', sans-serif;
-    font-size: 14px;
+    font-size: 10px;
     color: #333;
     cursor: pointer;
   }
@@ -762,5 +764,132 @@ width: 100%; /* Occupy most of the container's width */
     width: 100%; 
     margin: 5px 0; 
     padding: 15px; 
+  }
+}
+
+
+/* Modal overlay (background blur effect) */
+.account_modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6); /* Dark overlay */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(5px); /* Blurred background */
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Modal box */
+.account_modal {
+  background: #fff;
+  padding: 2rem;
+  width: 90%;
+  max-width: 400px;
+  border-radius: 10px;
+  box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  animation: slideIn 0.3s ease-in-out;
+}
+
+/* Modal header */
+.account_modal h1 {
+  font-size: 1.5rem;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+/* Form inputs */
+.account_input-row {
+  margin-bottom: 1rem;
+}
+
+.account_form-group {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.account_form-group label {
+  font-size: 0.9rem;
+  margin-bottom: 0.3rem;
+  color: #555;
+}
+
+.account_form-group input {
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1rem;
+  transition: border 0.3s ease-in-out;
+}
+
+.account_form-group input:focus {
+  border: 1px solid #007bff;
+  outline: none;
+}
+
+/* Buttons */
+.account_button-group {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+}
+
+
+
+.account_cancelForgotPassword {
+  background: #ccc;
+  color: #333;
+}
+
+.account_cancelForgotPassword:hover {
+  background: #bbb;
+}
+
+.account_sendotp {
+  background: #007bff;
+  color: white;
+}
+
+.account_sendotp:hover {
+  background: #0056b3;
+}
+
+.account_disabled-button {
+  background: #aaa !important;
+  cursor: not-allowed;
+}
+
+.account_account_verifyemail {
+  background: #28a745;
+  color: white;
+}
+
+.account_account_verifyemail:hover {
+  background: #218838;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
   }
 }

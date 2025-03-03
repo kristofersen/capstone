@@ -3,7 +3,6 @@ const { WorkPermit } = require('../../index/models');
 const updateworkpermitattachment = async (req, res) => {
     try {
       const permitId = req.params.id;
-      const files = req.files;
       const { remarksdoc1, remarksdoc2, remarksdoc3, remarksdoc4 } = req.body; // Extract remarks from the request body
   
       if (!permitId) {
@@ -12,12 +11,18 @@ const updateworkpermitattachment = async (req, res) => {
       }
   
       const updates = {};
+      const files = req.files;
+      console.log("Processed files:", files);
+      console.log(files.document1?.[0]?.path);
+      console.log(files.document2?.[0]?.path);
+      console.log(files.document3?.[0]?.path);
+      console.log(files.document4?.[0]?.path);
   
       // Update each document field if a new file is uploaded
-      if (files.document1) updates['formData.files.document1'] = files.document1[0].filename;
-      if (files.document2) updates['formData.files.document2'] = files.document2[0].filename;
-      if (files.document3) updates['formData.files.document3'] = files.document3[0].filename;
-      if (files.document4) updates['formData.files.document4'] = files.document4[0].filename;
+      if (files.document1) updates['formData.files.document1'] = files.document1[0].path;
+      if (files.document2) updates['formData.files.document2'] = files.document2[0].path;
+      if (files.document3) updates['formData.files.document3'] = files.document3[0].path;
+      if (files.document4) updates['formData.files.document4'] = files.document4[0].path;
   
       if (remarksdoc1) updates['formData.files.remarksdoc1'] = remarksdoc1;
       if (remarksdoc2) updates['formData.files.remarksdoc2'] = remarksdoc2;

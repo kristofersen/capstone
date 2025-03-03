@@ -178,36 +178,98 @@ const DataControllerViewApplicationDetails: React.FC = () => {
 
 
 //End REJECT MODAL @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-      const openModal = (filePath: string) => {
-        setModalFile(filePath);
-        setIsModalOpen(true);
-      };
-    
+
       const closeRejectModal = () => {
         setIsModalOpen(false);
         setShowRejectModal(false);
         setModalFile(null);
       };
     
-      const fetchDocumentUrl = (fileName: string | null, folder: 'uploads' | 'permits' | 'receipts'): string | null => {
-        if (!fileName) return null;
-        
-        // Return the file URL based on the folder specified
-        return `http://localhost:3000/${folder}/${fileName}`;
-      };
-      
-    const renderDocument = (fileName: string | null, folder: 'uploads' | 'permits' | 'receipts') => {
-      const fileUrl = fetchDocumentUrl(fileName, folder);
-      if (!fileUrl) return <span>Not uploaded</span>;
-    
-      const fileExtension = fileUrl.split('.').pop()?.toLowerCase();
-      console.log(fileUrl);
-      return (
-        <span style={{ cursor: 'pointer', color: 'blue' }} onClick={() => openModal(fileUrl)}>
-          {fileExtension === 'pdf' ? 'View PDF' : 'View Document'}
+
+  const DocumentViewer = ({ fileUrl, onClose }: { fileUrl: string; onClose: () => void }) => {
+    const isPdf = fileUrl.toLowerCase().endsWith(".pdf");
+    const isDocx = fileUrl.toLowerCase().endsWith(".docx") || fileUrl.toLowerCase().endsWith(".doc");
+  
+    return (
+      <div
+        className="modal-overlay fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+        onClick={onClose}
+      >
+        <div
+          className="modal-content bg-white rounded-2xl p-4 shadow-xl relative w-[90vw] max-w-[700px] max-h-[90vh] flex flex-col"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* File Viewer */}
+          {isPdf ? (
+            <>
+              <iframe
+                src={`https://docs.google.com/gview?url=${encodeURIComponent(fileUrl)}&embedded=true`}
+                className="w-full h-[80vh] rounded-md border mb-4"
+                title="PDF Viewer"
+              />
+              <DownloadButton fileUrl={fileUrl} />
+            </>
+          ) : isDocx ? (
+            <>
+              <iframe
+                src={`https://docs.google.com/gview?url=${encodeURIComponent(fileUrl)}&embedded=true`}
+                className="w-full h-[80vh] rounded-md border mb-4"
+                title="Word Document Viewer"
+              />
+              <DownloadButton fileUrl={fileUrl} />
+            </>
+          ) : (
+            <img src={fileUrl} alt="Uploaded Document" className="w-full max-h-[80vh] rounded-md mb-4" />
+          )}
+  
+          {/* Close Button */}
+          <button
+            className="btn btn-danger self-end bg-[#0056b3] hover:bg-[#003c80] text-white font-semibold py-2 px-6 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all"
+            onClick={onClose}
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    );
+  };
+  
+  // Reusable Download Button Component
+  const DownloadButton = ({ fileUrl }: { fileUrl: string }) => {
+    return (
+      <button
+        className="bg-blue-600 hover:bg-blue-800 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition-all text-center block"
+        onClick={(e) => {
+          e.preventDefault(); // Prevent default behavior
+          const link = document.createElement("a");
+          link.href = fileUrl;
+          link.download = fileUrl.split("/").pop() || "download"; // Extract filename
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        }}
+      >
+       Download File
+      </button>
+    );
+  };
+  
+  // File Renderer Component
+  const FileRenderer = ({ fileName }: { fileName: string | null }) => {
+    const [modalOpen, setModalOpen] = useState(false);
+    const fileUrl = fileName || "";
+  
+    if (!fileUrl) return <span>Not uploaded</span>;
+  
+    return (
+      <>
+        <span style={{ cursor: "pointer", color: "blue" }} onClick={() => setModalOpen(true)}>
+          {fileUrl.endsWith(".pdf") ? "View PDF" : "View Document"}
         </span>
-      );
-    };
+        {modalOpen && <DocumentViewer fileUrl={fileUrl} onClose={() => setModalOpen(false)} />}
+      </>
+    );
+  };
 
     const handleUpdate = async () => {
       console.log('Updating permit with ID:', workPermit?._id); // Log ID for debugging
@@ -309,40 +371,103 @@ return (
           <input type="text" value={workPermit.formData.emergencyContact.address|| ""} readOnly />
         
 
-      <h1>Documents</h1>
-      <div style={{display: 'flex',justifyContent: 'center', gap: '16px',flexWrap: 'wrap' }}>
-    <p>1x1 Picture: {workPermit.formData.files && renderDocument(workPermit.formData.files.document1, 'uploads')}</p>
+          <h1>Documents</h1>
+<div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+  {/* Main Documents Container */}
+  <div
+    style={{
+      display: "grid",
+      gridTemplateColumns: "1fr 2fr", // Align labels and files
+      alignItems: "center",
+      gap: "12px",
+      maxWidth: "600px", // Adjust for readability
+      margin: "0 auto", // Center align
+    }}
+  >
+    {/* 1x1 Picture */}
+    <p><strong>1x1 Picture:</strong></p>
+    <span>
+      {workPermit.formData.files?.document1 ? (
+        <FileRenderer fileName={workPermit.formData.files.document1} />
+      ) : (
+        "No file uploaded"
+      )}
+    </span>
 
-    <p>Cedula: {workPermit.formData.files && renderDocument(workPermit.formData.files.document2, 'uploads')}</p>
+    {/* Cedula */}
+    <p><strong>Cedula:</strong></p>
+    <span>
+      {workPermit.formData.files?.document2 ? (
+        <FileRenderer fileName={workPermit.formData.files.document2} />
+      ) : (
+        "No file uploaded"
+      )}
+    </span>
 
+    {/* Referral Letter (Conditional) */}
     {!workPermit.formData.personalInformation.currentlyResiding && (
-  <p>
-    Referral Letter: 
-    {workPermit.formData.files && renderDocument(workPermit.formData.files.document3, 'uploads')}
-  </p>
-)}
-  
-  {workPermit.classification === 'New' && (
-    <p>FTJS (First Time Job Seeker) Certificate: {workPermit.formData.files && renderDocument(workPermit.formData.files.document4, 'uploads')}</p>
-)}
+      <>
+        <p><strong>Referral Letter:</strong></p>
+        <span>
+          {workPermit.formData.files?.document3 ? (
+            <FileRenderer fileName={workPermit.formData.files.document3} />
+          ) : (
+            "No file uploaded"
+          )}
+        </span>
+      </>
+    )}
 
+    {/* FTJS Certificate (Conditional) */}
+    {workPermit.classification === "New" && (
+      <>
+        <p><strong>FTJS Certificate:</strong></p>
+        <span>
+          {workPermit.formData.files?.document4 ? (
+            <FileRenderer fileName={workPermit.formData.files.document4} />
+          ) : (
+            "No file uploaded"
+          )}
+        </span>
+      </>
+    )}
+
+    {/* Receipt (Conditional) */}
+    {workPermit.receipt?.receiptFile && (
+      <>
+        <p><strong>Receipt: </strong></p>
+        <span>
+          <FileRenderer fileName={workPermit.receipt.receiptFile} />
+        </span>
+      </>
+    )}
+
+    {/* Work Permit (Conditional) */}
+    {workPermit.permitFile && (
+      <>
+        <p><strong>Work Permit:</strong></p>
+        <span>
+          <FileRenderer fileName={workPermit.permitFile} />
+        </span>
+      </>
+    )}
   </div>
 
-      <div>
-  {workPermit.receipt?.receiptFile && (
-    <p>Receipt: {renderDocument(workPermit.receipt.receiptFile, 'receipts')}</p>
-  )}
-  {workPermit.permitFile && (
-    <p>Work Permit: {renderDocument(workPermit.permitFile, 'permits')}</p>
-  )}
+  {/* Application Comments (if available) */}
   {workPermit.applicationComments && (
-    <p>Comments: {workPermit.applicationComments}</p>
+    <div
+      style={{
+        marginTop: "16px",
+        padding: "12px",
+        backgroundColor: "#f9f9f9",
+        borderRadius: "8px",
+        textAlign: "center",
+      }}
+    >
+      <strong>Comments:</strong> {workPermit.applicationComments}
+    </div>
   )}
 </div>
-
-
-
-
             {workPermit.workpermitstatus === 'Pending' && (
               <p>
         <button className="btn btn-success" onClick={handleUpdate}>Accept Application</button>

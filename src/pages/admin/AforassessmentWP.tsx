@@ -1,6 +1,6 @@
 import '../styles/AdminStyles.css';
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import Modal from 'react-modal';
 import AdminSideBar from '../components/NavigationBars/AdminSideBar';
 
@@ -65,7 +65,7 @@ const AdminForAssessmentWP: React.FC = () => {
   const [isEditingAttach, setIsEditingAttach] = useState(false);
   const [workPermits, setWorkPermits] = useState<WorkPermit[]>([]);
   const [filteredItems, setFilteredItems] = useState<WorkPermit[]>([]);
-  const token = localStorage.getItem('token');
+
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedPermit, setSelectedPermit] = useState<WorkPermit | null>(null);
@@ -209,33 +209,30 @@ const AdminForAssessmentWP: React.FC = () => {
     console.log('Input Value:', inputValue);
   };
 
-  const fetchWorkPermits = async () => {
-    try {
-      const response = await fetch('http://localhost:3000/datacontroller/getworkpermitforassessment', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      
-      const WorkPermitData = await response.json();
-      setWorkPermits(WorkPermitData);
-    } catch (error) {
-      console.error('Error fetching profile:', error);
-    }
-  };
+  const { type } = useParams<{ type: string }>();
+
 
   useEffect(() => {
-    const handleTokenCheck = () => {
-      if (!token) {
-          navigate('/'); // Redirect to login if no token
-      } else {
-          fetchWorkPermits(); // Fetch work permits if token is present
+
+    const fetchWorkPermits = async () => {
+      try {
+        const response = await fetch(`http://localhost:3000/datacontroller/getworkpermitforassessment/${type}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        
+        const WorkPermitData = await response.json();
+        setWorkPermits(WorkPermitData);
+      } catch (error) {
+        console.error('Error fetching profile:', error);
       }
     };
+          fetchWorkPermits(); // Fetch work permits if token is present
+  
 
-    handleTokenCheck(); // Call the function to check the token
-  }, [navigate, token]);
+  }, [type]);
 
   useEffect(() => {
     setFilteredItems(workPermits); // Display all work permits by default
@@ -281,13 +278,6 @@ const AdminForAssessmentWP: React.FC = () => {
     }
   };
 
-  const handleViewDocument = (documentKey: 'document1' | 'document2' | 'document3' | 'document4') => {
-    const documentUrl = fetchDocumentUrl(selectedPermit?.formData.files[documentKey] ?? null, 'uploads');
-    setSelectedFiles((prev) => ({
-      ...prev,
-      [documentKey]: prev[documentKey] === documentUrl ? null : documentUrl, // Toggle visibility based on the URL
-    }));
-  };
 
   const closeModal = () => {
     setIsModalOpen(false);
@@ -358,23 +348,50 @@ const AdminForAssessmentWP: React.FC = () => {
 
   const [selectedFiles, setSelectedFiles] = useState<{ [key: string]: string | null }>({});
 
-const fetchDocumentUrl = (fileName: string | null, folder: 'uploads' | 'permits' | 'receipts'): string | null => {
-  if (!fileName) return null;
-  return `http://localhost:3000/${folder}/${fileName}`;
-};
+  const handleViewDocument = (documentKey: 'document1' | 'document2' | 'document3' | 'document4') => {
+    const documentUrl = selectedPermit?.formData.files[documentKey] ?? null; // Ensure it's never undefined
+    
+    setSelectedFiles((prev) => ({
+      ...prev,
+      [documentKey]: prev[documentKey] === documentUrl ? null : documentUrl, // Toggle visibility
+    }));
+  };
+
 
 const renderFile = (fileUrl: string | null) => {
-  if (!fileUrl) return <p>No file selected.</p>;
+
+  
+  if (!fileUrl) return null;
 
   if (fileUrl.endsWith('.pdf')) {
     return (
+      <>
       <iframe
-        src={fileUrl}
-        style={{ width: '100%', height: '400px', marginTop: '10px' }}
-        title="PDF Viewer"
-      />
+      src={`https://docs.google.com/gview?url=${encodeURIComponent(fileUrl)}&embedded=true`}
+      width="100%"
+      height="500px"
+      style={{ border: '1px solid #ccc' }}
+    />
+        <DownloadButton fileUrl={fileUrl || ''} /> 
+    </>
     );
-  } else {
+  } 
+  else if (fileUrl.endsWith('.docx')) {
+    return (
+      <>
+      <iframe
+      src={`https://docs.google.com/gview?url=${encodeURIComponent(fileUrl)}&embedded=true`}
+      width="100%"
+      height="500px"
+      style={{ border: '1px solid #ccc' }}
+    />
+    
+    <DownloadButton fileUrl={fileUrl || ''} />
+    </>
+    );
+
+  }
+  else {
     return (
       <img
         src={fileUrl}
@@ -383,6 +400,25 @@ const renderFile = (fileUrl: string | null) => {
       />
     );
   }
+};
+
+const DownloadButton = ({ fileUrl }: { fileUrl: string }) => {
+  return (
+    <button
+      className="bg-blue-600 hover:bg-blue-800 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition-all text-center block"
+      onClick={(e) => {
+        e.preventDefault(); // Prevent default behavior
+        const link = document.createElement("a");
+        link.href = fileUrl;
+        link.download = fileUrl.split("/").pop() || "download"; // Extract filename
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }}
+    >
+     Download File
+    </button>
+  );
 };
 
 const [remarksdoc1, setRemarksdoc1] = useState('');
@@ -1019,7 +1055,7 @@ useEffect(() => {
         <p>Permit ID: {selectedPermit?._id}</p>
         {/* Document 1 */}
         <p>
-          Document 1: {selectedPermit.formData.files.document1 || 'Not uploaded'}
+          Document 1: 
           {selectedPermit.formData.files.document1 && (
             <button
               type="button"
@@ -1042,7 +1078,7 @@ useEffect(() => {
         {renderFile(selectedFiles.document1)}
         {/* Document 2 */}
         <p>
-          Document 2: {selectedPermit.formData.files.document2 || 'Not uploaded'}
+          Document 2: 
           {selectedPermit.formData.files.document2 && (
             <button
               type="button"
@@ -1065,7 +1101,7 @@ useEffect(() => {
         {renderFile(selectedFiles.document2)}
         {/* Document 3 */}
         <p>
-          Document 3: {selectedPermit.formData.files.document3 || 'Not uploaded'}
+          Document 3:
           {selectedPermit.formData.files.document3 && (
             <button
               type="button"
@@ -1088,7 +1124,7 @@ useEffect(() => {
         {renderFile(selectedFiles.document3)}
         {/* Document 4 */}
         <p>
-          Document 4: {selectedPermit.formData.files.document4 || 'Not uploaded'}
+          Document 4:
           {selectedPermit.formData.files.document4 && (
             <button
               type="button"

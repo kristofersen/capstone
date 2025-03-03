@@ -228,13 +228,13 @@ const handleVerifyOtp = async () => {
 
       {/* Conditionally render the form based on isFormVisible */}
       {isFormVisible && (
-        <div className="modal-overlay">
-          <div className="modal">
+        <div className="account_modal-overlay" onClick={handleButtonClick}>
+          <div className="account_modal">
         <h1>Forgot Password</h1>
-        {error && <p className="error">{error}</p>}
-        {success && <p className="success">{success}</p>}
-        <div className="input-row">
-            <div className="form-group">
+        {error && <p className="account_error">{error}</p>}
+        {success && <p className="account_success">{success}</p>}
+        <div className="account_input-row">
+            <div className="account_form-group">
                 <label htmlFor="email">Email:</label>
                 <input
                     type="email"
@@ -245,9 +245,9 @@ const handleVerifyOtp = async () => {
                 />
             </div>
         </div>
-        <div className="input-row">
-            <div className="form-group">
-                <label htmlFor="otp">Enter OTP:</label>
+        <div className="account_input-row">
+            <div className="account_form-group">
+                <label htmlFor="account_otp">Enter OTP:</label>
                 <input
                     type="text"
                     id="otp"
@@ -257,8 +257,8 @@ const handleVerifyOtp = async () => {
                 />
             </div>
         </div>
-        <div className="input-row">
-            <div className="form-group">
+        <div className="account_input-row">
+            <div className="account_form-group">
                 <label htmlFor="otp">Password:</label>
                 <input
                     type="password"
@@ -269,8 +269,8 @@ const handleVerifyOtp = async () => {
                 />
             </div>
         </div>
-        <div className="input-row">
-            <div className="form-group">
+        <div className="account_input-row">
+            <div className="account_form-group">
                 <label htmlFor="otp">Confirm Password:</label>
                 <input
                     type="password"
@@ -281,23 +281,23 @@ const handleVerifyOtp = async () => {
                 />
             </div>
         </div>
-        <div className="button-group">
-        <button type="button" className="cancelForgotPassword" onClick={handleButtonClick}>
+        <div className="account_button-group">
+        <button type="button" className="account_cancelForgotPassword" onClick={handleButtonClick}>
             Cancel
         </button>
             <button
                 type="button"
-                className={`sendotp ${otpSent ? 'disabled-button' : ''}`}  // Add conditional class
+                className={`account_sendotp ${otpSent ? 'account_disabled-button' : ''}`}  // Add conditional class
                 onClick={handleSendOtp}
                 disabled={otpSent} // Disable button if OTP is sent
             >
             Send OTP
             </button>
-                <label className="otp-timer-label">
+                <label className="account_otp-timer-label">
                 {otpSent && otpCountdown !== null ? `(${otpCountdown}s)` : ''}
                 </label>
             <button type="button"
-                className="verifyemail"
+                className="account_verifyemail"
                 onClick={handleVerifyOtp}
             >
                 Change Password

@@ -12,6 +12,11 @@ const workpermitapplication = async (req, res) => {
     }
   
     const files = req.files;
+    console.log("Processed files:", files);
+    console.log(files.document1?.[0]?.path);
+    console.log(files.document2?.[0]?.path);
+    console.log(files.document3?.[0]?.path);
+    console.log(files.document4?.[0]?.path);
     const {
       lastName,
       firstName,
@@ -39,7 +44,7 @@ const workpermitapplication = async (req, res) => {
       workpermitclassification,
     } = req.body;
     console.log('Incoming data:', req.body);
-    console.log(req.files)
+    console.log(req.files);
     try {
       const decoded = jwt.verify(token, JWT_SECRET); // Decode the JWT to get the userId
       console.log('Decoded token:', decoded);
@@ -100,10 +105,13 @@ const workpermitapplication = async (req, res) => {
             address,
           },
           files: {
-            document1: files.document1 ? files.document1[0].filename : null,
-            document2: files.document2 ? files.document2[0].filename : null,
-            document3: files.document3 ? files.document3[0].filename : null,
-            document4: files.document4 ? files.document4[0].filename : null,
+          
+              document1: files.document1 ? files.document1?.[0]?.path : null,
+              document2: files.document2 ? files.document2?.[0]?.path : null,
+              document3: files.document3 ? files.document3?.[0]?.path : null,
+              document4: files.document4 ? files.document4?.[0]?.path : null,
+     
+            
           },
         },
         receipt: {
@@ -116,10 +124,20 @@ const workpermitapplication = async (req, res) => {
         amountPaid: null, // amount
         receiptFile: null,
         }
+        
+      });
+      console.log("Files being saved:", {
+        document1: files.document1?.[0]?.path || null,
+        document2: files.document2?.[0]?.path || null,
+        document3: files.document3?.[0]?.path || null,
+        document4: files.document4?.[0]?.path || null,
       });
       // Save new work permit and retrieve its _id
       const savedWorkPermit = await newWorkPermit.save();
       console.log('Saved WorkPermit ID:', savedWorkPermit._id); // Log the saved ID
+
+      const checkWorkPermit = await WorkPermit.findOne({ _id: savedWorkPermit._id });
+console.log("Stored WorkPermit from DB:", checkWorkPermit);
       
       await User.findByIdAndUpdate(userId, { $push: { workPermits: savedWorkPermit._id } });
       

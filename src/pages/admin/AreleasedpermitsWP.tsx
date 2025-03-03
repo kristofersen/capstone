@@ -76,17 +76,7 @@ const AreleasedpermitsWP: React.FC = () => {
   const [remarksdoc2, setRemarksdoc2] = useState('');
   const [remarksdoc3, setRemarksdoc3] = useState('');
   const [remarksdoc4, setRemarksdoc4] = useState('');
-  const [files, setFiles] = useState<{
-    document1: File | null;
-    document2: File | null;
-    document3: File | null;
-    document4: File | null;
-  }>({
-    document1: null,
-    document2: null,
-    document3: null,
-    document4: null,
-  });
+
 
   const customModalStyles = {
     content: {
@@ -273,7 +263,7 @@ const AreleasedpermitsWP: React.FC = () => {
         break;
 
       case 'viewWorkPermit':
-   renderDocument(permit.permitFile, 'permits');
+   renderDocument(permit.permitFile);
    setActivePermitId(permit);
         break;
         
@@ -282,16 +272,10 @@ const AreleasedpermitsWP: React.FC = () => {
     }
   };
 
-  const handleViewDocument = (documentKey: 'document1' | 'document2' | 'document3' | 'document4') => {
-    const documentUrl = fetchDocumentUrl(selectedPermit?.formData.files[documentKey] ?? null, 'uploads');
-    setSelectedFiles((prev) => ({
-      ...prev,
-      [documentKey]: prev[documentKey] === documentUrl ? null : documentUrl, // Toggle visibility based on the URL
-    }));
-  };
 
-  const renderDocument = (fileName: string | null, folder: 'uploads' | 'permits' | 'receipts') => {
-    const fileUrl = fetchDocumentUrl(fileName, folder);
+
+  const renderDocument = (fileName: string | null) => {
+    const fileUrl = fileName;
   
     if (!fileUrl) return <span>Not uploaded</span>;
   
@@ -329,20 +313,6 @@ const AreleasedpermitsWP: React.FC = () => {
     setActivePermitId(null);
   };
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>, doc: 'document1' | 'document2' | 'document3' | 'document4') => {
-    const selectedFiles = event.target.files;
-    if (selectedFiles && selectedFiles.length > 0) {
-      setFiles((prev) => ({
-        ...prev,
-        [doc]: selectedFiles[0],
-      }));
-    } else {
-      setFiles((prev) => ({
-        ...prev,
-        [doc]: null, 
-      }));
-    }
-  };
 
 
 
@@ -350,51 +320,78 @@ const AreleasedpermitsWP: React.FC = () => {
 
  
 
-  useEffect(() => {
-    const urls: Record<string, string> = {}; // Define a typed object for URLs
-
-    // Iterate through each file key in the `files` object
-    Object.entries(files).forEach(([key, file]) => {
-      if (file) {
-        const fileUrl = URL.createObjectURL(file);
-        urls[key] = fileUrl; // Store the created URL
-        setSelectedFiles((prev) => ({ ...prev, [key]: fileUrl }));
-      }
-    });
-
-    // Cleanup function to revoke URLs
-    return () => {
-      Object.values(urls).forEach((url) => URL.revokeObjectURL(url));
-    };
-  }, [files]); // Watch the `files` object for changes
-
-  const fetchDocumentUrl = (fileName: string | null, folder: 'uploads' | 'permits' | 'receipts'): string | null => {
-    if (!fileName) return null;
-    return `http://localhost:3000/${folder}/${fileName}`;
+  const handleViewDocument = (documentKey: 'document1' | 'document2' | 'document3' | 'document4') => {
+    const documentUrl = selectedPermit?.formData.files[documentKey] ?? null; // Ensure it's never undefined
+    
+    setSelectedFiles((prev) => ({
+      ...prev,
+      [documentKey]: prev[documentKey] === documentUrl ? null : documentUrl, // Toggle visibility
+    }));
   };
 
-  const renderFile = (fileUrl: string | null) => {
-    if (!fileUrl) return <p>No file selected.</p>;
 
-    if (fileUrl.endsWith('.pdf')) {
-      return (
-        <iframe
-          src={fileUrl}
-          style={{ width: '100%', height: '400px', marginTop: '10px' }}
-          title="PDF Viewer"
-        />
-      );
-    } else {
-      return (
-        <img
-          src={fileUrl}
-          alt="Document"
-          style={{ maxWidth: '100%', height: 'auto', marginTop: '10px' }}
-        />
-      );
-    }
-  };
+const renderFile = (fileUrl: string | null) => {
 
+  
+  if (!fileUrl) return null;
+
+  if (fileUrl.endsWith('.pdf')) {
+    return (
+      <>
+      <iframe
+      src={`https://docs.google.com/gview?url=${encodeURIComponent(fileUrl)}&embedded=true`}
+      width="100%"
+      height="500px"
+      style={{ border: '1px solid #ccc' }}
+    />
+        <DownloadButton fileUrl={fileUrl || ''} /> 
+    </>
+    );
+  } 
+  else if (fileUrl.endsWith('.docx')) {
+    return (
+      <>
+      <iframe
+      src={`https://docs.google.com/gview?url=${encodeURIComponent(fileUrl)}&embedded=true`}
+      width="100%"
+      height="500px"
+      style={{ border: '1px solid #ccc' }}
+    />
+    
+    <DownloadButton fileUrl={fileUrl || ''} />
+    </>
+    );
+
+  }
+  else {
+    return (
+      <img
+        src={fileUrl}
+        alt="Document"
+        style={{ maxWidth: '100%', height: 'auto', marginTop: '10px' }}
+      />
+    );
+  }
+};
+
+const DownloadButton = ({ fileUrl }: { fileUrl: string }) => {
+  return (
+    <button
+      className="bg-blue-600 hover:bg-blue-800 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition-all text-center block"
+      onClick={(e) => {
+        e.preventDefault(); // Prevent default behavior
+        const link = document.createElement("a");
+        link.href = fileUrl;
+        link.download = fileUrl.split("/").pop() || "download"; // Extract filename
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }}
+    >
+     Download File
+    </button>
+  );
+};
   return (
     <section className="Abody">
       <div className="Asidebar-container">
@@ -514,7 +511,7 @@ const AreleasedpermitsWP: React.FC = () => {
               <p>Permit ID: {selectedPermit?._id}</p>
               {/* Document 1 */}
               <p>
-                Document 1: {selectedPermit.formData.files.document1 || 'Not uploaded'}
+                Document 1:
                 {selectedPermit.formData.files.document1 && (
                   <button
                     type="button"
@@ -523,9 +520,7 @@ const AreleasedpermitsWP: React.FC = () => {
                     {selectedFiles.document1 ? 'Close' : 'View'}
                   </button>
                 )}
-                { (
-                  <input type="file" onChange={(e) => handleFileChange(e, 'document1')} />
-                )}
+
                 <label>Remarks:</label>
                 <input 
                   type="text" 
@@ -537,7 +532,7 @@ const AreleasedpermitsWP: React.FC = () => {
               {renderFile(selectedFiles.document1)}
               {/* Document 2 */}
               <p>
-                Document 2: {selectedPermit.formData.files.document2 || 'Not uploaded'}
+                Document 2: 
                 {selectedPermit.formData.files.document2 && (
                   <button
                     type="button"
@@ -546,9 +541,7 @@ const AreleasedpermitsWP: React.FC = () => {
                     {selectedFiles.document2 ? 'Close' : 'View'}
                   </button>
                 )}
-                { (
-                  <input type="file" onChange={(e) => handleFileChange(e, 'document2')} />
-                )}
+
                 <label>Remarks:</label>
                 <input 
                   type="text" 
@@ -560,7 +553,7 @@ const AreleasedpermitsWP: React.FC = () => {
               {renderFile(selectedFiles.document2)}
               {/* Document 3 */}
               <p>
-                Document 3: {selectedPermit.formData.files.document3 || 'Not uploaded'}
+                Document 3: 
                 {selectedPermit.formData.files.document3 && (
                   <button
                     type="button"
@@ -569,9 +562,7 @@ const AreleasedpermitsWP: React.FC = () => {
                     {selectedFiles.document3 ? 'Close' : 'View'}
                   </button>
                 )}
-                { (
-                  <input type="file" onChange={(e) => handleFileChange(e, 'document3')} />
-                )}
+
                 <label>Remarks:</label>
                 <input 
                   type="text" 
@@ -583,7 +574,7 @@ const AreleasedpermitsWP: React.FC = () => {
               {renderFile(selectedFiles.document3)}
               {/* Document 4 */}
               <p>
-                Document 4: {selectedPermit.formData.files.document4 || 'Not uploaded'}
+                Document 4: 
                 {selectedPermit.formData.files.document4 && (
                   <button
                     type="button"
@@ -592,9 +583,7 @@ const AreleasedpermitsWP: React.FC = () => {
                     {selectedFiles.document4 ? 'Close' : 'View'}
                   </button>
                 )}
-                {(
-                  <input type="file" onChange={(e) => handleFileChange(e, 'document4')} />
-                )}
+
                 <label>Remarks:</label>
                 <input 
                   type="text" 

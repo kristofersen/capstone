@@ -348,35 +348,75 @@ const handleDateSearch = () => {
 //File
 const [selectedFiles, setSelectedFiles] = useState<{ [key: string]: string | null }>({});
 
-      const fetchDocumentUrl = (fileName: string | null, folder: 'uploads' | 'permits' | 'receipts'): string | null => {
-        if (!fileName) return null;
-        
-        // Return the file URL based on the folder specified
-        return `http://localhost:3000/${folder}/${fileName}`;
-      };
+
       
-  const renderFile = (fileUrl: string | null) => {
-    if (!fileUrl) return <p>No file selected.</p>;
 
-    if (fileUrl.endsWith('.pdf')) {
-      return (
-        <iframe
-          src={fileUrl}
-          style={{ width: '100%', height: '400px', marginTop: '10px' }}
-          title="PDF Viewer"
-        />
-      );
-    } else {
-      return (
-        <img
-          src={fileUrl}
-          alt="Document"
-          style={{ maxWidth: '100%', height: 'auto', marginTop: '10px' }}
-        />
-      );
-    }
-  };
 
+
+const renderFile = (fileUrl: string | null) => {
+
+
+if (!fileUrl) return null;
+
+if (fileUrl.endsWith('.pdf')) {
+  return (
+    <>
+    <iframe
+    src={`https://docs.google.com/gview?url=${encodeURIComponent(fileUrl)}&embedded=true`}
+    width="100%"
+    height="500px"
+    style={{ border: '1px solid #ccc' }}
+  />
+      <DownloadButton fileUrl={fileUrl || ''} /> 
+  </>
+  );
+} 
+else if (fileUrl.endsWith('.docx')) {
+  return (
+    <>
+    <iframe
+    src={`https://docs.google.com/gview?url=${encodeURIComponent(fileUrl)}&embedded=true`}
+    width="100%"
+    height="500px"
+    style={{ border: '1px solid #ccc' }}
+  />
+  
+  <DownloadButton fileUrl={fileUrl || ''} />
+  </>
+  );
+
+}
+else {
+  return (
+    <img
+      src={fileUrl}
+      alt="Document"
+      style={{ maxWidth: '100%', height: 'auto', marginTop: '10px' }}
+    />
+  );
+}
+};
+
+const DownloadButton = ({ fileUrl }: { fileUrl: string }) => {
+return (
+  <button
+    className="bg-blue-600 hover:bg-blue-800 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition-all text-center block"
+    onClick={(e) => {
+      e.preventDefault(); // Prevent default behavior
+      const link = document.createElement("a");
+      link.href = fileUrl;
+      link.download = fileUrl.split("/").pop() || "download"; // Extract filename
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }}
+  >
+   Download File
+  </button>
+);
+};
+
+  
 //File
 
 
@@ -1421,15 +1461,15 @@ const updatebusinesspermitstatus = async (action: string, remarks: string) => {
 <p>
   {/* Conditional text based on classification */}
   {activePermitId.classification === 'RenewBusiness' ? (
-    <span>BIR: {activePermitId.files.document1 || 'Not uploaded'}</span>
+    <span>BIR: </span>
   ) : (
-    <span>DTI / SEC / CDA: {activePermitId.files.document1 || 'Not uploaded'}</span>
+    <span>DTI / SEC / CDA: </span>
   )}
 
-  {activePermitId.files.document1 && (
+{activePermitId.files.document1 && (
     <button
       onClick={() => {
-        const newFileUrl = fetchDocumentUrl(activePermitId.files.document1, 'uploads');
+        const newFileUrl = activePermitId.files.document1;
         setSelectedFiles((prev) => {
           const isFileSelected = prev.document1 === newFileUrl;
           return {
@@ -1454,26 +1494,28 @@ const updatebusinesspermitstatus = async (action: string, remarks: string) => {
   onChange={(e) => setRemarksdoc1(e.target.value)} 
   disabled={!isEditingAttach} 
 />
-</p>
 
 {renderFile(
   selectedFiles.document1 || (files.document1 && URL.createObjectURL(files.document1))
 )}
+</p>
+
+
 
 {/* Document 2 */}
 <p>
     {/* Conditional text based on classification */}
     {activePermitId.classification === 'RenewBusiness' ? (
-    <span>Past Business Permit Copy: {activePermitId.files.document2 || 'Not uploaded'}</span>
+    <span>Past Business Permit Copy: </span>
   ) : (
-    <span>Occupancy Permit (Optional): {activePermitId.files.document2 || 'Not uploaded'}</span>
+    <span>Occupancy Permit (Optional):</span>
   )}
 
 
   {activePermitId.files.document2 && (
     <button
       onClick={() => {
-        const newFileUrl = fetchDocumentUrl(activePermitId.files.document2, 'uploads');
+        const newFileUrl = activePermitId.files.document2;
         setSelectedFiles((prev) => {
           const isFileSelected = prev.document2 === newFileUrl;
           return {
@@ -1509,16 +1551,16 @@ const updatebusinesspermitstatus = async (action: string, remarks: string) => {
 <p>
     {/* Conditional text based on classification */}
     {activePermitId.classification === 'RenewBusiness' ? (
-    <span>Certification of Gross Sales: {activePermitId.files.document3 || 'Not uploaded'}</span>
+    <span>Certification of Gross Sales: </span>
   ) : (
-    <span>Lease Contract (if rented) / Tax Declaration (If Owned): {activePermitId.files.document3 || 'Not uploaded'}</span>
+    <span>Lease Contract (if rented) / Tax Declaration (If Owned): </span>
   )}
 
 
   {activePermitId.files.document3 && (
     <button
       onClick={() => {
-        const newFileUrl = fetchDocumentUrl(activePermitId.files.document3, 'uploads');
+        const newFileUrl = activePermitId.files.document3;
         setSelectedFiles((prev) => {
           const isFileSelected = prev.document3 === newFileUrl;
           return {
@@ -1554,15 +1596,15 @@ const updatebusinesspermitstatus = async (action: string, remarks: string) => {
 <p>
       {/* Conditional text based on classification */}
       {activePermitId.classification === 'RenewBusiness' ? (
-    <span>Zoning: {activePermitId.files.document4 || 'Not uploaded'}</span>
+    <span>Zoning: </span>
   ) : (
-    <span>Authorization Letter / S.P.A. / Board Resolution / Secretary's Certificate (if thru representative): {activePermitId.files.document4 || 'Not uploaded'}</span>
+    <span>Authorization Letter / S.P.A. / Board Resolution / Secretary's Certificate (if thru representative): </span>
   )}
 
   {activePermitId.files.document4 && (
     <button
       onClick={() => {
-        const newFileUrl = fetchDocumentUrl(activePermitId.files.document4, 'uploads');
+        const newFileUrl = activePermitId.files.document4;
         setSelectedFiles((prev) => {
           const isFileSelected = prev.document4 === newFileUrl;
           return {
@@ -1597,16 +1639,16 @@ const updatebusinesspermitstatus = async (action: string, remarks: string) => {
 <p>
         {/* Conditional text based on classification */}
         {activePermitId.classification === 'RenewBusiness' ? (
-    <span>Office of the Building Official: {activePermitId.files.document5 || 'Not uploaded'}</span>
+    <span>Office of the Building Official: </span>
   ) : (
-    <span>Owner's ID: {activePermitId.files.document5 || 'Not uploaded'}</span>
+    <span>Owner's ID: </span>
   )}
 
 
   {activePermitId.files.document5 && (
     <button
       onClick={() => {
-        const newFileUrl = fetchDocumentUrl(activePermitId.files.document5, 'uploads');
+        const newFileUrl = activePermitId.files.document5;
         setSelectedFiles((prev) => {
           const isFileSelected = prev.document5 === newFileUrl;
           return {
@@ -1641,16 +1683,16 @@ const updatebusinesspermitstatus = async (action: string, remarks: string) => {
 <p>
           {/* Conditional text based on classification */}
           {activePermitId.classification === 'RenewBusiness' ? (
-    <span>Ctiy Health Office: {activePermitId.files.document6 || 'Not uploaded'}</span>
+    <span>Ctiy Health Office: </span>
   ) : (
-    <span>Picture of Establishment (Perspective View): {activePermitId.files.document6 || 'Not uploaded'}</span>
+    <span>Picture of Establishment (Perspective View): </span>
   )}
 
 
   {activePermitId.files.document6 && (
     <button
       onClick={() => {
-        const newFileUrl = fetchDocumentUrl(activePermitId.files.document6, 'uploads');
+        const newFileUrl = activePermitId.files.document6;
         setSelectedFiles((prev) => {
           const isFileSelected = prev.document6 === newFileUrl;
           return {
@@ -1685,15 +1727,15 @@ const updatebusinesspermitstatus = async (action: string, remarks: string) => {
 <p>
             {/* Conditional text based on classification */}
             {activePermitId.classification === 'RenewBusiness' ? (
-    <span>Bureau of Fire Protection: {activePermitId.files.document7 || 'Not uploaded'}</span>
+    <span>Bureau of Fire Protection: </span>
   ) : (
-    <span>Zoning: {activePermitId.files.document7 || 'Not uploaded'}</span>
+    <span>Zoning: </span>
   )}
 
   {activePermitId.files.document7 && (
     <button
       onClick={() => {
-        const newFileUrl = fetchDocumentUrl(activePermitId.files.document7, 'uploads');
+        const newFileUrl = activePermitId.files.document7;
         setSelectedFiles((prev) => {
           const isFileSelected = prev.document7 === newFileUrl;
           return {
@@ -1728,12 +1770,12 @@ const updatebusinesspermitstatus = async (action: string, remarks: string) => {
 {/* Conditionally render Document 8 and file rendering based on classification */}
 {activePermitId.classification !== 'RenewBusiness' && (
   <p>
-    Office of the Building Official: {activePermitId.files.document8 || 'Not uploaded'}
+    Office of the Building Official: 
 
     {activePermitId.files.document8 && (
       <button
         onClick={() => {
-          const newFileUrl = fetchDocumentUrl(activePermitId.files.document8, 'uploads');
+          const newFileUrl = activePermitId.files.document8;
           setSelectedFiles((prev) => {
             const isFileSelected = prev.document8 === newFileUrl;
             return {
@@ -1770,12 +1812,12 @@ const updatebusinesspermitstatus = async (action: string, remarks: string) => {
 {/* Conditionally render Document 9 and file rendering based on classification */}
 {activePermitId.classification !== 'RenewBusiness' && (
   <p>
-    City Health Office: {activePermitId.files.document9 || 'Not uploaded'}
+    City Health Office: 
 
     {activePermitId.files.document9 && (
       <button
         onClick={() => {
-          const newFileUrl = fetchDocumentUrl(activePermitId.files.document9, 'uploads');
+          const newFileUrl = activePermitId.files.document9;
           setSelectedFiles((prev) => {
             const isFileSelected = prev.document9 === newFileUrl;
             return {
@@ -1811,12 +1853,12 @@ const updatebusinesspermitstatus = async (action: string, remarks: string) => {
 {/* Conditionally render Document 10 and file rendering based on classification */}
 {activePermitId.classification !== 'RenewBusiness' && (
   <p>
-   Bureau of Fire Protection: {activePermitId.files.document10 || 'Not uploaded'}
+   Bureau of Fire Protection: 
 
     {activePermitId.files.document10 && (
       <button
         onClick={() => {
-          const newFileUrl = fetchDocumentUrl(activePermitId.files.document10, 'uploads');
+          const newFileUrl = activePermitId.files.document10;
           setSelectedFiles((prev) => {
             const isFileSelected = prev.document10 === newFileUrl;
             return {

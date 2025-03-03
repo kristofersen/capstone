@@ -1,6 +1,6 @@
 const generateUserId = require('../utils/generateUserId'); 
 const generateWorkPermitID = require('../utils/generateWorkPermitID'); 
-const generateWorkPermitPDF = require('../utils/generateWorkPermitPDF'); 
+const {generateWorkPermitPDF} = require('../utils/generateWorkPermitPDF'); 
 const generateBusinessPermitID = require('../utils/generateBusinessPermitID'); 
 const { computeTax } = require('../utils/computeTax');
 const { generateBusinessPermitPDF } = require('../utils/generateBusinessPermitPDF');

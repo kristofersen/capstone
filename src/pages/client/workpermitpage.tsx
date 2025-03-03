@@ -4,6 +4,7 @@ import '../Styles/ClientStyles.css';
 import ClientNavbar from '../components/NavigationBars/clientnavbar';
 import axios from 'axios';
 import { WorkPermits} from "../components/Interface(Front-end)/Types";
+import Swal from 'sweetalert2';
 
 const WorkPermit: React.FC = () => {
   const navigate = useNavigate();
@@ -170,62 +171,90 @@ if (WorkPermitData.length > 0) {
         }
       }, [workPermits]);
       
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    const formData = new FormData();
-    formData.append('lastName', lastName);
-    formData.append('firstName', firstName);
-    formData.append('middleInitial', middleInitial);
-    formData.append('permanentAddress', permanentAddress);
-    formData.append('currentlyResiding', String(currentlyResiding));
-    formData.append('temporaryAddress', temporaryAddress);
-    formData.append('dateOfBirth', dateOfBirth);
-    formData.append('age', String(age));
-    formData.append('placeOfBirth', placeOfBirth);
-    formData.append('citizenship', citizenship);
-    formData.append('civilStatus', civilStatus);
-    formData.append('gender', gender);
-    formData.append('height', height);
-    formData.append('weight', weight);
-    formData.append('mobileTel', mobileTel);
-    formData.append('email', email);
-    formData.append('educationalAttainment', educationalAttainment);
-    formData.append('natureOfWork', natureOfWork);
-    formData.append('placeOfWork', placeOfWork);
-    formData.append('companyName', companyName);
-    formData.append('name2', name2);
-    formData.append('mobileTel2', mobileTel2);
-    formData.append('address', address);
-    formData.append('workpermitclassification', workpermitclassification);
-
-    if (files.document1) formData.append('document1', files.document1);
-    if (files.document2) formData.append('document2', files.document2);
-    if (files.document3) formData.append('document3', files.document3);
-    if (files.document4) formData.append('document4', files.document4);
-
-    logFormData(formData);
-
-  
-    try {
-      const response = await axios.post('http://localhost:3000/client/workpermitapplication', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-        withCredentials: true, 
-      });
-        console.log(response.data);
-        if (response.status === 200) {
-          alert('Work Permit Application submitted successfully!');
-          navigate('/dashboard');
-        } else {
-          const errorMessage = (response.data as { message: string }).message;
-          console.error('Error submitting application:', errorMessage);
+      const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+      
+        const formData = new FormData();
+        formData.append('lastName', lastName);
+        formData.append('firstName', firstName);
+        formData.append('middleInitial', middleInitial);
+        formData.append('permanentAddress', permanentAddress);
+        formData.append('currentlyResiding', String(currentlyResiding));
+        formData.append('temporaryAddress', temporaryAddress);
+        formData.append('dateOfBirth', dateOfBirth);
+        formData.append('age', String(age));
+        formData.append('placeOfBirth', placeOfBirth);
+        formData.append('citizenship', citizenship);
+        formData.append('civilStatus', civilStatus);
+        formData.append('gender', gender);
+        formData.append('height', height);
+        formData.append('weight', weight);
+        formData.append('mobileTel', mobileTel);
+        formData.append('email', email);
+        formData.append('educationalAttainment', educationalAttainment);
+        formData.append('natureOfWork', natureOfWork);
+        formData.append('placeOfWork', placeOfWork);
+        formData.append('companyName', companyName);
+        formData.append('name2', name2);
+        formData.append('mobileTel2', mobileTel2);
+        formData.append('address', address);
+        formData.append('workpermitclassification', workpermitclassification);
+      
+        if (files.document1) formData.append('document1', files.document1);
+        if (files.document2) formData.append('document2', files.document2);
+        if (files.document3) formData.append('document3', files.document3);
+        if (files.document4) formData.append('document4', files.document4);
+      
+        logFormData(formData);
+      
+        // Show loading SweetAlert
+        Swal.fire({
+          title: 'Submitting Application...',
+          text: 'Please wait while we process your request.',
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          },
+        });
+      
+        try {
+          const response = await axios.post('http://localhost:3000/client/workpermitapplication', formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+            withCredentials: true,
+          });
+      
+          console.log(response.data);
+      
+          if (response.status === 200) {
+            // Show success message
+            Swal.fire({
+              icon: 'success',
+              title: 'Application Submitted!',
+              text: 'Your work permit application has been submitted successfully!',
+              timer: 2000,
+              showConfirmButton: false,
+            }).then(() => {
+              navigate('/dashboard');
+            });
+          } else {
+            const errorMessage = (response.data as { message: string }).message;
+            Swal.fire({
+              icon: 'error',
+              title: 'Submission Failed',
+              text: errorMessage || 'Something went wrong. Please try again.',
+            });
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Something went wrong. Please try again later.',
+          });
         }
-      } catch (error) {
-        console.error('Error:', error);
-      }
-  };
+      };
 
   useEffect(() => {
     const checkAuth = async () => {

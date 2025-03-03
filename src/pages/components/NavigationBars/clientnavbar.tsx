@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import '../../Styles/clientnavbar.css';
+import Swal from 'sweetalert2';
 
 
 
@@ -15,6 +16,30 @@ const ClientNavbar: React.FC = () => {
 
 
   const handleLogout = async () => {
+    // Show confirmation dialog before logging out
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: 'You will be logged out of your account.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, logout',
+      cancelButtonText: 'Cancel',
+    });
+  
+    if (!result.isConfirmed) return; // Stop execution if user cancels
+  
+    // Show loading state
+    Swal.fire({
+      title: 'Logging out...',
+      text: 'Please wait while we process your request.',
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
+  
     try {
       const response = await fetch('http://localhost:3000/auth/logout', {
         method: 'POST',
@@ -26,20 +51,41 @@ const ClientNavbar: React.FC = () => {
         localStorage.removeItem('profile');
         localStorage.removeItem('userId');
   
-        // Redirect to the login page
-        navigate('/');
+        // Show success message
+        Swal.fire({
+          icon: 'success',
+          title: 'Logged Out',
+          text: 'You have been successfully logged out.',
+          timer: 2000,
+          showConfirmButton: false,
+        }).then(() => {
+          // Redirect to the login page
+          navigate('/');
+        });
+  
       } else {
         // Handle any errors from the server
         const errorData = await response.json();
-        console.error('Logout error:', errorData.message);
+        Swal.fire({
+          icon: 'error',
+          title: 'Logout Failed',
+          text: errorData.message || 'Something went wrong. Please try again.',
+        });
       }
     } catch (error) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Something went wrong. Please try again.',
+      });
       console.error('Error logging out:', error);
     }
   };
+  
 
 
-  const checkForPending = async () => {
+
+   const checkForPending = async () => {
     try {
       const response = await fetch('http://localhost:3000/client/checkpermitlatest', {
         method: 'GET',
@@ -48,36 +94,58 @@ const ClientNavbar: React.FC = () => {
   
       if (!response.ok) {
         console.error('Error fetching permit status');
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Unable to fetch permit status. Please try again later.',
+        });
         return;
       }
   
       const data = await response.json();
   
+      // Handle different statuses with SweetAlert2
       if (data.status === 'Pending') {
-        alert('Your permit application is pending approval. Please wait for further updates.');
-        return; //Stop execution here
-      } 
+        Swal.fire({
+          icon: 'info',
+          title: 'Pending Approval',
+          text: 'Your permit application is pending approval. Please wait for further updates.',
+        });
+        return;
+      }
   
       if (data.status === 'Waiting for Payment') {
-        alert('Your permit is awaiting payment. Please complete the payment.');
-        return; //Stop execution here
-      } 
+        Swal.fire({
+          icon: 'warning',
+          title: 'Payment Required',
+          text: 'Your permit is awaiting payment. Please complete the payment.',
+        });
+        return;
+      }
   
       if (data.status === 'Released') {
-        alert('You have an ongoing permit. Please wait for expiry.');
-        return; //Stop execution here
-      }
-      if (data.status === 'Expired' || data.status === 'No Permit') {
-        navigate('/workpermitpage');
-        return; //Stop execution here
+        Swal.fire({
+          icon: 'warning',
+          title: 'Ongoing Permit',
+          text: 'You have an ongoing permit. Please wait for expiry.',
+        });
+        return;
       }
   
-      //Only proceed if none of the above conditions were met
+
+      // Default case if none of the above conditions match
       navigate('/workpermitpage');
+  
     } catch (error) {
       console.error('Error checking permit status:', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Something went wrong. Please try again later.',
+      });
     }
   };
+  
   
 
   return (

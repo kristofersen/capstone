@@ -8,6 +8,9 @@ import WorkPermitTable from "../components/Tables/WorkPermitTable-Client";
 import BusinessPermitTable from "../components/Tables/BusinessPermitTable-Client";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import Swal from 'sweetalert2';
+
+
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -24,46 +27,67 @@ const Dashboard: React.FC = () => {
  
 
 //Content Codes
+   const checkForPending = async () => {
+    try {
+      const response = await fetch('http://localhost:3000/client/checkpermitlatest', {
+        method: 'GET',
+        credentials: 'include', // Include cookies in the request
+      });
+  
+      if (!response.ok) {
+        console.error('Error fetching permit status');
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Unable to fetch permit status. Please try again later.',
+        });
+        return;
+      }
+  
+      const data = await response.json();
+  
+      // Handle different statuses with SweetAlert2
+      if (data.status === 'Pending') {
+        Swal.fire({
+          icon: 'info',
+          title: 'Pending Approval',
+          text: 'Your permit application is pending approval. Please wait for further updates.',
+        });
+        return;
+      }
+  
+      if (data.status === 'Waiting for Payment') {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Payment Required',
+          text: 'Your permit is awaiting payment. Please complete the payment.',
+        });
+        return;
+      }
+  
+      if (data.status === 'Released') {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Ongoing Permit',
+          text: 'You have an ongoing permit. Please wait for expiry.',
+        });
+        return;
+      }
+  
 
-const checkForPending = async () => {
-  try {
-    const response = await fetch('http://localhost:3000/client/checkpermitlatest', {
-      method: 'GET',
-      credentials: 'include', // Include cookies in the request
-    });
-
-    if (!response.ok) {
-      console.error('Error fetching permit status');
-      return;
-    }
-
-    const data = await response.json();
-
-    if (data.status === 'Pending') {
-      alert('Your permit application is pending approval. Please wait for further updates.');
-      return; //Stop execution here
-    } 
-
-    if (data.status === 'Waiting for Payment') {
-      alert('Your permit is awaiting payment. Please complete the payment.');
-      return; //Stop execution here
-    } 
-
-    if (data.status === 'Released') {
-      alert('You have an ongoing permit. Please wait for expiry.');
-      return; //Stop execution here
-    }
-    if (data.status === 'Expired' || data.status === 'No Permit') {
+      // Default case if none of the above conditions match
       navigate('/workpermitpage');
-      return; //Stop execution here
+  
+    } catch (error) {
+      console.error('Error checking permit status:', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Something went wrong. Please try again later.',
+      });
     }
+  };
 
-    //Only proceed if none of the above conditions were met
-    navigate('/workpermitpage');
-  } catch (error) {
-    console.error('Error checking permit status:', error);
-  }
-};
 
 const fetchProfile = async () => {
   try {
@@ -210,10 +234,10 @@ useEffect(() => {
       <div id="carouselExampleFade" className="carousel slide carousel-fade" style={{ width: '60%', margin: 'auto' }} >
         <div className="carousel-inner">
           <div className="carousel-item active">
-            <img src="/public/step1.svg"  className="d-block w-100" alt="..."></img>
+            <img src="https://res.cloudinary.com/dqbobmeyb/image/upload/v1741007084/step1_lipali.png"  className="d-block w-100" alt="..."></img>
           </div>
           <div className="carousel-item">
-            <img src="/public/step2.svg"  className="d-block w-100" alt="..."></img>
+            <img src="https://res.cloudinary.com/dqbobmeyb/image/upload/v1741007084/step2_cms6zl.png"  className="d-block w-100" alt="..."></img>
           </div>
           <div className="carousel-item">
             <img src="/public/step3.svg"  className="d-block w-100" alt="..."></img>

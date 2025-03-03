@@ -3,63 +3,100 @@ import { useNavigate } from 'react-router-dom';
 import './Styles/login.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import Swal from 'sweetalert2';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+    
     if (!email || !password) {
-      setError('All fields are required.');
+      Swal.fire({
+        icon: 'warning',
+        title: 'Missing Fields',
+        text: 'All fields are required.',
+      });
       return;
     }
 
+      // Show loading alert
+  Swal.fire({
+    title: 'Logging in...',
+    text: 'Please wait while we authenticate your credentials.',
+    allowOutsideClick: false,
+    didOpen: () => {
+      Swal.showLoading();
+    },
+  });
+  
     try {
       const response = await fetch('http://localhost:3000/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, password, }),
+        body: JSON.stringify({ email, password }),
         credentials: 'include', // Include credentials to send cookies
       });
+  
       const data = await response.json();
+  
       if (response.ok) {
         // Store the JWT token
         localStorage.setItem('token', data.token);
-        setSuccess(data.message);
-        setError(null);
-        
-        // Check the user's role and navigate accordingly
-        switch (data.role) {
-          case 'Admin':
-            navigate('/Adashboard'); // Redirect to admin dashboard
-            break;
-          case 'Client':
-            navigate('/dashboard'); // Redirect to client dashboard
-            break;
-          case 'Data Controller':
-            navigate('/DAdashboard'); // Redirect to data controller dashboard
-            break;
-          default:
-            navigate('/'); // Fallback dashboard
-        }
-      } 
-      
-      if (data.error === 'Email is not verified') {
-        navigate('/emailverification', { state: { email } }); // Redirect to email verification page if email not verified
+  
+        // Show success message
+        Swal.fire({
+          icon: 'success',
+          title: 'Login Successful!',
+          text: data.message,
+          timer: 2000,
+          showConfirmButton: false,
+        }).then(() => {
+          // Navigate after success
+          switch (data.role) {
+            case 'Admin':
+              navigate('/Adashboard');
+              break;
+            case 'Client':
+              navigate('/dashboard');
+              break;
+            case 'Data Controller':
+              navigate('/DAdashboard');
+              break;
+            default:
+              navigate('/');
+          }
+        });
+  
+      } else if (data.error === 'Email is not verified') {
+        // Redirect to email verification with SweetAlert prompt
+        Swal.fire({
+          icon: 'info',
+          title: 'Email Not Verified',
+          text: 'Please verify your email before logging in.',
+          confirmButtonText: 'Verify Now'
+        }).then(() => {
+          navigate('/emailverification', { state: { email } });
+        });
+  
       } else {
-        setError(data.error);
-        setTimeout(() => {
-          setError(null);
-        }, 5000);
+        Swal.fire({
+          icon: 'error',
+          title: 'Login Failed',
+          text: data.error,
+        });
       }
+      
     } catch (error) {
-      setError('Error logging in');
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Something went wrong. Please try again.',
+      });
       console.error('Error logging in', error);
     }
   };
@@ -73,8 +110,6 @@ const Login: React.FC = () => {
     <div className="bodylogin">
       <div className="login-container">
       <h2 className="text-center mb-4">Log In</h2>
-      {error && <p className="text-danger text-center">{error}</p>}
-      {success && <p className="text-success text-center">{success}</p>}
       <form onSubmit={handleSubmit}>
         {/* Email Input */}
         <div className="mb-3">

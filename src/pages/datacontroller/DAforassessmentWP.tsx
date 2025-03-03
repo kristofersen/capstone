@@ -283,13 +283,7 @@ const DataControllerForAssessmentWP: React.FC = () => {
     }
   };
 
-  const handleViewDocument = (documentKey: 'document1' | 'document2' | 'document3' | 'document4') => {
-    const documentUrl = fetchDocumentUrl(selectedPermit?.formData.files[documentKey] ?? null, 'uploads');
-    setSelectedFiles((prev) => ({
-      ...prev,
-      [documentKey]: prev[documentKey] === documentUrl ? null : documentUrl, // Toggle visibility based on the URL
-    }));
-  };
+
 
   const closeModal = () => {
     setIsModalOpen(false);
@@ -361,32 +355,48 @@ const DataControllerForAssessmentWP: React.FC = () => {
 
   const [selectedFiles, setSelectedFiles] = useState<{ [key: string]: string | null }>({});
 
-const fetchDocumentUrl = (fileName: string | null, folder: 'uploads' | 'permits' | 'receipts'): string | null => {
-  if (!fileName) return null;
-  return `http://localhost:3000/${folder}/${fileName}`;
-};
+  const handleViewDocument = (documentKey: 'document1' | 'document2' | 'document3' | 'document4') => {
+    const documentUrl = selectedPermit?.formData.files[documentKey] ?? null; // Ensure it's never undefined
+    
+    setSelectedFiles((prev) => ({
+      ...prev,
+      [documentKey]: prev[documentKey] === documentUrl ? null : documentUrl, // Toggle visibility
+    }));
+  };
+
 
 const renderFile = (fileUrl: string | null) => {
-  if (!fileUrl) return <p>No file selected.</p>;
+
+  
+  if (!fileUrl) return null;
 
   if (fileUrl.endsWith('.pdf')) {
     return (
+      <>
       <iframe
-        src={fileUrl}
-        style={{ width: '100%', height: '400px', marginTop: '10px' }}
-        title="PDF Viewer"
-      />
+      src={`https://docs.google.com/gview?url=${encodeURIComponent(fileUrl)}&embedded=true`}
+      width="100%"
+      height="500px"
+      style={{ border: '1px solid #ccc' }}
+    />
+        <DownloadButton fileUrl={fileUrl || ''} /> 
+    </>
     );
   } 
   else if (fileUrl.endsWith('.docx')) {
     return (
-      <div style={{ marginTop: '10px' }}>
-        <p>Word file detected. Download File</p>
-        <a href={fileUrl} download>
-          <button>Download</button>
-        </a>
-      </div>
+      <>
+      <iframe
+      src={`https://docs.google.com/gview?url=${encodeURIComponent(fileUrl)}&embedded=true`}
+      width="100%"
+      height="500px"
+      style={{ border: '1px solid #ccc' }}
+    />
+    
+    <DownloadButton fileUrl={fileUrl || ''} />
+    </>
     );
+
   }
   else {
     return (
@@ -397,6 +407,25 @@ const renderFile = (fileUrl: string | null) => {
       />
     );
   }
+};
+
+const DownloadButton = ({ fileUrl }: { fileUrl: string }) => {
+  return (
+    <button
+      className="bg-blue-600 hover:bg-blue-800 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition-all text-center block"
+      onClick={(e) => {
+        e.preventDefault(); // Prevent default behavior
+        const link = document.createElement("a");
+        link.href = fileUrl;
+        link.download = fileUrl.split("/").pop() || "download"; // Extract filename
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }}
+    >
+     Download File
+    </button>
+  );
 };
 
 const [remarksdoc1, setRemarksdoc1] = useState('');
@@ -1048,24 +1077,15 @@ if (type === 'new') {
         <p>Permit ID: {selectedPermit?._id}</p>
         {/* Document 1 */}
         <p>
-          Document 1: {selectedPermit.formData.files.document1 || 'Not uploaded'}
+          1x1 Picture: 
           {selectedPermit.formData.files.document1 && (
-               <button
-               type="button"
-               onClick={() => {
-                 const newFileUrl = fetchDocumentUrl(selectedPermit.formData.files.document1, 'uploads');
-                 setSelectedFiles((prev) => {
-                   const isFileSelected = prev.document1 === newFileUrl;
-                   return {
-                     ...prev,
-                     document1: isFileSelected ? null : newFileUrl, // Toggle visibility based on the URL
-                   };
-                 });
-               }}
-             >
-               {selectedFiles.document1 ? 'Back' : 'View'}
-             </button>
-          )}
+                  <button
+                    type="button"
+                    onClick={() => handleViewDocument('document1')}
+                  >
+                    {selectedFiles.document1 ? 'Back' : 'View'}
+                  </button>
+                )}
           {isEditingAttach && (
             <input type="file" onChange={(e) => handleFileChange(e, 'document1')} />
           )}
@@ -1082,7 +1102,7 @@ if (type === 'new') {
         {renderFile(selectedFiles.document1)}
         {/* Document 2 */}
         <p>
-          Document 2: {selectedPermit.formData.files.document2 || 'Not uploaded'}
+          Cedula: 
           {selectedPermit.formData.files.document2 && (
             <button
               type="button"
@@ -1105,7 +1125,7 @@ if (type === 'new') {
         {renderFile(selectedFiles.document2)}
         {/* Document 3 */}
         <p>
-          Document 3: {selectedPermit.formData.files.document3 || 'Not uploaded'}
+          Referral Letter: 
           {selectedPermit.formData.files.document3 && (
             <button
               type="button"
@@ -1128,7 +1148,7 @@ if (type === 'new') {
         {renderFile(selectedFiles.document3)}
         {/* Document 4 */}
         <p>
-          Document 4: {selectedPermit.formData.files.document4 || 'Not uploaded'}
+        FTJS Certificate: 
           {selectedPermit.formData.files.document4 && (
             <button
               type="button"

@@ -34,14 +34,14 @@ const WorkPermitTable: React.FC<WorkPermitTableProps> = ({ workPermits}) => {
       case "viewReceipt":
         if (permit.receipt?.receiptFile) {
 
-          renderDocument(permit.receipt.receiptFile, "receipts");
+          renderDocument(permit.receipt.receiptFile);
         } else {
           console.log(`No receipt file found for permit: ${permit.id}`);
         }
         break;
       case "viewPermit":
 
-        renderDocument(permit.permitFile || "", "permits");
+        renderDocument(permit.permitFile);
         break;
       case "expirePermit":
         expireWorkPermit(permit._id);
@@ -51,38 +51,42 @@ const WorkPermitTable: React.FC<WorkPermitTableProps> = ({ workPermits}) => {
     }
   };
 
-//Pageination Code
-const [currentPage, setCurrentPage] = useState(0);
+// Pagination Code
+const [currentPage, setCurrentPage] = useState(1); // Start from 1
 const itemsPerPage = 5;
-const totalPages = Math.ceil(workPermits.length / itemsPerPage)
-const startIndex = currentPage * itemsPerPage;
+const totalPages = Math.ceil(workPermits.length / itemsPerPage);
+const startIndex = (currentPage - 1) * itemsPerPage; // Adjust for 1-based index
 const endIndex = startIndex + itemsPerPage;
+
 const sortedWorkPermits = workPermits
-  .slice() // Make a copy of the array to avoid modifying the original
+  .slice()
   .sort((a, b) => {
     const dateA = new Date(a.createdAt);
     const dateB = new Date(b.createdAt);
-
-    // Check if both dates are valid
+    
     if (isNaN(dateA.getTime()) || isNaN(dateB.getTime())) {
-      return 0; // If either date is invalid, keep their order (or handle as needed)
+      return 0;
     }
 
-    return dateB.getTime() - dateA.getTime(); // Sort in descending order
+    return dateB.getTime() - dateA.getTime();
   });
 
-// Now slice the sorted array to get the current items
 const currentItems = sortedWorkPermits.slice(startIndex, endIndex);
+
 const handleNextPage = () => {
-  if (currentPage < totalPages - 1) {
-    setCurrentPage(currentPage + 1);
+  if (currentPage < totalPages) {
+    setCurrentPage((prev) => prev + 1);
   }
 };
+
 const handlePreviousPage = () => {
-  if (currentPage > 0) {
-    setCurrentPage(currentPage - 1);
+  if (currentPage > 1) {
+    setCurrentPage((prev) => prev - 1);
   }
 };
+
+
+
 
   //Modal
   const [modalFile, setModalFile] = useState<string | null>(null);
@@ -193,15 +197,10 @@ else{
       }
     };
 
-  const fetchDocumentUrl = (fileName: string | null, folder: 'uploads' | 'permits' | 'receipts'): string | null => {
-    if (!fileName) return null;
-    
-    // Return the file URL based on the folder specified
-    return `http://localhost:3000/${folder}/${fileName}`;
-  };
+
   
-  const renderDocument = (fileName: string | null, folder: 'uploads' | 'permits' | 'receipts') => {
-    const fileUrl = fetchDocumentUrl(fileName, folder);
+  const renderDocument = (fileName: string | null) => {
+    const fileUrl = fileName;
   
     if (!fileUrl) return <span>Not uploaded</span>;
   
@@ -360,10 +359,25 @@ const openModal = (filePath: string) => {
       </table>
       
 
-      <div className="pagination-buttons">
-        {currentPage > 0 && <button onClick={handlePreviousPage}>Back</button>}
-        {currentPage < totalPages - 1 && <button onClick={handleNextPage}>Next</button>}
-      </div>
+      <div className="pagination">
+            <button
+              onClick={handlePreviousPage}
+              disabled={currentPage === 1}
+              className="btn btn-danger"
+            >
+              Previous
+            </button>
+            <span style={{ margin: "0 10px",  marginTop: "8px" }}>
+              Page {currentPage} of {totalPages}
+            </span>
+            <button
+              onClick={handleNextPage}
+              disabled={currentPage === totalPages}
+              className="btn btn-success"
+            >
+              Next
+            </button>
+          </div>
 </>)}
       {/* Modal Dumps */}
 {showPaymentMethod && (

@@ -49,15 +49,15 @@ const AdminForAssessment: React.FC = () => {
                 </header>
 
                 <div className="button-container"> {/* Centering container */}
-                    <a href="/AforassessmentWP" className="DAworkpermitbutton">
+                    <a href="/AforassessmentWP/new" className="DAworkpermitbutton">
                         For Assessment New Working Permit
                     </a>
 
-                    <a href="/AforassessmentWP" className="DAworkpermitbutton">
+                    <a href="/AforassessmentWP/renew" className="DAworkpermitbutton">
                         For Assessment Renew Working Permit
                     </a>
 
-                    <a href="/AforassessmentWP" className="DAworkpermitbutton">
+                    <a href="/AforassessmentWP/" className="DAworkpermitbutton">
                         View All For Assessment Working Permit
                     </a>
           

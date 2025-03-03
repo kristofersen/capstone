@@ -114,7 +114,7 @@ const BusinessPermitTable: React.FC<BusinessPermitTableProps> = ({ businessPermi
       return; // Exit if there is no active permit or file URL
     }
   
-    const fileUrl = fetchDocumentUrl(activePermitId.statementofaccount.statementofaccountfile, 'receipts');
+    const fileUrl = activePermitId.statementofaccount.statementofaccountfile;
     
     // Open a new window
     const newWindow = window.open('', '', 'height=500,width=800');
@@ -191,12 +191,7 @@ const [files, setFiles] = useState<{
     document3: null,
   });
 
-  const fetchDocumentUrl = (fileName: string | null, folder: 'uploads' | 'permits' | 'receipts'): string | null => {
-        if (!fileName) return null;
-        
-        // Return the file URL based on the folder specified
-        return `http://localhost:3000/${folder}/${fileName}`;
-  };
+ 
 
   const renderFile = (fileUrl: string | null) => {
     if (!fileUrl) return <p>No file selected.</p>;
@@ -205,38 +200,31 @@ const [files, setFiles] = useState<{
       return (
         <iframe
           src={fileUrl}
-          style={{ width: '100%', height: '400px', marginTop: '10px' }}
-          title="PDF Viewer"
+          width="100%"
+          height="500px"
+          style={{ border: '1px solid #ccc' }}
         />
       );
     } else {
       return (
         <img
           src={fileUrl}
-          alt="Document"
-          style={{ maxWidth: '100%', height: 'auto', marginTop: '10px' }}
+          width="100%"
+          height="500px"
+          style={{ border: '1px solid #ccc' }}
         />
       );
     }
   };
 
-  const renderDocument = (fileName: string | null, folder: 'uploads' | 'permits' | 'receipts') => {
-    const fileUrl = fetchDocumentUrl(fileName, folder);
+  const renderDocument = (fileName: string | null) => {
+    const fileUrl = fileName;
   
     if (!fileUrl) return <span>Not uploaded</span>;
-  
-    const fileExtension = fileUrl.split('.').pop()?.toLowerCase();
-  
     // Automatically open the modal if a valid file is found
-   
+
         openModal(fileUrl); // Open the modal automatically
-  
-  
-    return (
-      <span>
-        {fileExtension === 'pdf' ? 'View PDF' : 'View Document'}
-      </span>
-    );
+
   };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>, doc: 'document1' | 'document2' | 'document3' ) => {
@@ -300,6 +288,8 @@ const [files, setFiles] = useState<{
      if (currentPage > 1) setCurrentPage((prev) => prev - 1);
    };
  
+   const [viewingType, setViewingType] = useState('');
+
   //Action Button Content
   const handleActionBP = (action: string,  permitId: BusinessPermit) => {
     console.log(permitId._id);
@@ -310,17 +300,24 @@ const [files, setFiles] = useState<{
         navigate(`/viewapplicationdetailsbusiness/${permitId._id}`);
         break;
         case 'viewAssessment':
-          renderDocument(permitId.statementofaccount.statementofaccountfile, 'receipts'); // Automatically open modal
+          renderDocument(permitId.statementofaccount.statementofaccountfile); // Automatically open modal
+          setViewingType('receipts');
+          setActivePermitId(permitId);
           break;
       case 'viewReceipt':
-        renderDocument(permitId.receipt.receiptFile, 'receipts'); // Automatically open modal
+        renderDocument(permitId.receipt.receiptFile); // Automatically open modal
+        setActivePermitId(permitId);
+        setViewingType('receipts');
         break;
       case 'viewPermit':
-        renderDocument(permitId.permitFile, 'permits'); // Automatically open modal
+        renderDocument(permitId.permitFile); // Automatically open modal
+        setActivePermitId(permitId);
+        setViewingType('permits');
         break;
       case 'payment':
         setViewPayment(true);
         setActivePermitId(permitId);
+        setViewingType('receipts')
         break;
       case 'renewbusiness':
         navigate(`/businesspermitrenew/${permitId._id}`);
@@ -606,7 +603,7 @@ const [files, setFiles] = useState<{
         </div>
         <div className="mb-3">
           {/* Render the PDF or image file */}
-          {renderFile(fetchDocumentUrl(activePermitId.statementofaccount?.statementofaccountfile, "receipts"))}
+          {renderFile(activePermitId.statementofaccount?.statementofaccountfile)}
         </div>
       </div>
 
@@ -699,7 +696,7 @@ const [files, setFiles] = useState<{
   </div>
 )}
 
-{isModalOpenFile && (
+{isModalOpenFile && activePermitId && (
   <div
     className="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
     style={{ backgroundColor: "rgba(0, 0, 0, 0.45)", zIndex: 1050 }}
@@ -717,6 +714,12 @@ const [files, setFiles] = useState<{
       onClick={(e) => e.stopPropagation()}
     >
       <div className="mb-4">
+      {viewingType === 'receipts' && (
+            <label>Viewing Receipt for {activePermitId.id}</label>
+          )}
+          {viewingType === 'permits' && (
+            <label>Viewing Business Permit for {activePermitId.id}</label>
+          )}
         {modalFile ? (
           modalFile.endsWith(".pdf") ? (
             <iframe

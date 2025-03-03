@@ -1,25 +1,29 @@
-const fs = require('fs');
-const path = require('path');
 const multer = require('multer');
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const cloudinary = require('cloudinary').v2;
 
-// Ensure the upload directory exists
-const uploadDir = path.join(__dirname, '../documents/receipts');
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, uploadDir); // Use absolute path
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + '-' + file.originalname);
+
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
+
+// Set up Cloudinary storage
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'receipt_documents', // Change folder name as needed
+    resource_type: 'auto',
+    public_id: (req, file) => Date.now() + '-' + file.originalname
   }
 });
 
-const receipt = multer({ storage });
+const upload = multer({ storage });
 
-const uploadworkpermitreceipt = receipt.fields([
+const uploadworkpermitreceipt = upload.fields([
   { name: 'document1', maxCount: 1 }
 ]);
 

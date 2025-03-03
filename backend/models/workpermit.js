@@ -46,11 +46,11 @@ const workPermitSchema = new mongoose.Schema({
       address: String
     },
     files: {
-      document1: String,
-      document2: String,
-      document3: String,
-      document4: String,
-      document5: String,
+      document1: { type: String, required: false },
+      document2: { type: String, required: false },
+      document3: { type: String, required: false },
+      document4: { type: String, required: false },
+    
 
       remarksdoc1: String,
       remarksdoc2: String,

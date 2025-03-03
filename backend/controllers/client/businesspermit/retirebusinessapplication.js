@@ -25,9 +25,10 @@ const retirebusinessapplication = async (req, res) => {
         {
           $set: {
             // Compute the total amount to pay
+            'businessstatus': 'ForRetire',
             'forretirement': 'ForRetire',
-            'files.document11': files.document1 ? files.document1[0].filename : null,
-            'files.document12': files.document2 ? files.document2[0].filename : null,
+            'files.document11': files.document1 ? files.document1[0].path : null,
+            'files.document12': files.document2 ? files.document2[0].path : null,
           }
         },
         { new: true } // Return the updated document

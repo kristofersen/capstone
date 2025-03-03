@@ -11,8 +11,7 @@ const ViewApplicationDetailsBusiness: React.FC = () => {
   const { id } = useParams<{ id: string }>(); // Extract work permit ID from URL
   const [businessPermit, setBusinessPermit] = useState<BusinessPermit | null>(null);
   const token = localStorage.getItem('token'); // Assuming the token is stored in local storage
-  const [modalFile, setModalFile] = useState<string | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+
 
 
 
@@ -61,35 +60,91 @@ const ViewApplicationDetailsBusiness: React.FC = () => {
 
 
 
-   const openModal = (filePath: string) => {
-    setModalFile(filePath);
-    setIsModalOpen(true);
-  };
 
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setModalFile(null);
-  };
-
-  const fetchDocumentUrl = (fileName: string | null, folder: 'uploads' | 'permits' | 'receipts'): string | null => {
-    if (!fileName) return null;
-    
-    // Return the file URL based on the folder specified
-    return `http://localhost:3000/${folder}/${fileName}`;
+  const DocumentViewer = ({ fileUrl, onClose }: { fileUrl: string; onClose: () => void }) => {
+    const isPdf = fileUrl.toLowerCase().endsWith(".pdf");
+    const isDocx = fileUrl.toLowerCase().endsWith(".docx") || fileUrl.toLowerCase().endsWith(".doc");
+  
+    return (
+      <div
+        className="modal-overlay fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+        onClick={onClose}
+      >
+        <div
+          className="modal-content bg-white rounded-2xl p-4 shadow-xl relative w-[90vw] max-w-[700px] max-h-[90vh] flex flex-col"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* File Viewer */}
+          {isPdf ? (
+            <>
+              <iframe
+                src={`https://docs.google.com/gview?url=${encodeURIComponent(fileUrl)}&embedded=true`}
+                className="w-full h-[80vh] rounded-md border mb-4"
+                title="PDF Viewer"
+              />
+              <DownloadButton fileUrl={fileUrl} />
+            </>
+          ) : isDocx ? (
+            <>
+              <iframe
+                src={`https://docs.google.com/gview?url=${encodeURIComponent(fileUrl)}&embedded=true`}
+                className="w-full h-[80vh] rounded-md border mb-4"
+                title="Word Document Viewer"
+              />
+              <DownloadButton fileUrl={fileUrl} />
+            </>
+          ) : (
+            <img src={fileUrl} alt="Uploaded Document" className="w-full max-h-[80vh] rounded-md mb-4" />
+          )}
+  
+          {/* Close Button */}
+          <button
+            className="btn btn-danger self-end bg-[#0056b3] hover:bg-[#003c80] text-white font-semibold py-2 px-6 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all"
+            onClick={onClose}
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    );
   };
   
-const renderDocument = (fileName: string | null, folder: 'uploads' | 'permits' | 'receipts') => {
-  const fileUrl = fetchDocumentUrl(fileName, folder);
-  if (!fileUrl) return <span>Not uploaded</span>;
-
-  const fileExtension = fileUrl.split('.').pop()?.toLowerCase();
-
-  return (
-    <span style={{ cursor: 'pointer', color: 'blue' }} onClick={() => openModal(fileUrl)}>
-      {fileExtension === 'pdf' ? 'View PDF' : 'View Document'}
-    </span>
-  );
-};
+  // Reusable Download Button Component
+  const DownloadButton = ({ fileUrl }: { fileUrl: string }) => {
+    return (
+      <button
+        className="bg-blue-600 hover:bg-blue-800 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition-all text-center block"
+        onClick={(e) => {
+          e.preventDefault(); // Prevent default behavior
+          const link = document.createElement("a");
+          link.href = fileUrl;
+          link.download = fileUrl.split("/").pop() || "download"; // Extract filename
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        }}
+      >
+       Download File
+      </button>
+    );
+  };
+  
+  // File Renderer Component
+  const FileRenderer = ({ fileName }: { fileName: string | null }) => {
+    const [modalOpen, setModalOpen] = useState(false);
+    const fileUrl = fileName || "";
+  
+    if (!fileUrl) return <span>Not uploaded</span>;
+  
+    return (
+      <>
+        <span style={{ cursor: "pointer", color: "blue" }} onClick={() => setModalOpen(true)}>
+          {fileUrl.endsWith(".pdf") ? "View PDF" : "View Document"}
+        </span>
+        {modalOpen && <DocumentViewer fileUrl={fileUrl} onClose={() => setModalOpen(false)} />}
+      </>
+    );
+  };
 
 useEffect(() => {
   const checkAuth = async () => {
@@ -302,71 +357,153 @@ useEffect(() => {
             
 
   <div style={{display: 'flex',justifyContent: 'center', gap: '16px',flexWrap: 'wrap' }}>
-    <p>Document 1: {renderDocument(businessPermit.files?.document1, 'uploads')}</p>
+    <p> Upload DTI / SEC / CDA: </p>
+    <span>
+      {businessPermit.files?.document1 ? (
+        <FileRenderer fileName={businessPermit.files?.document1} />
+      ) : (
+        "No file uploaded"
+      )}
+    </span>
     {businessPermit.files.remarksdoc1 && (
     <p>Remarks: {businessPermit.files.remarksdoc1}</p>
   )}
-    <p>Document 2: {renderDocument(businessPermit.files?.document2, 'uploads')}</p>
+    <p> Occupancy Permit (Optional): </p>
+    <span>
+      {businessPermit.files?.document2 ? (
+        <FileRenderer fileName={businessPermit.files?.document2} />
+      ) : (
+        "No file uploaded"
+      )}
+    </span>
     {businessPermit.files.remarksdoc2 && (
     <p>Remarks: {businessPermit.files.remarksdoc2}</p>
   )}
-    <p>Document 3: {renderDocument(businessPermit.files?.document3, 'uploads')}</p>
+    <p>Lease Contract (if rented) / Tax Declaration (If Owned): </p>
+    <span>
+      {businessPermit.files?.document3 ? (
+        <FileRenderer fileName={businessPermit.files?.document3} />
+      ) : (
+        "No file uploaded"
+      )}
+    </span>
     {businessPermit.files.remarksdoc3 && (
     <p>Remarks: {businessPermit.files.remarksdoc3}</p>
   )}
-    <p>Document 4: {renderDocument(businessPermit.files?.document4, 'uploads')}</p>
+    <p>Authorization Letter / S.P.A. / Board Resolution / Secretary's Certificate (if thru representative): </p>
+    <span>
+      {businessPermit.files?.document4 ? (
+        <FileRenderer fileName={businessPermit.files?.document4} />
+      ) : (
+        "No file uploaded"
+      )}
+    </span>
     {businessPermit.files.remarksdoc4 && (
     <p>Remarks: {businessPermit.files.remarksdoc4}</p>
   )}
-    <p>Document 5: {renderDocument(businessPermit.files?.document5, 'uploads')}</p>
+    <p>Owner's ID: </p>
+    <span>
+      {businessPermit.files?.document5 ? (
+        <FileRenderer fileName={businessPermit.files?.document5} />
+      ) : (
+        "No file uploaded"
+      )}
+    </span>
     {businessPermit.files.remarksdoc5 && (
     <p>Remarks: {businessPermit.files.remarksdoc5}</p>
   )}
-    <p>Document 6: {renderDocument(businessPermit.files?.document6, 'uploads')}</p>
+    <p>Picture of Establishment (Perspective View): </p>
+    <span>
+      {businessPermit.files?.document6 ? (
+        <FileRenderer fileName={businessPermit.files?.document6} />
+      ) : (
+        "No file uploaded"
+      )}
+    </span>
     {businessPermit.files.remarksdoc6 && (
     <p>Remarks: {businessPermit.files.remarksdoc6}</p>
   )}
-    <p>Document 7: {renderDocument(businessPermit.files?.document7, 'uploads')}</p>
+    <p> Zoning: </p>    
+    <span>
+      {businessPermit.files?.document7 ? (
+        <FileRenderer fileName={businessPermit.files?.document7} />
+      ) : (
+        "No file uploaded"
+      )}
+    </span>
     {businessPermit.files.remarksdoc7 && (
     <p>Remarks: {businessPermit.files.remarksdoc7}</p>
   )}
-    <p>Document 8: {renderDocument(businessPermit.files?.document8, 'uploads')}</p>
+    <p>Office of the Building Official: </p>
+    <span>
+      {businessPermit.files?.document8 ? (
+        <FileRenderer fileName={businessPermit.files?.document8} />
+      ) : (
+        "No file uploaded"
+      )}
+    </span>
     {businessPermit.files.remarksdoc8 && (
     <p>Remarks: {businessPermit.files.remarksdoc8}</p>
   )}
-    <p>Document 9: {renderDocument(businessPermit.files?.document9, 'uploads')}</p>
+    <p>City Health Office: </p>
+    <span>
+      {businessPermit.files?.document9 ? (
+        <FileRenderer fileName={businessPermit.files?.document9} />
+      ) : (
+        "No file uploaded"
+      )}
+    </span>
     {businessPermit.files.remarksdoc9 && (
     <p>Remarks: {businessPermit.files.remarksdoc9}</p>
   )}
-    <p>Document 10: {renderDocument(businessPermit.files?.document10, 'uploads')}</p>
+    <p>Bureau of Fire Protection: </p>
+    <span>
+      {businessPermit.files?.document10 ? (
+        <FileRenderer fileName={businessPermit.files?.document10} />
+      ) : (
+        "No file uploaded"
+      )}
+    </span>
     {businessPermit.files.remarksdoc10 && (
     <p>Remarks: {businessPermit.files.remarksdoc10}</p>
   )}
+  </div>            
+  {businessPermit.receipt?.receiptFile && (
+      <div>
+    <p>Receipt: </p>
+    <span>
+    {businessPermit.receipt?.receiptFile ? (
+      <FileRenderer fileName={businessPermit.receipt?.receiptFile} />
+    ) : (
+      "No file uploaded"
+    )}
+  </span>
   </div>
-              
-
-
-            {/* Render additional fields as necessary 
-              
-              {workPermit.receipt?.receiptFile && (
-    <p>Receipt: {renderDocument(workPermit.receipt.receiptFile, 'receipts')}</p>
   )}
-    {workPermit.permitFile && (
-    <p>Work Permit: {renderDocument(workPermit.permitFile, 'permits')}</p>
+  {businessPermit.statementofaccount.statementofaccountfile && (
+  <div>
+  <p>
+    Statement of Account (Assessment): </p>
+  <span>
+    {businessPermit.statementofaccount?.statementofaccountfile ? (
+      <FileRenderer fileName={businessPermit.statementofaccount?.statementofaccountfile} />
+    ) : (
+      "No file uploaded"
+    )}
+  </span>
+  </div>
   )}
-  {workPermit.applicationComments && (
-    <p>Comments: {workPermit.applicationComments}</p>
-  )}
-    
-  */}
-    {businessPermit.receipt?.receiptFile && (
-    <p>Receipt: {renderDocument(businessPermit.receipt.receiptFile, 'receipts')}</p>
-  )}
-      {businessPermit.statementofaccount.statementofaccountfile && (
-    <p>Statement of Account (Assessment): {renderDocument(businessPermit.statementofaccount.statementofaccountfile, 'receipts')}</p>
-  )}
-    {businessPermit.permitFile && (
-    <p>Business Permit: {renderDocument(businessPermit.permitFile, 'permits')}</p>
+  {businessPermit.permitFile && (
+      <div>
+    <p>Business Permit: </p>
+    <span>
+    {businessPermit.permitFile ? (
+      <FileRenderer fileName={businessPermit.permitFile} />
+    ) : (
+      "No file uploaded"
+    )}
+  </span>
+    </div>
   )}
   {businessPermit.applicationComments && (
     <p>Comments: {businessPermit.applicationComments}</p>
@@ -376,26 +513,7 @@ useEffect(() => {
         ) : (
           <p>Business permit details available.</p>
         )}
-
-{isModalOpen && (
-        <div className="modal-overlay" onClick={closeModal}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            {modalFile && (
-              <div>
-                {modalFile.endsWith('.pdf') ? (
-                  <iframe src={modalFile} style={{ width: '500px', height: '600px' }} title="PDF Viewer" />
-                ) : (
-                  <img src={modalFile} alt="Document" style={{ maxWidth: '100%', height: 'auto' }} />
-                )}
-              </div>
-            )}
-            <button onClick={closeModal}>Close</button>
-          </div>
         </div>
-      )}
-        </div>
-        
-    
       </div>
       </div>
     </section>

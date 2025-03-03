@@ -6,6 +6,9 @@ const { fetchuserbusinesspermits, businesspermitapplication, fetchbusinesspermit
 
 
 
+
+
+
 const router = express.Router();
 
 //User
@@ -42,6 +45,7 @@ router.post('/retirebusinessapplication/:id', uploadbusinesspermitfiles, retireb
 router.put('/expirebusinesspermit/:id', expirebusinesspermit);
 
 router.delete('/deletebusinesspermit/:permitId', deletebusinesspermit);
+
 
 
 module.exports = router;

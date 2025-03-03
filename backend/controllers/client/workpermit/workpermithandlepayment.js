@@ -38,7 +38,7 @@ console.log("Generated PDF File:", workpermitFileName);
           receipt: {
           receiptDate: new Date().toISOString(),
           amountPaid: 200,
-          receiptFile: files.document1 ? files.document1[0].filename : null,
+          receiptFile: files.document1 ? files.document1[0].path : null,
         }
       }
       }
