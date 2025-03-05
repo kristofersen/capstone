@@ -1,355 +1,396 @@
 /* DASHBOARD CONTAINER STYLE */
 .DAbody {
-    display: flex; /* Use flexbox to create a side-by-side layout */
-    height: 100vh; /* Full height of the viewport */
-    overflow: hidden; /* Prevents scrolling */
+  display: flex; /* Use flexbox to create a side-by-side layout */
+  height: 100vh; /* Full height of the viewport */
+  overflow: hidden; /* Prevents scrolling */
 }
 
 .DAstats {
-    display: flex;
-    justify-content: space-between;
-    padding: 20px;
-    background-color: #f9f9f9;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    margin-bottom: 20px;
-  }
-  
-  .DAstats div {
-    margin-right: 20px;
-    font-size: 16px;
+  display: flex;
+  justify-content: space-between;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.DAstats div {
+  margin-right: 20px;
+  font-size: 16px;
+}
+
+
+.DAchart-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  gap: 20px; /* Adjust the gap between charts */
+  padding: 30px;
+}
+
+.DAchart {
+  flex:45%; /* Adjust the flex basis to fit two charts side by side */
+  padding: 20px; /* Increased padding for a cleaner appearance */
+  background-color: #ffffff; /* Bright white for better contrast */
+  border: 1px solid #ccc; /* Softer border color */
+  border-radius: 12px; /* Slightly more rounded corners */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  width: 100%; /* Default width for small screens */
+  max-width: 45%; /* Ensure the charts don't exceed 45% of the container width */
+  margin: 10px; /* Margin for spacing when wrapping */
+  transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth hover effects */
+  display: block;
+}
+
+
+.DAchartreport {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+  gap: 20px; /* Adjust the gap between charts */
+  padding: 60px;
+  margin: 20px 0; /* Space above and below the table */
+  border-radius: 8px; /* Rounded corners */
+  background-color: #ffffff; /* White background for contrast */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  overflow-x: auto;
+  grid-template-areas: 
+      "graph1 graph2"
+      "location location"; /* Define the layout areas */
+}
+
+.DAchartgraph {
+  padding: 75px; 
+  background-color: #ffffff; 
+  border: 1px solid #ccc;
+  border-radius: 12px; 
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
+  transition: transform 0.3s ease, box-shadow 0.3s ease; 
+  display: block;
+}
+
+  .DAchartgraph:nth-child(1) {
+    grid-area: graph1; 
   }
 
-  .DaChartcontainer {
-    display: flex;
-    gap: 20px; /* Adds spacing between the charts */
-    justify-content: center; /* Centers the charts horizontally */
-    align-items: center; /* Centers the charts vertically */
-    flex-wrap: wrap; /* Allows charts to wrap on smaller screens */
-    padding: 20px; /* Adds padding around the container */
-    background-color: #f5f5f5; /* Subtle background color for the container */
-  }
-  
-  .DAchart-container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-around;
-    gap: 20px; /* Adjust the gap between charts */
-    padding: 20px;
+  .DAchartgraph:nth-child(2) {
+    grid-area: graph2; 
   }
 
-  .DAchart {
-    flex: 1 1 45%; /* Adjust the flex basis to fit two charts side by side */
-    padding: 20px; /* Increased padding for a cleaner appearance */
-    background-color: #ffffff; /* Bright white for better contrast */
-    border: 1px solid #ccc; /* Softer border color */
-    border-radius: 12px; /* Slightly more rounded corners */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
-    width: 100%; /* Default width for small screens */
-    max-width: 45%; /* Ensure the charts don't exceed 45% of the container width */
-    margin: 10px; /* Margin for spacing when wrapping */
-    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth hover effects */
-    display: block;
-  }
-  
-  .DAchart:hover {
-    transform: translateY(-5px); /* Slight lift effect on hover */
-    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2); /* Stronger shadow on hover */
-  }
+
+
+.DAchart:hover {
+  transform: translateY(-5px); /* Slight lift effect on hover */
+  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2); /* Stronger shadow on hover */
+}
+
+
+.DAchartlocation {
+  grid-area: location; 
+  padding: 20px;
+  width: 100%; 
+  padding: 20px;
+  background-color: #ffffff;
+  border: 1px solid #ccc; 
+  border-radius: 12px; 
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth hover effects */
+  display: block;
+}
 
 /* SIDEBAR CONTAINER STYLE */
 .DAsidebar-container {
-    width: 225px; /* Fixed width for the sidebar */
-    z-index: 1000; /* Ensure it's above other content */
+  width: 225px; /* Fixed width for the sidebar */
+  z-index: 1000; /* Ensure it's above other content */
 }
 
 /* HEADER AND NAVIGATION */
 .DAheader {
-    margin-bottom: 20px; /* Space below the header */
-    background-color: #0047AB; /* Example background color */
-    color: #ffffff; /* White text color for contrast */
-    padding: 20px; /* Padding inside the header */
-    border-radius: 10px; /* Rounded corners */
-    text-align: center; /* Center-align the header text */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional: subtle shadow for depth */
+  margin-bottom: 20px; /* Space below the header */
+  background-color: #0047AB; /* Example background color */
+  color: #ffffff; /* White text color for contrast */
+  padding: 20px; /* Padding inside the header */
+  border-radius: 10px; /* Rounded corners */
+  text-align: center; /* Center-align the header text */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional: subtle shadow for depth */
 }
 
 /* CONTENT STYLE */
 .DAcontent {
-    flex-grow: 1; /* Allow content area to expand to fill available space */
-    padding: 20px; /* Add padding around the content */
-    overflow-y: auto; /* Enable vertical scrolling for content if necessary */
+  flex-grow: 1; /* Allow content area to expand to fill available space */
+  padding: 20px; /* Add padding around the content */
+  overflow-y: auto; /* Enable vertical scrolling for content if necessary */
 }
 
 /* BUTTON STYLES */
 .button-container {
-    display: flex; /* Use flexbox to layout buttons */
-    justify-content: center; /* Distribute space between buttons */
-    width: 100%; /* Ensure the container takes full width */
-    gap: 10rem; /* Optional: Space between buttons */
-    margin-top: 2rem;
+  display: flex; /* Use flexbox to layout buttons */
+  justify-content: center; /* Distribute space between buttons */
+  width: 100%; /* Ensure the container takes full width */
+  gap: 10rem; /* Optional: Space between buttons */
+  margin-top: 2rem;
 }
 
 .DAbusinesspermitbutton, .DAworkpermitbutton {
-    display: inline-block; /* Ensure buttons are inline */
-    background-color: #ffffff; /* Button background color */
-    color: rgb(0, 0, 0); /* black text color */
-    padding: 3rem; /* Padding for the button */
-    border-radius: 5px; /* Rounded corners */
-    text-decoration: none; /* Remove underline */
-    transition: background-color 0.3s; /* Smooth hover effect */
+  display: inline-block; /* Ensure buttons are inline */
+  background-color: #ffffff; /* Button background color */
+  color: rgb(0, 0, 0); /* black text color */
+  padding: 3rem; /* Padding for the button */
+  border-radius: 5px; /* Rounded corners */
+  text-decoration: none; /* Remove underline */
+  transition: background-color 0.3s; /* Smooth hover effect */
 }
 
 .DAbusinesspermitbutton:hover, .DAworkpermitbutton:hover {
-    background-color: #0056b3; /* Darker shade on hover */
+  background-color: #0056b3; /* Darker shade on hover */
 }
 
 /* SEARCH BAR CONTAINER */
 .search-bar-container {
-    display: flex; /* Use flexbox for layout */
-    justify-content: flex-start; /* Align items to the left */
-    align-items: center; /* Center items vertically */
-    margin-bottom: 20px; /* Space below the search bar */
-    width: 400px;
+  display: flex; /* Use flexbox for layout */
+  justify-content: flex-start; /* Align items to the left */
+  align-items: center; /* Center items vertically */
+  margin-bottom: 20px; /* Space below the search bar */
+  width: 400px;
 }
 
 /* SEARCH INPUT STYLE */
 .search-input {
-    width: 360px; /* Set a fixed width for the input */
-    padding: 10px; /* Padding inside the input */
-    border: 1px solid #ccc; /* Border color */
-    border-radius: 5px; /* Rounded corners */
-    font-size: 16px; /* Font size */
-    margin-right: 10px; /* Space between input and button */
+  width: 360px; /* Set a fixed width for the input */
+  padding: 10px; /* Padding inside the input */
+  border: 1px solid #ccc; /* Border color */
+  border-radius: 5px; /* Rounded corners */
+  font-size: 16px; /* Font size */
+  margin-right: 10px; /* Space between input and button */
 }
 
 
 /* SEARCH BUTTON STYLE */
 .search-button {
-    background-color: #0056b3; /* Button background color */
-    color: white; /* White text color */
-    padding: 10px 20px; /* Padding for the button */
-    border: none; /* Remove border */
-    border-radius: 5px; /* Rounded corners */
-    cursor: pointer; /* Pointer cursor on hover */
-    transition: background-color 0.3s; /* Smooth hover effect */
+  background-color: #0056b3; /* Button background color */
+  color: white; /* White text color */
+  padding: 10px 20px; /* Padding for the button */
+  border: none; /* Remove border */
+  border-radius: 5px; /* Rounded corners */
+  cursor: pointer; /* Pointer cursor on hover */
+  transition: background-color 0.3s; /* Smooth hover effect */
 }
 
 .actionreject-button{
-    background-color: #d9534f; /* Button background color */
-    color: white; /* White text color */
-    padding: 10px 20px; /* Padding for the button */
-    border: none; /* Remove border */
-    border-radius: 5px; /* Rounded corners */
-    cursor: pointer; /* Pointer cursor on hover */
-    transition: background-color 0.3s; /* Smooth hover effect */
+  background-color: #d9534f; /* Button background color */
+  color: white; /* White text color */
+  padding: 10px 20px; /* Padding for the button */
+  border: none; /* Remove border */
+  border-radius: 5px; /* Rounded corners */
+  cursor: pointer; /* Pointer cursor on hover */
+  transition: background-color 0.3s; /* Smooth hover effect */
 }
 
 .actionreject-button:hover{
-    background-color: #ff2921
+  background-color: #ff2921
 }
 
 /* SEARCH BUTTON HOVER STYLE */
 .search-button:hover {
-    background-color: #0074f1; /* Darker shade on hover */
+  background-color: #0074f1; /* Darker shade on hover */
 }
 
 /* Date Picker Container */
 .date-picker-container {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-top: 20px;
-  }
-  
-  .date-picker-container input[type="date"] {
-    width: 160px;
-    color: #333;
-  }
-  
-  .date-picker-container input[type="date"]:hover {
-    border-color: #0056b3;
-  }
-  
-  .date-picker-container input[type="date"]:focus {
-    border-color: #0056b3;
-    box-shadow: 0 0 5px rgba(0, 86, 179, 0.5);
-  }
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.date-picker-container input[type="date"] {
+  width: 160px;
+  color: #333;
+}
+
+.date-picker-container input[type="date"]:hover {
+  border-color: #0056b3;
+}
+
+.date-picker-container input[type="date"]:focus {
+  border-color: #0056b3;
+  box-shadow: 0 0 5px rgba(0, 86, 179, 0.5);
+}
 
 .DAactionbutton{
-    background-color: #0056b3; /* Button background color */
-    color: white; /* White text color */
-    padding: 10px 20px; /* Padding for the button */
-    border: none; /* Remove border */
-    border-radius: 5px; /* Rounded corners */
-    cursor: pointer; /* Pointer cursor on hover */
-    transition: background-color 0.3s; /* Smooth hover effect */
+  background-color: #0056b3; /* Button background color */
+  color: white; /* White text color */
+  padding: 10px 20px; /* Padding for the button */
+  border: none; /* Remove border */
+  border-radius: 5px; /* Rounded corners */
+  cursor: pointer; /* Pointer cursor on hover */
+  transition: background-color 0.3s; /* Smooth hover effect */
 }
 
 .DAactionbutton:hover {
-    background-color: #014084; /* Darker shade on hover */
+  background-color: #014084; /* Darker shade on hover */
 }
 /* STATUS CARDS */
 .status-cards {
-    display: flex;
-    justify-content: space-around;
-    margin-bottom: 20px;
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 20px;
 }
 
 .status-card {
-    background: #f4f4f4;
-    padding: 10px;
-    border-radius: 5px;
-    text-align: center;
-    width: 22%;
+  background: #f4f4f4;
+  padding: 10px;
+  border-radius: 5px;
+  text-align: center;
+  width: 22%;
 }
 
 /* CHARTS CONTAINER */
 .charts-container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-around;
-    margin-bottom: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  margin-bottom: 20px;
 }
 
 .chart {
-    width: 45%;
-    margin-bottom: 20px;
+  width: 45%;
+  margin-bottom: 20px;
 }
 
 /* APPLICATION LOGS */
 .application-logs {
-    margin-top: 20px;
-    color: grey;
+  margin-top: 20px;
+  color: grey;
 }
 
 .application-logs table {
-    width: 100%;
-    border-collapse: collapse;
+  width: 100%;
+  border-collapse: collapse;
 }
 
 .application-logs th, .application-logs td {
-    border: 1px solid #ddd;
-    padding: 8px;
+  border: 1px solid #ddd;
+  padding: 8px;
 }
 
 .application-logs th {
-    background-color: #f2f2f2;
-    text-align: left;
+  background-color: #f2f2f2;
+  text-align: left;
 }
 
 .text{
-    color: black;
+  color: black;
 }
 
-  /* ===================================  MODAL OVERLAY Styles =================================== */
+/* ===================================  MODAL OVERLAY Styles =================================== */
 
 .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
 }
 
 .modal {
-    background-color: #ffffff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    max-width: 600px;
-    width: 90%;
-    text-align: center;
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  max-width: 600px;
+  width: 90%;
+  text-align: center;
 }
 
 .modal h3 {
-    color: #0056b3;
-    margin-bottom: 20px;
-    font-weight: bold;
+  color: #0056b3;
+  margin-bottom: 20px;
+  font-weight: bold;
 }
 
 .modal-button,.editbutton {
-    background-color: #0056b3;
-    color: #ffffff;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 4px;
-    cursor: pointer;
-    margin: 10px 5px;
-    transition: background-color 0.3s;
+  background-color: #0056b3;
+  color: #ffffff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin: 10px 5px;
+  transition: background-color 0.3s;
 }
 
 .modal-button:hover {
-    background-color: #004494;
+  background-color: #004494;
 }
 
 .cancel-button {
-    background-color: #d9534f; /* A red color for cancel */
-    color: #ffffff;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 4px;
-    cursor: pointer;
-    margin: 10px 5px;
-    transition: background-color 0.3s;
+  background-color: #d9534f; /* A red color for cancel */
+  color: #ffffff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin: 10px 5px;
+  transition: background-color 0.3s;
 }
 
 .cancel-button:hover {
-    background-color: #c9302c; /* Darker red on hover */
+  background-color: #c9302c; /* Darker red on hover */
 }
 
- /* ===================================  VIEW APPLICAION DETIALS STYLES =================================== */
+/* ===================================  VIEW APPLICAION DETIALS STYLES =================================== */
 .panel {
-    background-color: #fff;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    padding: 20px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  padding: 20px;
 }
 
 .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000; 
-  }
-  
-  .modal-content {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    max-width: 950px;
-    width: 100%;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    z-index: 1001; 
-  }
-  
-  .file-viewer {
-    margin-top: 20px;
-  }
-  
-  button {
-    padding: 8px 12px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  
-  button:hover {
-    background-color: #0056b3;
-  }
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; 
+}
+
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  max-width: 950px;
+  width: 100%;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  z-index: 1001; 
+}
+
+.file-viewer {
+  margin-top: 20px;
+}
+
+button {
+  padding: 8px 12px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
 
 
 
@@ -360,123 +401,103 @@
 
 
 
-  /*test*/
-  .viewdetailsmodal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.6);  /* Slightly darker background */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  
-  .viewdetailscontent {
-    background: linear-gradient(145deg, #f9f9f9, #e0e0e0);  /* Gradient effect */
-    padding: 30px;
-    border-radius: 15px;
-    max-width: 700px;
-    width: 90%;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);  /* Stronger shadow for depth */
-    position: relative;
-    overflow: hidden;
-    transform: scale(0.9);
-    transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
-    opacity: 0;
-  }
-  
-  /* Add an "active" class to trigger animation */
-  .viewdetailsmodal .viewdetailscontent.active {
-    transform: scale(1);
-    opacity: 1;
-  }
-  
-  /* Optional: Add a close button */
-  .viewdetailscontent .closeview {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    background: #ff4c4c;
-    border: none;
-    color: white;
-    font-size: 18px;
-    padding: 10px;
-    border-radius: 50%;
-    cursor: pointer;
-  }
-  
-  .viewdetailscontent .closeview:hover {
-    background: #ff1c1c;
-  }
-  
+/*test*/
+.viewdetailsmodal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);  /* Slightly darker background */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
-  .tabs {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 20px;
+.viewdetailscontent {
+  background: linear-gradient(145deg, #f9f9f9, #e0e0e0);  /* Gradient effect */
+  padding: 30px;
+  border-radius: 15px;
+  max-width: 700px;
+  width: 90%;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);  /* Stronger shadow for depth */
+  position: relative;
+  overflow: hidden;
+  transform: scale(0.9);
+  transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+  opacity: 0;
+}
+
+/* Add an "active" class to trigger animation */
+.viewdetailsmodal .viewdetailscontent.active {
+  transform: scale(1);
+  opacity: 1;
+}
+
+/* Optional: Add a close button */
+.viewdetailscontent .closeview {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: #ff4c4c;
+  border: none;
+  color: white;
+  font-size: 18px;
+  padding: 10px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.viewdetailscontent .closeview:hover {
+  background: #ff1c1c;
+}
+
+
+.tabs {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
 }
 
 .tab-button {
-    padding: 10px 20px;
-    margin: 0 5px;
-    border: 1px solid #ccc;
-    background-color: #007bff;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s ease;
+  padding: 10px 20px;
+  margin: 0 5px;
+  border: 1px solid #ccc;
+  background-color: #007bff;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
 }
 
 .tab-button.active {
-    background-color: #024286;
-    color: white;
+  background-color: #024286;
+  color: white;
 }
 
 .tab-content {
-    padding: 20px;
-    border-top: 2px solid #ccc;
+  padding: 20px;
+  border-top: 2px solid #ccc;
 }
 
 .user-info,
 .business-info {
-    display: block;
+  display: block;
 }
 
 h2 {
-    margin-top: 0;
+  margin-top: 0;
 }
 
 .view-only {
-    background-color: #f9f9f9;  /* Light gray background to show it is non-editable */
-    pointer-events: none;       /* Prevent user from interacting with the select box */
-    border: 1px solid #ccc;     /* Optional: Add a border to keep it consistent */
-    color: #555;                /* Optional: Adjust text color */
+  background-color: #f9f9f9;  /* Light gray background to show it is non-editable */
+  pointer-events: none;       /* Prevent user from interacting with the select box */
+  border: 1px solid #ccc;     /* Optional: Add a border to keep it consistent */
+  color: #555;                /* Optional: Adjust text color */
 }
 
 /* Optional: To make the selected option stand out */
 .view-only option {
-    color: #555;  /* Adjust the text color of the selected option */
+  color: #555;  /* Adjust the text color of the selected option */
 }
 
-.DAChart {
-        width: 300px; /* Adjust the width as needed */
-        height: 300px; /* Adjust the height as needed */
-        margin: 0 auto; /* Center the container */
-        padding: 10px; /* Add some padding */
-        background-color: #f9f9f9; /* Light background color */
-        border: 1px solid #ddd; /* Light border */
-        border-radius: 8px; /* Rounded corners */
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-}
 
-.DApanel-Header{
-    background-color: #004494; /* Black background color */
-    color: #ffffff; /* White text color */
-    padding: 10px 20px; /* Padding around the header */
-    border-radius: 10px; /* Rounded corners */
-    display: flex;
-    align-items: center;
-    justify-content: space-between; /* Space between elements inside the header */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-}

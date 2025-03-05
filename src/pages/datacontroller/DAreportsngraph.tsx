@@ -2,7 +2,7 @@ import '../Styles/DataControllerStyles.css';
 import DASidebar from '../components/NavigationBars/DAsidebar';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import {  Bar, Doughnut } from 'react-chartjs-2';
+import {  Bar } from 'react-chartjs-2';
 import 'chart.js/auto'; // Import Chart.js
 import * as XLSX from 'xlsx';
 
@@ -41,7 +41,7 @@ const DataControllerReportandGraph: React.FC = () => {
     useEffect(() => {
         const checkAuth = async () => {
           try {
-            const response = await fetch('http://localhost:3000/auth/check-auth-datacontroller', {
+            const response = await fetch('https://capstone-project-backend-nu.vercel.app/auth/check-auth-datacontroller', {
               method: 'GET',
               credentials: 'include', // This ensures cookies are sent with the request
             });
@@ -104,7 +104,7 @@ const DataControllerReportandGraph: React.FC = () => {
     // };
     // setMonthlyData(mockMonthlyData);
 
-        fetch('http://localhost:3000/datacontroller/graphbusinesspermitlocation')
+        fetch('https://capstone-project-backend-nu.vercel.app/datacontroller/graphbusinesspermitlocation')
             .then(response => response.json())
             .then(data => {
                 const filteredData = data.filter((item: BusinessPermitLocation) => barangays.includes(item._id));
@@ -114,7 +114,7 @@ const DataControllerReportandGraph: React.FC = () => {
             })
             .catch(error => console.error('Error fetching location data:', error));
             
-        fetch('http://localhost:3000/datacontroller/graphmonthlypaymentstatus')
+        fetch('https://capstone-project-backend-nu.vercel.app/datacontroller/graphmonthlypaymentstatus')
             .then(response => response.json())
             .then(data => {
                 const labels = data.map((item: MonthlyPaymentStatus) => item.month);
@@ -124,7 +124,7 @@ const DataControllerReportandGraph: React.FC = () => {
             })
             .catch(error => console.error('Error fetching monthly payment data:', error));
 
-        fetch('http://localhost:3000/datacontroller/graphpermitapplicationcategory')
+        fetch('https://capstone-project-backend-nu.vercel.app/datacontroller/graphpermitapplicationcategory')
             .then(response => response.json())
             .then(data => {
                 const workPermitLabels = data.workPermitCategories.map((item: CategoryData) => item._id);
@@ -172,13 +172,13 @@ const DataControllerReportandGraph: React.FC = () => {
         downloadExcel(data, 'PermitApplicationsByCategory');
     };
 
-    const doughnutData = {
+    const locationbarData = {
         labels: locationData.labels,
         datasets: [
             {
                 data: locationData.data,
                 backgroundColor: [
-                    '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40', '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
+                    '#4BC0C0', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40', '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
                     '#9966FF', '#FF9F40', '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40', '#FF6384', '#36A2EB',
                     '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40', '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40',
                     '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40', '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
@@ -224,7 +224,7 @@ const DataControllerReportandGraph: React.FC = () => {
     };
 
     return (
-        <section className="DAbody">
+<section className="DAbody">
             <div className="DAsidebar-container">
                 <DASidebar /> {/* Pass handleLogout to DASidebar */}
             </div>
@@ -234,17 +234,10 @@ const DataControllerReportandGraph: React.FC = () => {
                     <h1>Online Business and Work Permit Licensing System</h1>
                 </header>
 
-                 <div className="DAchart-container">
-                    <div className="DAchart" onClick={handlePieClick}>
-                        <h2>Business Permit Locations - {currentYear}</h2>
-                        {doughnutData.datasets[0].data.length > 0 ? (
-                            <Doughnut data={doughnutData} />
-                        ) : (
-                            <p>There is no data</p>
-                        )}
-                    </div>
+                <div className='DaChartcontainer'>
+                 <div className="DAchartreport">
 
-                    <div className="DAchart" onClick={handleBarClick}>
+                    <div className="DAchartgraph" onClick={handleBarClick}>
                         <h2>Monthly Payment Status - {currentYear}</h2>
                         {barData.datasets[0].data.length > 0 ? (
                             <Bar data={barData} />
@@ -253,13 +246,23 @@ const DataControllerReportandGraph: React.FC = () => {
                         )}
                     </div>
 
-                    <div className="DAchart" onClick={handleCategoryClick}>
+                    <div className="DAchartgraph" onClick={handleCategoryClick}>
                         <h2>Permit Applications by Category - {currentYear}</h2>
                         {categoryDataForChart.datasets[0].data.length > 0 ? (
                             <Bar data={categoryDataForChart} />
                         ) : (
                             <p>There is no data</p>
                         )}
+                    </div>
+
+                    <div className="DAchartlocation" onClick={handlePieClick}>
+                        <h2>Business Permit Locations - {currentYear}</h2>
+                        {locationbarData.datasets[0].data.length > 0 ? (
+                            <Bar data={locationbarData} />
+                        ) : (
+                            <p>There is no data</p>
+                        )}
+                    </div>
                     </div>
                 </div>
             </div>
