@@ -1959,12 +1959,12 @@ if (type === 'new') {
     ))}
   </tbody>
           </table>
-          <div className="pagination-buttons">
+          <div className="pagination">
             {currentPage > 0 && (
-              <button onClick={handlePreviousPage}>Back</button>
+              <button className='btn btn-danger' onClick={handlePreviousPage}>Back</button>
             )}
             {currentPage < totalPages - 1 && (
-              <button onClick={handleNextPage}>Next</button>
+              <button className='btn btn-success' onClick={handleNextPage}>Next</button>
             )}
           </div>
         </div>
@@ -2178,7 +2178,7 @@ if (type === 'new') {
       </div>
 
       <div>
-        <button className="cancel-button" onClick={CloseOwnerModal}>Close</button>
+        <button className="btn btn-danger" onClick={CloseOwnerModal}>Close</button>
       </div>
     </div>
   </div>
@@ -3109,7 +3109,7 @@ if (type === 'new') {
   <div>
 
           {/* Close Modal Button */}
-          <button className="close-modal" onClick={closeViewBusinessDetails}>
+          <button className="btn btn-danger" onClick={closeViewBusinessDetails}>
           Close
         </button>
     </div>
@@ -3158,7 +3158,7 @@ if (type === 'new') {
         <div>No businesses to display.</div>
       )}
 
-<button className="cancel-button" onClick={closeViewBusinessNature}>Close</button>
+<button className="btn btn-danger" onClick={closeViewBusinessNature}>Close</button>
     </div>
   </div>
 )}
@@ -3172,9 +3172,10 @@ if (type === 'new') {
 
                         {/* Render the PDF or image file */}
       {renderFile(activePermitId.statementofaccount?.statementofaccountfile)}
-
+      <div className='pagination'>
       <button onClick={handlePrint}>Print</button>
-      <button onClick={handlePayment}>Update Payment</button> {/* Add the handler for Pay button */}
+      <button onClick={handlePayment}>Update Payment</button> 
+      </div>
           </div>
         </div>
 )}

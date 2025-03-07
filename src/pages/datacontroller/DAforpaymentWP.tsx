@@ -508,7 +508,7 @@ if (type === 'new') {
             </tbody>
           </table>
 
-          <div className="pagination-buttons">
+          <div className="pagination">
             {currentPage > 0 && (
               <button onClick={handlePreviousPage}>Back</button>
             )}
@@ -636,7 +636,7 @@ if (type === 'new') {
               </p>
               {renderFile(selectedFiles.document4)}
 
-              <button type="button" onClick={() => closeAttachmentsModal()} style={{ marginLeft: '10px' }}>
+              <button className='btn btn-danger' onClick={() => closeAttachmentsModal()} style={{ marginLeft: '10px' }}>
             Close
           </button>
             </div>

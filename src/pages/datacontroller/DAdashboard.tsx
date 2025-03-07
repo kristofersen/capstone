@@ -2,7 +2,7 @@ import '../Styles/DataControllerStyles.css';
 import DASidebar from '../components/NavigationBars/DAsidebar';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Line } from 'react-chartjs-2';
+import { Bar} from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, LineElement, CategoryScale, LinearScale, PointElement } from 'chart.js';
 
 ChartJS.register(ArcElement, Tooltip, Legend, LineElement, CategoryScale, LinearScale, PointElement);
@@ -181,7 +181,7 @@ const DAdashboard: React.FC = () => {
             labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
             datasets: [
               {
-                label: 'New Permits',
+                label: 'New Working Permits',
                 data: [newPermitsData.count],
                 backgroundColor: 'rgba(75, 192, 192, 0.2)',
                 borderColor: 'rgba(75, 192, 192, 1)',
@@ -189,7 +189,7 @@ const DAdashboard: React.FC = () => {
                 fill: true,
               },
               {
-                label: 'Renewal Permits',
+                label: 'Renewal Working Permits',
                 data: [renewalPermitsData.count],
                 backgroundColor: 'rgba(153, 102, 255, 0.2)',
                 borderColor: 'rgba(153, 102, 255, 1)',
@@ -307,10 +307,10 @@ const DAdashboard: React.FC = () => {
               </div>
               <div className="DaChartcontainer">
                 <div className="DAchart">
-                  <Line data={totalWorkingPermitsData} />
+                  <Bar data={totalWorkingPermitsData} />
                 </div>
                 <div className="DAchart">
-                  <Line data={WorkingPermitChart} />
+                  <Bar data={WorkingPermitChart} />
                 </div>
               </div>
             </div>
@@ -329,10 +329,10 @@ const DAdashboard: React.FC = () => {
               </div>
               <div className="DaChartcontainer">
                 <div className="DAchart">
-                  <Line data={totalBusinessPermitsData} />
+                  <Bar data={totalBusinessPermitsData} />
                 </div>
                 <div className="DAchart">
-                  <Line data={BusinessPermitChart} />
+                  <Bar data={BusinessPermitChart} />
                 </div>
               </div>
             </div>

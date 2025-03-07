@@ -1894,12 +1894,12 @@ if (type === 'new') {
     ))}
   </tbody>
           </table>
-          <div className="pagination-buttons">
+          <div className="pagination">
             {currentPage > 0 && (
-              <button onClick={handlePreviousPage}>Back</button>
+              <button className='btn btn-danger' onClick={handlePreviousPage}>Back</button>
             )}
             {currentPage < totalPages - 1 && (
-              <button onClick={handleNextPage}>Next</button>
+              <button className='btn btn-success' onClick={handleNextPage}>Next</button>
             )}
           </div>
         </div>
@@ -3044,7 +3044,7 @@ if (type === 'new') {
   <div>
 
           {/* Close Modal Button */}
-          <button className="close-modal" onClick={closeViewBusinessDetails}>
+          <button style={{marginTop: '10px'}} className="btn btn-danger" onClick={closeViewBusinessDetails}>
           Close
         </button>
     </div>
@@ -3094,7 +3094,7 @@ if (type === 'new') {
         <div>No businesses to display.</div>
       )}
 
-<button className="cancel-button" onClick={closeViewBusinessNature}>Close</button>
+<button className="btn btn-danger" style={{marginTop: '10px'}} onClick={closeViewBusinessNature}>Close</button>
     </div>
   </div>
 )}
@@ -3126,7 +3126,7 @@ if (type === 'new') {
           )}
         </div>
       )}
-      <button className="back-button" onClick={closeModal}>Close</button>
+      <button className="btn-danger" style={{marginTop: '10px'}} onClick={closeModal}>Close</button>
     </div>
   </div>
 )}

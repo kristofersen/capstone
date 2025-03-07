@@ -2985,17 +2985,17 @@ return (
                         <h2>View Business Nature</h2>
                         {/* Add your user information content here */}
 
-                        <button className="editbutton"onClick={isEditing ? handleSaveBusinessNature : () => setIsEditing(true)}>
+  <button className='editbutton' style={{ display:'flex', justifyContent: 'center', marginLeft: '645px'  }} onClick={() => { window.location.href = `/DABusinessAssessment/${businessPermit?._id}`;}}>For Assessment</button>
+                      
+
+  <button className="editsave"onClick={isEditing ? handleSaveBusinessNature : () => setIsEditing(true)}>
     {isEditing ? 'Save' : 'Edit'}
   </button>
   {isEditing && (
-    <button className="cancel-button" onClick={handleCancelEdit} style={{ marginLeft: '10px' }}>
+    <button className="editcancel" onClick={handleCancelEdit} style={{ marginLeft: '10px' }}>
       Cancel
     </button>
   )}
-
-  <button className='editbutton' onClick={() => { window.location.href = `/DABusinessAssessment/${businessPermit?._id}`;}}>For Assessment</button>
-                      
                         {isEditing && (
   <>
     <h2>Add a New Business</h2>
@@ -3052,7 +3052,7 @@ return (
           </div>
         ) : null}
       </div>
-      <button onClick={handleAddBusiness}>Add Business</button>
+      <button style={{ margin: '10px 0px'}} onClick={handleAddBusiness} >Add Business</button>
     </div>
   </>
 )}

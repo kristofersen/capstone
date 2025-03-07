@@ -489,7 +489,7 @@ const DownloadButton = ({ fileUrl }: { fileUrl: string }) => {
   </tbody>
           </table>
 
-          <div className="pagination-buttons">
+          <div className="pagination">
             {currentPage > 0 && (
               <button onClick={handlePreviousPage}>Back</button>
             )}
@@ -602,15 +602,17 @@ const DownloadButton = ({ fileUrl }: { fileUrl: string }) => {
       </Modal>
       {isModalOpenFile && activePermitId && (
         <div className="modal-overlay" onClick={closeModal}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{justifyContent:'center'}}>
             {modalFile && (
               <div>
                 Viewing Work Permit of {activePermitId.id}
+                <div>
                 {modalFile.endsWith('.pdf') ? (
-                  <iframe src={modalFile} style={{ width: '500px', height: '600px' }} title="PDF Viewer" />
+                  <iframe src={modalFile} style={{ width: '700px', height: '600px', marginTop: '20px', marginLeft:'110px'}} title="PDF Viewer" />
                 ) : (
                   <img src={modalFile} alt="Document" style={{ maxWidth: '100%', height: 'auto' }} />
                 )}
+                </div>
               </div>
             )}
             <button className="back-button" onClick={closeModal}>Close</button>

@@ -16,7 +16,7 @@ const { WorkPermit, BusinessPermit } = require('../../index/models');
   // Endpoint for fetching the count of renewal working permits 
     const renewalWorkingpermits = async (req, res) => {
     try {
-      const renewalPermitsCount = await WorkPermit.countDocuments({ classification: 'Renewal' });
+      const renewalPermitsCount = await WorkPermit.countDocuments({ classification: 'Renew' });
       const month = new Date().toLocaleString('default', { month: 'long' });
       res.json({ count: renewalPermitsCount });
     } catch (error) {
@@ -28,7 +28,7 @@ const { WorkPermit, BusinessPermit } = require('../../index/models');
   // Endpoint for fetching the count of new business permits
    const newBusinesspermits = async (req, res) => {
     try {
-      const newBusinessPermitsCount = await BusinessPermit.countDocuments({ classification: 'New' });
+      const newBusinessPermitsCount = await BusinessPermit.countDocuments({ classification: 'NewBusiness' });
       const month = new Date().toLocaleString('default', { month: 'long' });
       res.json({ count: newBusinessPermitsCount });
     } catch (error) {
@@ -40,7 +40,7 @@ const { WorkPermit, BusinessPermit } = require('../../index/models');
   // Endpoint for fetching the count of renewal business permits
     const renewalBusinesspermits = async (req, res) => {
     try {
-      const renewalBusinessPermitsCount = await BusinessPermit.countDocuments({ classification: 'Renewal' });
+      const renewalBusinessPermitsCount = await BusinessPermit.countDocuments({ classification: 'RenewBusiness' });
       const month = new Date().toLocaleString('default', { month: 'long' });
       res.json({ count: renewalBusinessPermitsCount });
     } catch (error) {
@@ -78,7 +78,7 @@ const { WorkPermit, BusinessPermit } = require('../../index/models');
    const workpermitdatastats = async (req, res) => {
     try {
       const totalPermitApplications = await WorkPermit.countDocuments();
-      const totalRenewalApplications = await WorkPermit.countDocuments({ classification: 'Renewal' });
+      const totalRenewalApplications = await WorkPermit.countDocuments({ classification: 'Renew' });
       const totalCollections = await WorkPermit.aggregate([
         { $group: { _id: null, total: { $sum: "$amountPaid" } } }
       ]);
@@ -100,14 +100,14 @@ const { WorkPermit, BusinessPermit } = require('../../index/models');
      const dashboardData = async (req, res) => {
     try {
       const totalWorkPermitApplications = await WorkPermit.countDocuments();
-      const totalWorkRenewalApplications = await WorkPermit.countDocuments({ classification: 'Renewal' });
+      const totalWorkRenewalApplications = await WorkPermit.countDocuments({ classification: 'Renew' });
       const totalWorkCollections = await WorkPermit.aggregate([
         { $group: { _id: null, total: { $sum: "$amountPaid" } } }
       ]);
       const totalWorkReleased = await WorkPermit.countDocuments({ workpermitstatus: 'Released' });
   
       const totalBusinessPermitApplications = await BusinessPermit.countDocuments();
-      const totalBusinessRenewalApplications = await BusinessPermit.countDocuments({ classification: 'Renewal' });
+      const totalBusinessRenewalApplications = await BusinessPermit.countDocuments({ classification: 'RenewBusiness' });
       const totalBusinessCollections = await BusinessPermit.aggregate([
         { $group: { _id: null, total: { $sum: "$amountPaid" } } }
       ]);

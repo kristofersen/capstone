@@ -1901,7 +1901,7 @@ const businessNatureMap = {
     ))}
   </tbody>
           </table>
-          <div className="pagination-buttons">
+          <div className="pagination">
             {currentPage > 0 && (
               <button onClick={handlePreviousPage}>Back</button>
             )}
@@ -2120,7 +2120,7 @@ const businessNatureMap = {
       </div>
 
       <div>
-        <button className="cancel-button" onClick={CloseOwnerModal}>Close</button>
+        <button className="btn btn-danger" onClick={CloseOwnerModal}>Close</button>
       </div>
     </div>
   </div>
@@ -2526,7 +2526,7 @@ const businessNatureMap = {
   </p>
 )}
         {/* Close Modal Button */}
-        <button className="close-modal" onClick={closeViewAttachmentsModal}>
+        <button className="btn btn-danger" onClick={closeViewAttachmentsModal}>
           Close
         </button>
       </div>
@@ -3051,7 +3051,7 @@ const businessNatureMap = {
   <div>
 
           {/* Close Modal Button */}
-          <button className="close-modal" onClick={closeViewBusinessDetails}>
+          <button className="btn btn-danger" onClick={closeViewBusinessDetails}>
           Close
         </button>
     </div>
@@ -3101,7 +3101,7 @@ const businessNatureMap = {
         <div>No businesses to display.</div>
       )}
 
-<button className="cancel-button" onClick={closeViewBusinessNature}>Close</button>
+<button className="btn btn-danger" onClick={closeViewBusinessNature}>Close</button>
     </div>
   </div>
 )}
@@ -3133,7 +3133,7 @@ const businessNatureMap = {
           )}
         </div>
       )}
-      <button className="back-button" onClick={closeModal}>Close</button>
+      <button className="btn btn-danger" onClick={closeModal}>Close</button>
     </div>
   </div>
 )}

@@ -20,6 +20,11 @@
   font-size: 16px;
 }
 
+.pagination {
+   margin-top: 10px;
+   gap: 5px;
+}
+
 
 .DAchart-container {
   display: flex;
@@ -122,6 +127,7 @@
   overflow-y: auto; /* Enable vertical scrolling for content if necessary */
 }
 
+
 /* BUTTON STYLES */
 .button-container {
   display: flex; /* Use flexbox to layout buttons */
@@ -132,13 +138,26 @@
 }
 
 .DAbusinesspermitbutton, .DAworkpermitbutton {
-  display: inline-block; /* Ensure buttons are inline */
+  display: grid; /* Ensure buttons are inline */
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  text-align: center; /* Center-align the button text */
   background-color: #ffffff; /* Button background color */
   color: rgb(0, 0, 0); /* black text color */
   padding: 3rem; /* Padding for the button */
   border-radius: 5px; /* Rounded corners */
   text-decoration: none; /* Remove underline */
   transition: background-color 0.3s; /* Smooth hover effect */
+  justify-items: center;
+  width: 400px; /* Set a fixed width for the buttons */
+  font-size: x-large;
+}
+
+.DAbusinesspermitbutton{
+  background-color: #a4c4f2; /* Example background color */
+}
+
+.DAworkpermitbutton {
+  background-color: #998fe3; /* Example background color */
 }
 
 .DAbusinesspermitbutton:hover, .DAworkpermitbutton:hover {
@@ -314,8 +333,29 @@
   font-weight: bold;
 }
 
-.modal-button,.editbutton {
+.modal-button {
   background-color: #0056b3;
+  color: #ffffff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin: 10px 5px;
+  transition: background-color 0.3s;
+}
+
+.editsave {
+  background-color: #00b10f;
+  color: #ffffff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin: 10px 5px;
+  transition: background-color 0.3s;
+}
+.editcancel {
+  background-color: #ee0000;
   color: #ffffff;
   border: none;
   padding: 10px 20px;
